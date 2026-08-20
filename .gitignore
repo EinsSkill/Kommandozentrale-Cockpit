@@ -1,0 +1,13 @@
+node_modules/
+.env
+.env.*
+!.env.example
+.DS_Store
+*.csv
+*.xlsx
+*.xls
+*.zip
+*.log
+script-properties.json
+secrets/
+local/
