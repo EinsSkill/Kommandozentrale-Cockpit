@@ -48,4 +48,10 @@ Die Repositorybasis ist bewusst klein gehalten. Neue Abstraktionen oder zusätzl
 
 ## Phase 4 – personalisierter Second-Brain-Kontext
 
-Die optionale `src/SecondBrain.gs`-Schicht scannt den konfigurierten inneren Second-Brain-Vault read-only. Der vollständige Markdown-Bestand bleibt außerhalb von GitHub; das Cockpit erhält nur kompakte, quellengestützte Kontextdaten und eine On-Demand-Suche. Die Einrichtung und Datenschutzgrenzen stehen in [docs/phase4-personal-context.md](docs/phase4-personal-context.md).
+`src/SecondBrain.gs` bleibt die read-only Grundlage für die geschützte Volltextsuche. Der vollständige Markdown-Bestand bleibt außerhalb von GitHub.
+
+## Phase 4B – Personal Operator Layer
+
+`src/PersonalOperator.gs` lädt beim Dashboard-Start nur fünf kanonische, nicht-sensitive Systemseiten. Zusammen mit aktuellen OPS-Daten erzeugt das Cockpit daraus eine handlungsorientierte Personal Lens: nächster sichtbarer Schritt, Begründung, bewusster Nicht-Fokus und passende Arbeitsregel. Die Volltextsuche bleibt ausdrücklich on-demand.
+
+Einrichtung, Datenschutzgrenzen und Live-Smoke-Test stehen in [docs/phase4b-personal-operator.md](docs/phase4b-personal-operator.md).
