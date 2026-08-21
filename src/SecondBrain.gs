@@ -19,6 +19,10 @@ const SBV4_MAX_SCAN_FILES = 400;
 const SBV4_MAX_MATCHES = 10;
 const SBV4_MAX_LINE_LENGTH = 360;
 
+function refreshPersonalContextV1() {
+  return getPersonalContextV1(true);
+}
+
 function getPersonalContextV1(force) {
   return cachedJson_(SBV4_CACHE_KEY, SBV4_CACHE_SECONDS, !!force, function () {
     const started = new Date().getTime();
