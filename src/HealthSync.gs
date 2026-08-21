@@ -612,7 +612,105 @@ function healthSyncWriteV1_(ss, days, activities, weights) {
   if (!workoutSheet) throw new Error('Tab WORKOUTS fehlt.');
   var health = healthSyncUpsertHealthV1_(healthSheet, days);
   var workouts = healthSyncUpsertWorkoutsV1_(workoutSheet, activities);
-  return {health:health, workouts:workouts};
+  var trends = healthSyncRebuildTrendsV1_(ss);
+  return {health:health, workouts:workouts, trends:trends};
+}
+
+
+function healthSyncTrendDirectionV1_(current, previous) {
+  if (current == null || previous == null || previous === 0) return 'NO_DATA';
+  var delta = current - previous;
+  if (Math.abs(delta) < Math.max(0.01, Math.abs(previous) * 0.03)) return 'STABLE';
+  return delta > 0 ? 'UP' : 'DOWN';
+}
+
+function healthSyncRebuildTrendsV1_(ss) {
+  var healthSheet = ss.getSheetByName('HEALTH_DAILY');
+  var trendSheet = ss.getSheetByName('HEALTH_TRENDS');
+  if (!healthSheet || !trendSheet) return {rows:0, status:'NOT_CONFIGURED'};
+  var health = table_(healthSheet);
+  var buckets = {};
+  health.rows.filter(function(row) { return row.health_id; }).forEach(function(row) {
+    var date = asDate_(row.date);
+    if (!date) return;
+    var monday = new Date(date.getTime());
+    monday.setHours(0, 0, 0, 0);
+    var weekday = monday.getDay() || 7;
+    monday.setDate(monday.getDate() - weekday + 1);
+    var start = dateText_(monday);
+    var bucket = buckets[start] || {
+      start:start,
+      end:'',
+      steps:0, stepDays:0,
+      sleep:0, sleepDays:0,
+      restingHr:0, restingHrDays:0,
+      hrv:0, hrvDays:0,
+      weight:0, weightDays:0,
+      workouts:0
+    };
+    var end = new Date(monday.getTime());
+    end.setDate(end.getDate() + 6);
+    bucket.end = dateText_(end);
+    if (row.steps !== '' && row.steps != null) {
+      bucket.steps += num_(row.steps);
+      bucket.stepDays++;
+    }
+    if (num_(row.sleep_duration_minutes) > 0) {
+      bucket.sleep += num_(row.sleep_duration_minutes);
+      bucket.sleepDays++;
+    }
+    if (num_(row.resting_hr) > 0) {
+      bucket.restingHr += num_(row.resting_hr);
+      bucket.restingHrDays++;
+    }
+    if (num_(row.hrv) > 0) {
+      bucket.hrv += num_(row.hrv);
+      bucket.hrvDays++;
+    }
+    if (num_(row.weight_kg) > 0) {
+      bucket.weight += num_(row.weight_kg);
+      bucket.weightDays++;
+    }
+    bucket.workouts += num_(row.workout_count);
+    buckets[start] = bucket;
+  });
+  var periods = Object.keys(buckets).sort().slice(-12);
+  var output = [];
+  var previous = null;
+  periods.forEach(function(key) {
+    var b = buckets[key];
+    var avgSteps = b.stepDays ? Math.round(b.steps / b.stepDays) : null;
+    var avgSleep = b.sleepDays ? Math.round(b.sleep / b.sleepDays * 10) / 10 : null;
+    var avgRestingHr = b.restingHrDays ? Math.round(b.restingHr / b.restingHrDays * 10) / 10 : null;
+    var avgHrv = b.hrvDays ? Math.round(b.hrv / b.hrvDays * 10) / 10 : null;
+    var avgWeight = b.weightDays ? Math.round(b.weight / b.weightDays * 100) / 100 : null;
+    output.push({
+      period_start:healthSyncMidnightDateV1_(b.start),
+      period_end:healthSyncMidnightDateV1_(b.end),
+      avg_steps:avgSteps == null ? '' : avgSteps,
+      avg_sleep:avgSleep == null ? '' : avgSleep,
+      avg_resting_hr:avgRestingHr == null ? '' : avgRestingHr,
+      avg_hrv:avgHrv == null ? '' : avgHrv,
+      avg_weight:avgWeight == null ? '' : avgWeight,
+      workout_frequency:b.workouts || '',
+      trend_sleep:healthSyncTrendDirectionV1_(avgSleep, previous && previous.avgSleep),
+      trend_activity:healthSyncTrendDirectionV1_(avgSteps, previous && previous.avgSteps),
+      trend_recovery:'NO_DATA',
+      trend_weight:healthSyncTrendDirectionV1_(avgWeight, previous && previous.avgWeight),
+      ai_summary:'Berechnet aus HEALTH_DAILY; fehlende Messfelder bleiben leer.'
+    });
+    previous = {avgSleep:avgSleep, avgSteps:avgSteps, avgWeight:avgWeight};
+  });
+  var headers = table_(trendSheet).headers;
+  if (trendSheet.getLastRow() > 1) {
+    trendSheet.getRange(2, 1, trendSheet.getLastRow() - 1, headers.length).clearContent();
+  }
+  output.forEach(function(record) {
+    trendSheet.appendRow(headers.map(function(header) {
+      return record[header] == null ? '' : record[header];
+    }));
+  });
+  return {rows:output.length, status:'OK'};
 }
 
 function healthSyncUpdateStateV1_(ss, summary, errorMessage) {
