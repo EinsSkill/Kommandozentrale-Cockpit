@@ -26,6 +26,7 @@ Der konfigurierte Ordner muss direkt `_System/SCHEMA.md`, `_System/index.md` und
 
 - Der komplette Markdown-Bestand wird indexiert, aber nicht als Volltext an den Browser übertragen.
 - Normale Treffer liefern nur kurze Ausschnitte und ihre Quelle.
+- Eine sensible Suche bleibt auch bei einem direkten Funktionsaufruf gesperrt, solange nicht zusätzlich `SECOND_BRAIN_ALLOW_SENSITIVE_SEARCH=TRUE` gesetzt wird; diese Property bleibt standardmäßig ungesetzt.
 - Seiten mit `sensitivity: sensitive` werden nie als Volltext übertragen. Nur ausdrücklich freigegebene, kompakte Profilfelder dürfen den persönlichen Kontext speisen; Suchtreffer bleiben standardmäßig gesperrt.
 - Der Code schreibt, verschiebt, benennt und löscht keine Second-Brain-Dateien.
 - OPS bleibt die operative Wahrheit für Aufgaben, Prioritäten, Deadlines und aktuellen Projektstatus.
