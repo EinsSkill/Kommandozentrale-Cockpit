@@ -8,6 +8,10 @@
  * Location values are configuration, not source code.
  */
 var WEATHER_V1_SOURCE = 'Open-Meteo';
+var WEATHER_V1_MIN_REQUEST_INTERVAL_SECONDS = 10 * 60;
+var WEATHER_V1_429_COOLDOWN_SECONDS = 30 * 60;
+var WEATHER_V1_LAST_REQUEST_PROPERTY = 'WEATHER_V1_LAST_REQUEST_AT';
+var WEATHER_V1_NEXT_ALLOWED_PROPERTY = 'WEATHER_V1_NEXT_ALLOWED_AT';
 
 function previewWeatherSyncV1() {
   var ss = SpreadsheetApp.openById(OPS_SPREADSHEET_ID);
@@ -16,7 +20,19 @@ function previewWeatherSyncV1() {
   if (cfg.latitude == null || cfg.longitude == null) {
     return {ok:false, status:'NOT_CONFIGURED', message:'Wetterkoordinaten in SYS_CONFIG fehlen.'};
   }
-  var payload = weatherFetchV1_(cfg);
+  var payload;
+  try {
+    payload = weatherFetchV1_(cfg);
+  } catch (error) {
+    var previewMessage = String(error && error.message ? error.message : error);
+    return {
+      ok:false,
+      status:error && error.code === 'WEATHER_THROTTLED' ? 'THROTTLED' : 'ERROR',
+      source:WEATHER_V1_SOURCE,
+      error:previewMessage,
+      retryAt:error && error.retryAt ? error.retryAt : ''
+    };
+  }
   return {
     ok:true,
     status:'PREVIEW',
@@ -62,6 +78,15 @@ function runWeatherSyncV1() {
       written:written
     };
   } catch (error) {
+    if (error && error.code === 'WEATHER_THROTTLED') {
+      return {
+        ok:true,
+        status:'THROTTLED',
+        source:WEATHER_V1_SOURCE,
+        retryAt:error.retryAt || '',
+        message:error.message || 'Wetter-Refresh pausiert.'
+      };
+    }
     var message = String(error && error.message ? error.message : error);
     if (ss) {
       try {
@@ -103,15 +128,11 @@ function setupWeatherSyncV1() {
     'precipitation_probability_percent','precipitation_mm','wind_kmh',
     'condition_code','condition_text','source','synced_at'
   ]);
-  var existing = ScriptApp.getProjectTriggers().some(function(trigger) {
-    return trigger.getHandlerFunction() === 'runWeatherSyncV1';
-  });
-  if (!existing) {
-    ScriptApp.newTrigger('runWeatherSyncV1').timeBased().everyMinutes(30).create();
-  }
+  weatherNormalizeTriggersV1_();
   var result = runWeatherSyncV1();
   result.triggerInstalled = true;
   result.intervalMinutes = 30;
+  result.triggerStatus = weatherTriggerStatusV1();
   return result;
 }
 
@@ -123,6 +144,43 @@ function setupLiveDataV1() {
 
 function runLiveDataSyncV1() {
   return {health:runHealthSyncV1(), weather:runWeatherSyncV1()};
+}
+
+function weatherTriggerStatusV1() {
+  var triggers = ScriptApp.getProjectTriggers();
+  return {
+    weather:triggers.filter(function(trigger) {
+      return trigger.getHandlerFunction() === 'runWeatherSyncV1';
+    }).length,
+    legacyLiveData:triggers.filter(function(trigger) {
+      return trigger.getHandlerFunction() === 'runLiveDataSyncV1';
+    }).length,
+    handlers:triggers.map(function(trigger) {
+      return trigger.getHandlerFunction();
+    })
+  };
+}
+
+function weatherNormalizeTriggersV1_() {
+  var triggers = ScriptApp.getProjectTriggers();
+  var weatherTriggerKept = false;
+  triggers.forEach(function(trigger) {
+    var handler = trigger.getHandlerFunction();
+    if (handler === 'runLiveDataSyncV1') {
+      ScriptApp.deleteTrigger(trigger);
+      return;
+    }
+    if (handler === 'runWeatherSyncV1') {
+      if (weatherTriggerKept) {
+        ScriptApp.deleteTrigger(trigger);
+      } else {
+        weatherTriggerKept = true;
+      }
+    }
+  });
+  if (!weatherTriggerKept) {
+    ScriptApp.newTrigger('runWeatherSyncV1').timeBased().everyMinutes(30).create();
+  }
 }
 
 function weatherConfigV1_(ss) {
@@ -140,6 +198,13 @@ function weatherConfigV1_(ss) {
 }
 
 function weatherFetchV1_(cfg) {
+  var guard = weatherRequestGuardV1_();
+  if (!guard.allowed) {
+    var throttled = new Error('Open-Meteo Refresh pausiert bis ' + guard.retryAt + '.');
+    throttled.code = 'WEATHER_THROTTLED';
+    throttled.retryAt = guard.retryAt;
+    throw throttled;
+  }
   var url = 'https://api.open-meteo.com/v1/forecast' +
     '?latitude=' + encodeURIComponent(cfg.latitude) +
     '&longitude=' + encodeURIComponent(cfg.longitude) +
@@ -153,10 +218,58 @@ function weatherFetchV1_(cfg) {
     headers:{Accept:'application/json'}
   });
   var status = response.getResponseCode();
+  if (status === 429) {
+    weatherSetCooldownV1_(weatherRetryAfterSecondsV1_(response));
+    var rateLimitError = new Error('Open-Meteo HTTP 429');
+    rateLimitError.code = 'OPEN_METEO_RATE_LIMIT';
+    throw rateLimitError;
+  }
   if (status < 200 || status >= 300) throw new Error('Open-Meteo HTTP ' + status);
   var payload = JSON.parse(response.getContentText());
   if (!payload || !payload.current || !payload.hourly) throw new Error('Open-Meteo Antwort unvollständig.');
+  weatherClearCooldownV1_();
   return payload;
+}
+
+function weatherRequestGuardV1_() {
+  var properties = PropertiesService.getScriptProperties();
+  var now = Date.now();
+  var lastRequestAt = Number(properties.getProperty(WEATHER_V1_LAST_REQUEST_PROPERTY) || 0);
+  var nextAllowedAt = Number(properties.getProperty(WEATHER_V1_NEXT_ALLOWED_PROPERTY) || 0);
+  var intervalAllowedAt = lastRequestAt ? lastRequestAt + WEATHER_V1_MIN_REQUEST_INTERVAL_SECONDS * 1000 : 0;
+  var allowedAt = Math.max(intervalAllowedAt, nextAllowedAt);
+  if (allowedAt > now) {
+    return {allowed:false, retryAt:new Date(allowedAt).toISOString()};
+  }
+  properties.setProperty(WEATHER_V1_LAST_REQUEST_PROPERTY, String(now));
+  return {allowed:true};
+}
+
+function weatherSetCooldownV1_(seconds) {
+  var properties = PropertiesService.getScriptProperties();
+  var now = Date.now();
+  var duration = Number(seconds);
+  if (!(duration > 0)) duration = WEATHER_V1_429_COOLDOWN_SECONDS;
+  duration = Math.max(5 * 60, Math.min(60 * 60, Math.ceil(duration)));
+  var existing = Number(properties.getProperty(WEATHER_V1_NEXT_ALLOWED_PROPERTY) || 0);
+  var retryAt = Math.max(existing, now + duration * 1000);
+  properties.setProperty(WEATHER_V1_NEXT_ALLOWED_PROPERTY, String(retryAt));
+  return new Date(retryAt).toISOString();
+}
+
+function weatherClearCooldownV1_() {
+  PropertiesService.getScriptProperties().deleteProperty(WEATHER_V1_NEXT_ALLOWED_PROPERTY);
+}
+
+function weatherRetryAfterSecondsV1_(response) {
+  var headers = {};
+  try {
+    headers = response.getHeaders ? response.getHeaders() || {} : {};
+  } catch (ignored) {}
+  var raw = headers['Retry-After'] || headers['retry-after'];
+  var seconds = Number(raw);
+  if (!(seconds > 0)) seconds = WEATHER_V1_429_COOLDOWN_SECONDS;
+  return Math.max(5 * 60, Math.min(60 * 60, Math.ceil(seconds)));
 }
 
 function weatherCurrentV1_(payload) {
@@ -258,12 +371,41 @@ function weatherUpdateStateV1_(ss, cfg, payload, errorMessage) {
 function getWeatherSnapshot_(rd) {
   var current = rd.rows('WEATHER_CURRENT').filter(function(row) { return row.weather_id; })[0] || null;
   var hourly = rd.rows('WEATHER_HOURLY').filter(function(row) { return row.forecast_time; }).slice(0, 24);
-  if (!current) return {available:false, status:'UNKNOWN', source:'', location:'', current:null, hours:[]};
+  var sync = rd.rows('SYNC_STATE').filter(function(row) {
+    return String(row.system_name || '') === 'Weather';
+  })[0] || null;
+  var storedStatus = String(current && current.sync_status || 'UNKNOWN').toUpperCase();
+  var syncStatus = String(sync && sync.status || storedStatus).toUpperCase();
+  var stale = syncStatus !== 'OK';
+  if (sync && sync.last_success_at) {
+    var lastSuccessMs = new Date(String(sync.last_success_at)).getTime();
+    if (isFinite(lastSuccessMs) && Date.now() - lastSuccessMs > 90 * 60 * 1000) stale = true;
+  } else if (sync) {
+    stale = true;
+  }
+  var lastError = String(sync && sync.last_error || current && current.last_error || '');
+  var lastSuccessAt = String(sync && sync.last_success_at || '');
+  if (!current) {
+    return {
+      available:false,
+      stale:stale,
+      status:syncStatus,
+      source:'',
+      location:'',
+      lastError:lastError,
+      lastSuccessAt:lastSuccessAt,
+      current:null,
+      hours:[]
+    };
+  }
   return {
-    available:String(current.sync_status || '') === 'OK',
-    status:current.sync_status || 'UNKNOWN',
+    available:storedStatus === 'OK',
+    stale:stale,
+    status:syncStatus,
     source:current.source || WEATHER_V1_SOURCE,
     location:current.location_label || '',
+    lastError:lastError,
+    lastSuccessAt:lastSuccessAt,
     current:{
       time:current.observed_at || '',
       temperatureC:healthSyncNumberV1_(current.temperature_c),
