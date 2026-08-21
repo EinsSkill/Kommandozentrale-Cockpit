@@ -319,7 +319,7 @@ function wellbeingChartSvg_(history,limit){
     }).filter(Boolean);
     return points.length>=2?'<polyline points="'+points.join(' ')+'" fill="none" stroke="'+metric.stroke+'" stroke-width="1.6" vector-effect="non-scaling-stroke" stroke-linejoin="round"/>':'';
   }).join('');
-  return '<svg class="lineSvg" viewBox="0 0 600 92" preserveAspectRatio="none"><line x1="0" y1="82" x2="600" y2="82" stroke="rgba(27,67,50,.1)" stroke-width="1"/>'+polylines+'</svg><div style="display:flex;justify-content:space-between;margin-top:8px;font:400 10px/1 'IBM Plex Sans',sans-serif;color:rgba(27,67,50,.4)"><span>'+esc(labels[0])+'</span><span>'+esc(labels[labels.length-1])+'</span></div><div class="wellbeingLegend"><span>Stimmung</span><span class="energy">Energie</span><span class="pressure">Innerer Druck</span></div>';
+  return '<svg class="lineSvg" viewBox="0 0 600 92" preserveAspectRatio="none"><line x1="0" y1="82" x2="600" y2="82" stroke="rgba(27,67,50,.1)" stroke-width="1"/>'+polylines+'</svg><div style="display:flex;justify-content:space-between;margin-top:8px;font:400 10px/1 \'IBM Plex Sans\',sans-serif;color:rgba(27,67,50,.4)"><span>'+esc(labels[0])+'</span><span>'+esc(labels[labels.length-1])+'</span></div><div class="wellbeingLegend"><span>Stimmung</span><span class="energy">Energie</span><span class="pressure">Innerer Druck</span></div>';
 }
 function personalList_(items,max){return (items||[]).slice(0,max||5).map(x=>'<li>'+esc(x)+'</li>').join('')||'<li>Keine Einträge aus dem Second Brain verfügbar.</li>'}
 function personalOperatorTopTask_(){
