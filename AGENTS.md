@@ -35,3 +35,7 @@ Dieses Repository enthält nur die Software des Cockpits. Es ist keine Kopie des
 - Frontend und Backend behalten das bestehende Datenformat, sofern eine Spezifikation nichts anderes verlangt.
 - Fehler und fehlende Quellen sollen sichtbar bleiben; keine stillen erfundenen Fallback-Daten.
 - Änderungen an externen Systemen gehören nicht in lokale Tests.
+
+## Phase-4-Sonderregel
+
+Bei Änderungen an `src/SecondBrain.gs` oder der persönlichen Kontextanzeige zuerst `docs/phase4-personal-context.md` lesen. Der Second Brain bleibt außerhalb des Repositories; echte persönliche Inhalte gehören weder in Fixtures noch in Logs.
