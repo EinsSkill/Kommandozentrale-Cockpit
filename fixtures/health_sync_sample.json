@@ -1,0 +1,6 @@
+{
+  "stepsCsv": "Datum,Zeit,Schritte\n2099.01.02 08:00:00,08:00:00,100\n2099.01.02 08:00:00,08:00:00,100\n2099.01.02 09:00:00,09:00:00,50",
+  "activityCsv": "Quell-App,Aktivitätstyp,Aktivitätsname,Datum,Zeit,Verstrichene Zeit,Aktive Zeit,Entfernung (km),Kalorien (kcal)\nfixture,WALKING,null,2099.01.02 10:00:00,10:00:00,120,120,0,10",
+  "tcx": "<TrainingCenterDatabase><Activities><Activity Sport=\"WALKING\"><Id>2099-01-02T09:00:00.000Z</Id><Lap><TotalTimeSeconds>120</TotalTimeSeconds><DistanceMeters>1000</DistanceMeters><Calories>50</Calories></Lap></Activity></Activities></TrainingCenterDatabase>",
+  "weightCsv": "Datum,Zeit,Gewicht,Körperfettanteil\n2099.01.02 12:00:00,12:00:00,\"63.0\",\"0.0\""
+}
