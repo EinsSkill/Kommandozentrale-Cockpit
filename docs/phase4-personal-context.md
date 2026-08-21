@@ -17,7 +17,7 @@ Der konfigurierte Ordner muss direkt `_System/SCHEMA.md`, `_System/index.md` und
 ## Erster Test
 
 1. `src/SecondBrain.gs` zusätzlich als Datei `SecondBrain.gs` in Apps Script kopieren.
-2. In Apps Script die Funktion `getPersonalContextV1` auswählen und mit `force = true` ausführen.
+2. In Apps Script die Funktion `refreshPersonalContextV1` auswählen und ausführen.
 3. Den Drive-Zugriff genehmigen, falls Google danach fragt.
 4. Im Ausführungsprotokoll prüfen, dass `status: READY` und eine plausible Dateizahl zurückkommen.
 5. Danach `getDashboardBaseV31` und `getMailV3` erneut ausführen.
