@@ -58,7 +58,7 @@ Einrichtung, Datenschutzgrenzen und Live-Smoke-Test stehen in [docs/phase4b-pers
 
 ## Phase 5 – Wohlbefinden
 
-Die unterste Karte **Dein Wohlbefinden** bietet einen freiwilligen Abendcheck mit sechs 1–10-Werten, einem Hauptgefühl, Einflussfaktor und optionalem Reflexionssatz. Der Verlauf bleibt im OPS-Tab \`WELLBEING_LOG\`; die Detailansicht zeigt 7- und 30-Tage-Verläufe. Bestätigte langfristige Muster werden nicht automatisch ins Second Brain geschrieben.
+Die unterste Karte **Dein Wohlbefinden** bietet einen freiwilligen Abendcheck mit sechs 1–10-Werten, einem Hauptgefühl, Einflussfaktor und optionalem Reflexionssatz. Der Verlauf bleibt im OPS-Tab `WELLBEING_LOG`; die Detailansicht zeigt 7- und 30-Tage-Verläufe. Bestätigte langfristige Muster werden nicht automatisch ins Second Brain geschrieben.
 
-Die Einrichtung und die persönliche Entscheidungslogik stehen in [docs/phase5-wellbeing.md](docs/phase5-wellbeing.md). Die Funktion \`ensureWellbeingLogV1\` legt den leeren OPS-Tab mit Kopfzeile an.
+Die Einrichtung und die persönliche Entscheidungslogik stehen in [docs/phase5-wellbeing.md](docs/phase5-wellbeing.md). Die Funktion `ensureWellbeingLogV1` legt den leeren OPS-Tab mit Kopfzeile an.
 
