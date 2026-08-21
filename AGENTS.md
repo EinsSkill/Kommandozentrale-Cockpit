@@ -38,4 +38,4 @@ Dieses Repository enthält nur die Software des Cockpits. Es ist keine Kopie des
 
 ## Phase-4-Sonderregel
 
-Bei Änderungen an `src/SecondBrain.gs` oder der persönlichen Kontextanzeige zuerst `docs/phase4-personal-context.md` lesen. Der Second Brain bleibt außerhalb des Repositories; echte persönliche Inhalte gehören weder in Fixtures noch in Logs.
+Bei Änderungen an `src/SecondBrain.gs`, `src/PersonalOperator.gs` oder der persönlichen Kontextanzeige zuerst `docs/phase4-personal-context.md` und `docs/phase4b-personal-operator.md` lesen. Der Second Brain bleibt außerhalb des Repositories; echte persönliche Inhalte gehören weder in Fixtures noch in Logs.
