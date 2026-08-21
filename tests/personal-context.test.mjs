@@ -21,6 +21,7 @@ test('personal context scans broadly but blocks sensitive search results by defa
   assert.match(secondBrain, /sensitivity === 'sensitive'/);
   assert.match(secondBrain, /blockedSensitive/);
   assert.match(secondBrain, /includeSensitive/);
+  assert.match(secondBrain, /SECOND_BRAIN_ALLOW_SENSITIVE_SEARCH/);
   assert.match(secondBrain, /gesamter Vault als Suchraum/);
 });
 
