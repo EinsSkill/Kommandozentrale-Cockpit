@@ -163,24 +163,13 @@ function weatherTriggerStatusV1() {
 
 function weatherNormalizeTriggersV1_() {
   var triggers = ScriptApp.getProjectTriggers();
-  var weatherTriggerKept = false;
   triggers.forEach(function(trigger) {
     var handler = trigger.getHandlerFunction();
-    if (handler === 'runLiveDataSyncV1') {
+    if (handler === 'runWeatherSyncV1' || handler === 'runLiveDataSyncV1') {
       ScriptApp.deleteTrigger(trigger);
-      return;
-    }
-    if (handler === 'runWeatherSyncV1') {
-      if (weatherTriggerKept) {
-        ScriptApp.deleteTrigger(trigger);
-      } else {
-        weatherTriggerKept = true;
-      }
     }
   });
-  if (!weatherTriggerKept) {
-    ScriptApp.newTrigger('runWeatherSyncV1').timeBased().everyMinutes(30).create();
-  }
+  ScriptApp.newTrigger('runWeatherSyncV1').timeBased().everyMinutes(30).create();
 }
 
 function weatherConfigV1_(ss) {
