@@ -14,6 +14,7 @@
  */
 const SBV4_CACHE_KEY = 'KZ_V4_SB_PERSONAL_CONTEXT';
 const SBV4_ROOT_PROPERTY = 'SECOND_BRAIN_ROOT_ID';
+const SBV4_ALLOW_SENSITIVE_PROPERTY = 'SECOND_BRAIN_ALLOW_SENSITIVE_SEARCH';
 const SBV4_CACHE_SECONDS = 300;
 const SBV4_MAX_SCAN_FILES = 400;
 const SBV4_MAX_MATCHES = 10;
@@ -109,7 +110,8 @@ function searchSecondBrainV1(query, includeSensitive) {
   try {
     const root = DriveApp.getFolderById(rootId);
     const scan = sbv4Scan_(root);
-    const allowSensitive = includeSensitive === true || String(includeSensitive || '').toUpperCase() === 'TRUE';
+    const sensitiveSearchEnabled = String(PropertiesService.getScriptProperties().getProperty(SBV4_ALLOW_SENSITIVE_PROPERTY) || '').toUpperCase() === 'TRUE';
+    const allowSensitive = sensitiveSearchEnabled && (includeSensitive === true || String(includeSensitive || '').toUpperCase() === 'TRUE');
     const terms = sbv4Normalize_(q).split(/\s+/).filter(function (term) {
       return term.length >= 2;
     });
