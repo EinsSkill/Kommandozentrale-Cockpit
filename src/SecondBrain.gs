@@ -354,7 +354,7 @@ function sbv4BuildContext_(root, scan) {
       retrieval: 'gesamter Vault als Suchraum, relevante Seiten bedarfsgerecht',
       writes: 'keine Schreib-, Lösch-, Verschiebe- oder Umbenennungsaktionen',
       sourceRequired: true,
-      sensitiveDefault: 'sensible Seiten werden indexiert, aber im normalen Kontext und in der Suche blockiert',
+      sensitiveDefault: 'sensible Seiten werden nie als Volltext übertragen; nur ausdrücklich freigegebene, kompakte Profilfelder werden genutzt, Suchtreffer bleiben standardmäßig blockiert',
       operationalTruth: 'OPS Sheet',
       projectTruth: 'Repository, Git, Tests und sichtbares Verhalten'
     }
