@@ -45,3 +45,7 @@ IDEe/Spezifikation → Claude-Code-Branch → Tests → unabhängiger Review
 ```
 
 Die Repositorybasis ist bewusst klein gehalten. Neue Abstraktionen oder zusätzliche Dienste werden erst aufgenommen, wenn sie ein konkretes Problem lösen.
+
+## Phase 4 – personalisierter Second-Brain-Kontext
+
+Die optionale `src/SecondBrain.gs`-Schicht scannt den konfigurierten inneren Second-Brain-Vault read-only. Der vollständige Markdown-Bestand bleibt außerhalb von GitHub; das Cockpit erhält nur kompakte, quellengestützte Kontextdaten und eine On-Demand-Suche. Die Einrichtung und Datenschutzgrenzen stehen in [docs/phase4-personal-context.md](docs/phase4-personal-context.md).
