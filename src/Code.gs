@@ -18,6 +18,33 @@ const CACHE_BASE_V31 = 'KZ_V31_BASE';
 const CACHE_FIN_V31 = 'KZ_V31_FIN';
 const CACHE_FIN_V33 = 'KZ_V33_FIN';
 const CACHE_HEALTH_V31 = 'KZ_V31_HEALTH';
+const CACHE_WELLBEING_V1 = 'KZ_V5_WELLBEING';
+const WELLBEING_SHEET = 'WELLBEING_LOG';
+const WELLBEING_HEADERS = [
+  'entry_id','entry_date','recorded_at',
+  'mood','energy','inner_pressure','sleep_quality','motivation','recovery',
+  'feeling','feeling_intensity','influence_factor','reflection','routine_status','source'
+];
+const WELLBEING_FEELINGS = [
+  'ruhig / ausgeglichen',
+  'zufrieden / verbunden',
+  'motiviert / zuversichtlich',
+  'angespannt / unter Druck',
+  'überfordert / voll im Kopf',
+  'frustriert / blockiert',
+  'traurig / niedergeschlagen',
+  'leer / abgestumpft',
+  'erschöpft / antriebslos'
+];
+const WELLBEING_INFLUENCES = [
+  'Arbeit / Schule',
+  'Beziehung / Soziales',
+  'Finanzen',
+  'Schlaf / Gesundheit',
+  'Projekt / Überforderung',
+  'Freizeit / Erholung',
+  'unklar'
+];
 
 function doGet() {
   return HtmlService.createHtmlOutputFromFile('Index')
@@ -245,6 +272,335 @@ function getHealthV31(force) {
   });
 }
 
+/**
+ * Phase 5 – read/write wellbeing log.
+ *
+ * WELLBEING_LOG is an explicit user-owned OPS log. The dashboard only reads
+ * the recent history and writes after a direct user save action.
+ * No Second-Brain writes happen here.
+ */
+function getWellbeingV1(force) {
+  return cachedJson_(CACHE_WELLBEING_V1, 60, !!force, function () {
+    const started = new Date().getTime();
+    try {
+      const ss = SpreadsheetApp.openById(OPS_SPREADSHEET_ID);
+      const sh = ss.getSheetByName(WELLBEING_SHEET);
+      if (!sh) {
+        return {
+          ok: true,
+          available: false,
+          configured: false,
+          status: 'NOT_CONFIGURED',
+          code: 'WELLBEING_LOG_MISSING',
+          message: 'Tab WELLBEING_LOG fehlt. Einmal ensureWellbeingLogV1() ausführen.',
+          history: [],
+          summary: wellbeingSummary_([]),
+          pattern: wellbeingPattern_([]),
+          morningGuidance: { active: false, message: '' },
+          options: { feelings: WELLBEING_FEELINGS, influences: WELLBEING_INFLUENCES },
+          timingMs: new Date().getTime() - started
+        };
+      }
+
+      const rows = table_(sh).rows
+        .map(wellbeingRow_)
+        .filter(function (row) { return !!row.id; })
+        .sort(function (a, b) { return dateSort_(b.date) - dateSort_(a.date); });
+
+      const history = rows.slice(0, 30);
+      const pattern = wellbeingPattern_(history);
+      return {
+        ok: true,
+        available: true,
+        configured: true,
+        status: 'READY',
+        generatedAt: new Date().toISOString(),
+        history: history,
+        summary: wellbeingSummary_(history),
+        pattern: pattern,
+        morningGuidance: wellbeingMorningGuidance_(pattern),
+        options: { feelings: WELLBEING_FEELINGS, influences: WELLBEING_INFLUENCES },
+        timingMs: new Date().getTime() - started
+      };
+    } catch (e) {
+      return {
+        ok: false,
+        available: false,
+        status: 'ERROR',
+        code: 'WELLBEING_READ_FAILED',
+        error: String(e && e.message ? e.message : e),
+        history: [],
+        summary: wellbeingSummary_([]),
+        pattern: wellbeingPattern_([]),
+        morningGuidance: { active: false, message: '' },
+        options: { feelings: WELLBEING_FEELINGS, influences: WELLBEING_INFLUENCES },
+        timingMs: new Date().getTime() - started
+      };
+    }
+  });
+}
+
+function ensureWellbeingLogV1() {
+  const ss = SpreadsheetApp.openById(OPS_SPREADSHEET_ID);
+  let sh = ss.getSheetByName(WELLBEING_SHEET);
+  const created = !sh;
+  if (!sh) sh = ss.insertSheet(WELLBEING_SHEET);
+  ensureWellbeingHeaders_(sh);
+  appendAudit_(ss, {
+    action_type: 'WELLBEING_LOG_SETUP',
+    target_system: 'OPS Sheet',
+    target_id: WELLBEING_SHEET,
+    trigger_type: 'USER_RUN_FUNCTION',
+    permission_class: 'USER_APPROVED',
+    status: 'SUCCESS',
+    previous_value: created ? 'missing' : 'existing',
+    new_value: 'headers_ready',
+    rollback_available: true,
+    note: 'WELLBEING_LOG durch den Nutzer eingerichtet; keine echten Werte wurden angelegt.'
+  });
+  return {
+    ok: true,
+    sheetName: WELLBEING_SHEET,
+    created: created,
+    headers: WELLBEING_HEADERS,
+    note: 'Keine echten Werte wurden angelegt.'
+  };
+}
+
+function saveWellbeingEntryV1(payload) {
+  const entry = normalizeWellbeingPayload_(payload);
+  if (!entry.hasData) throw new Error('Mindestens eine Wohlbefindensangabe ist erforderlich.');
+
+  const ss = SpreadsheetApp.openById(OPS_SPREADSHEET_ID);
+  const sh = ss.getSheetByName(WELLBEING_SHEET);
+  if (!sh) throw new Error('Tab WELLBEING_LOG fehlt. Einmal ensureWellbeingLogV1() ausführen.');
+
+  ensureWellbeingHeaders_(sh);
+  const table = table_(sh);
+  const existing = table.rows.find(function (row) {
+    return dateText_(row.entry_date) === entry.entryDate;
+  });
+
+  const record = {
+    entry_id: existing ? String(existing.entry_id || entry.entryId) : entry.entryId,
+    entry_date: entry.entryDate,
+    recorded_at: entry.recordedAt,
+    mood: entry.mood,
+    energy: entry.energy,
+    inner_pressure: entry.innerPressure,
+    sleep_quality: entry.sleepQuality,
+    motivation: entry.motivation,
+    recovery: entry.recovery,
+    feeling: entry.feeling,
+    feeling_intensity: entry.feelingIntensity,
+    influence_factor: entry.influenceFactor,
+    reflection: entry.reflection,
+    routine_status: entry.routineStatus,
+    source: 'DASHBOARD_USER_ACTION'
+  };
+
+  let action = 'CREATE';
+  if (existing) {
+    action = 'UPDATE';
+    WELLBEING_HEADERS.forEach(function (header) {
+      setByHeader_(sh, table, existing.__row, header, record[header] != null ? record[header] : '');
+    });
+  } else {
+    sh.appendRow(table.headers.map(function (header) {
+      return record[header] != null ? record[header] : '';
+    }));
+  }
+
+  appendAudit_(ss, {
+    action_type: 'WELLBEING_ENTRY_' + action,
+    target_system: 'OPS Sheet',
+    target_id: record.entry_id,
+    trigger_type: 'DASHBOARD_USER_ACTION',
+    permission_class: 'USER_APPROVED',
+    status: 'SUCCESS',
+    previous_value: existing ? 'same-day entry' : '',
+    new_value: entry.routineStatus,
+    rollback_available: true,
+    note: 'Wohlbefindenscheck direkt durch den Nutzer gespeichert; keine Second-Brain-Änderung.'
+  });
+
+  invalidateWellbeing_();
+  return {
+    ok: true,
+    action: action,
+    entryId: record.entry_id,
+    entryDate: record.entry_date,
+    data: getWellbeingV1(true)
+  };
+}
+
+function ensureWellbeingHeaders_(sh) {
+  const lastColumn = sh.getLastColumn();
+  if (lastColumn < 1 || sh.getLastRow() < 1) {
+    sh.getRange(1, 1, 1, WELLBEING_HEADERS.length).setValues([WELLBEING_HEADERS]);
+  } else {
+    const current = sh.getRange(1, 1, 1, lastColumn).getValues()[0]
+      .map(function (value) { return String(value || '').trim(); });
+    const missing = WELLBEING_HEADERS.filter(function (header) {
+      return current.indexOf(header) < 0;
+    });
+    if (missing.length) {
+      sh.getRange(1, lastColumn + 1, 1, missing.length).setValues([missing]);
+    }
+  }
+  sh.setFrozenRows(1);
+}
+
+function normalizeWellbeingPayload_(payload) {
+  const p = payload || {};
+  const entryDate = String(p.entryDate || Utilities.formatDate(new Date(), TZ, 'yyyy-MM-dd')).trim();
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(entryDate)) throw new Error('entryDate muss YYYY-MM-DD sein.');
+
+  const entry = {
+    entryId: 'WB_' + Utilities.formatDate(new Date(), TZ, 'yyyyMMdd_HHmmss_SSS'),
+    entryDate: entryDate,
+    recordedAt: isoLocal_(new Date()),
+    mood: wellbeingMetric_(p.mood, 'Stimmung'),
+    energy: wellbeingMetric_(p.energy, 'Energie'),
+    innerPressure: wellbeingMetric_(p.innerPressure, 'Innerer Druck'),
+    sleepQuality: wellbeingMetric_(p.sleepQuality, 'Schlafqualität'),
+    motivation: wellbeingMetric_(p.motivation, 'Motivation'),
+    recovery: wellbeingMetric_(p.recovery, 'Erholung'),
+    feeling: wellbeingEnum_(p.feeling, WELLBEING_FEELINGS),
+    feelingIntensity: wellbeingIntensity_(p.feelingIntensity),
+    influenceFactor: wellbeingEnum_(p.influenceFactor, WELLBEING_INFLUENCES),
+    reflection: wellbeingText_(p.reflection, 500)
+  };
+
+  if (!entry.feeling) entry.feelingIntensity = '';
+  entry.routineStatus = Object.keys({
+    mood: entry.mood,
+    energy: entry.energy,
+    innerPressure: entry.innerPressure,
+    sleepQuality: entry.sleepQuality,
+    motivation: entry.motivation,
+    recovery: entry.recovery,
+    feeling: entry.feeling,
+    influenceFactor: entry.influenceFactor,
+    reflection: entry.reflection
+  }).some(function (key) {
+    return entry[key] !== '' && entry[key] != null;
+  }) ? 'PARTIAL_OR_COMPLETE' : 'EMPTY';
+
+  entry.hasData = entry.routineStatus !== 'EMPTY';
+  return entry;
+}
+
+function wellbeingMetric_(value, label) {
+  if (value == null || value === '' || Number(value) === 0) return '';
+  const n = Number(value);
+  if (!Number.isInteger(n) || n < 1 || n > 10) throw new Error(label + ' muss zwischen 1 und 10 liegen.');
+  return n;
+}
+
+function wellbeingIntensity_(value) {
+  if (value == null || value === '' || Number(value) === 0) return '';
+  const n = Number(value);
+  if (!Number.isInteger(n) || n < 1 || n > 5) throw new Error('Die Gefühlsintensität muss zwischen 1 und 5 liegen.');
+  return n;
+}
+
+function wellbeingEnum_(value, allowed) {
+  if (value == null || value === '') return '';
+  const text = String(value).trim();
+  return allowed.indexOf(text) >= 0 ? text : '';
+}
+
+function wellbeingText_(value, max) {
+  return String(value == null ? '' : value).replace(/\s+/g, ' ').trim().slice(0, max || 500);
+}
+
+function wellbeingRow_(row) {
+  return {
+    id: String(row.entry_id || ''),
+    date: dateText_(row.entry_date || row.recorded_at),
+    recordedAt: String(row.recorded_at || ''),
+    mood: numOrNull_(row.mood),
+    energy: numOrNull_(row.energy),
+    innerPressure: numOrNull_(row.inner_pressure),
+    sleepQuality: numOrNull_(row.sleep_quality),
+    motivation: numOrNull_(row.motivation),
+    recovery: numOrNull_(row.recovery),
+    feeling: String(row.feeling || ''),
+    feelingIntensity: numOrNull_(row.feeling_intensity),
+    influenceFactor: String(row.influence_factor || ''),
+    reflection: String(row.reflection || ''),
+    routineStatus: String(row.routine_status || '')
+  };
+}
+
+function wellbeingAverage_(rows, key) {
+  const values = rows.map(function (row) { return Number(row[key]); })
+    .filter(function (value) { return Number.isFinite(value); });
+  if (!values.length) return null;
+  return round2_(values.reduce(function (sum, value) { return sum + value; }, 0) / values.length);
+}
+
+function wellbeingSummary_(history) {
+  const rows = (history || []).slice(0, 7).reverse();
+  return {
+    count: (history || []).length,
+    last7Count: rows.length,
+    averages: {
+      mood: wellbeingAverage_(rows, 'mood'),
+      energy: wellbeingAverage_(rows, 'energy'),
+      innerPressure: wellbeingAverage_(rows, 'innerPressure'),
+      sleepQuality: wellbeingAverage_(rows, 'sleepQuality'),
+      motivation: wellbeingAverage_(rows, 'motivation'),
+      recovery: wellbeingAverage_(rows, 'recovery')
+    },
+    latest: history && history.length ? history[0] : null,
+    last7: rows.map(function (row) {
+      return {
+        date: row.date,
+        mood: row.mood,
+        energy: row.energy,
+        innerPressure: row.innerPressure
+      };
+    })
+  };
+}
+
+function wellbeingPattern_(history) {
+  const recent = (history || []).slice(0, 3);
+  if (recent.length < 3) {
+    return { candidate: false, status: 'INSUFFICIENT_DATA', days: recent.length, reason: '' };
+  }
+
+  const lowMood = recent.every(function (row) { return row.mood != null && row.mood <= 4; });
+  const lowEnergy = recent.every(function (row) { return row.energy != null && row.energy <= 4; });
+  const highPressure = recent.every(function (row) { return row.innerPressure != null && row.innerPressure >= 7; });
+  const candidate = highPressure && (lowMood || lowEnergy);
+  const reasons = [];
+  if (candidate) {
+    if (lowMood) reasons.push('niedrige Stimmung');
+    if (lowEnergy) reasons.push('wenig Energie');
+    reasons.push('hoher innerer Druck');
+  }
+
+  return {
+    candidate: candidate,
+    status: candidate ? 'PROPOSAL' : 'NO_CLEAR_PATTERN',
+    days: recent.length,
+    reason: reasons.join(', '),
+    requiresConfirmation: candidate
+  };
+}
+
+function wellbeingMorningGuidance_(pattern) {
+  if (!pattern || !pattern.candidate) return { active: false, message: '' };
+  return {
+    active: true,
+    message: 'Die letzten drei Einträge zeigen ' + pattern.reason + '. Soll der heutige Tag bewusst leichter geplant werden?',
+    mode: 'gentle_check_in'
+  };
+}
+
 function safeAssign_(out, key, fn, fallback) {
   try { out[key] = fn(); }
   catch (e) {
@@ -294,6 +650,7 @@ function getDashboardData() {
   const core = getDashboardCoreV3(false);
   core.calendar = getCalendarWeekV3(false);
   core.mail = getMailV3(false);
+  core.wellbeing = getWellbeingV1(false);
   return core;
 }
 
@@ -522,6 +879,10 @@ function setByHeader_(sh,table,rowIndex,header,value){if(table.index[header]==nu
 function appendAudit_(ss,data){const sh=ss.getSheetByName('AUDIT_LOG');if(!sh)return;const t=table_(sh),headers=t.headers,stamp=isoLocal_(new Date()),id='AUDIT_'+Utilities.formatDate(new Date(),TZ,'yyyyMMdd_HHmmss_SSS'),record=Object.assign({audit_id:id,timestamp:stamp,actor:'USER',error_message:'',rollback_reference:''},data);sh.appendRow(headers.map(h=>record[h]!=null?record[h]:''));}
 
 function cachedJson_(key,seconds,force,producer){const c=CacheService.getScriptCache();if(!force){const raw=c.get(key);if(raw){try{return JSON.parse(raw);}catch(e){}}}const value=producer();try{const raw=JSON.stringify(value);if(raw.length<95000)c.put(key,raw,seconds);}catch(e){}return value;}
+function invalidateWellbeing_(){
+  CacheService.getScriptCache().remove(CACHE_WELLBEING_V1);
+}
+
 function invalidateCore_(){
   const c=CacheService.getScriptCache();
   c.remove(CACHE_CORE);
@@ -529,6 +890,7 @@ function invalidateCore_(){
   c.remove(CACHE_FIN_V31);
   c.remove(CACHE_FIN_V33);
   c.remove(CACHE_HEALTH_V31);
+  c.remove(CACHE_WELLBEING_V1);
 }
 
 function confidence_(v){const n=num_(v);return n>1?n/100:n;}

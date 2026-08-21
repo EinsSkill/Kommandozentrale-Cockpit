@@ -55,3 +55,10 @@ Die Repositorybasis ist bewusst klein gehalten. Neue Abstraktionen oder zusätzl
 `src/PersonalOperator.gs` lädt beim Dashboard-Start nur fünf kanonische, nicht-sensitive Systemseiten. Zusammen mit aktuellen OPS-Daten erzeugt das Cockpit daraus eine handlungsorientierte Personal Lens: nächster sichtbarer Schritt, Begründung, bewusster Nicht-Fokus und passende Arbeitsregel. Die Volltextsuche bleibt ausdrücklich on-demand.
 
 Einrichtung, Datenschutzgrenzen und Live-Smoke-Test stehen in [docs/phase4b-personal-operator.md](docs/phase4b-personal-operator.md).
+
+## Phase 5 – Wohlbefinden
+
+Die unterste Karte **Dein Wohlbefinden** bietet einen freiwilligen Abendcheck mit sechs 1–10-Werten, einem Hauptgefühl, Einflussfaktor und optionalem Reflexionssatz. Der Verlauf bleibt im OPS-Tab `WELLBEING_LOG`; die Detailansicht zeigt 7- und 30-Tage-Verläufe. Bestätigte langfristige Muster werden nicht automatisch ins Second Brain geschrieben.
+
+Die Einrichtung und die persönliche Entscheidungslogik stehen in [docs/phase5-wellbeing.md](docs/phase5-wellbeing.md). Die Funktion `ensureWellbeingLogV1` legt den leeren OPS-Tab mit Kopfzeile an.
+

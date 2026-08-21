@@ -64,6 +64,33 @@ footer{display:flex;align-items:center;justify-content:space-between;gap:20px;bo
 .sbResultTitle{font:450 13px/1.35 'IBM Plex Sans',sans-serif}
 .sbResultPath{font:400 10px/1.4 'IBM Plex Sans',sans-serif;color:var(--gold);margin-top:3px}
 .sbResultExcerpt{font:400 11px/1.55 'IBM Plex Sans',sans-serif;color:rgba(27,67,50,.58);margin-top:5px}
+.wellbeingCard{background:#FDFBF4;border-color:rgba(201,162,39,.30);border-top:2px solid var(--gold)}
+.wellbeingTop{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;padding-bottom:17px;margin-bottom:16px;border-bottom:1px solid rgba(201,162,39,.22)}
+.wellbeingMetrics{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px}
+.wellbeingMetric{padding:12px 13px;border:1px solid var(--line);background:rgba(255,255,255,.58)}
+.wellbeingMetric .metricLabel{font:450 9px/1.25 'IBM Plex Sans',sans-serif;letter-spacing:.08em;text-transform:uppercase;color:rgba(27,67,50,.45)}
+.wellbeingMetric .metricValue{font-family:'Source Serif 4',Georgia,serif;font-size:23px;line-height:1;margin-top:8px;color:var(--ink)}
+.wellbeingMetric .metricScale{font:400 9px/1.25 'IBM Plex Sans',sans-serif;color:rgba(27,67,50,.4);margin-top:4px}
+.wellbeingGrid{display:grid;grid-template-columns:1.2fr .8fr;gap:22px;align-items:start}
+.wellbeingChart{min-height:116px}
+.wellbeingLegend{display:flex;gap:16px;flex-wrap:wrap;margin-top:8px;font:400 9.5px/1 'IBM Plex Sans',sans-serif;color:rgba(27,67,50,.45)}
+.wellbeingLegend span:before{content:"";display:inline-block;width:16px;height:2px;margin:0 6px 3px 0;background:var(--ink)}
+.wellbeingLegend .energy:before{background:var(--green)}
+.wellbeingLegend .pressure:before{background:var(--gold)}
+.wellbeingHint{padding:13px 15px;background:#FBF7E9;border-left:2px solid var(--gold);font:400 11.5px/1.55 'IBM Plex Sans',sans-serif;color:rgba(27,67,50,.72)}
+.wellbeingActions{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:15px}
+.wellbeingForm{display:flex;flex-direction:column;gap:16px}
+.wellbeingFormGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.wellbeingField{padding:13px;border:1px solid var(--line);background:rgba(255,255,255,.62)}
+.wellbeingField label{display:flex;align-items:baseline;justify-content:space-between;gap:10px;font:450 10px/1.25 'IBM Plex Sans',sans-serif;letter-spacing:.08em;text-transform:uppercase;color:rgba(27,67,50,.52)}
+.wellbeingField output{font-family:'Source Serif 4',Georgia,serif;font-size:20px;color:var(--ink);letter-spacing:0;text-transform:none}
+.wellbeingField input[type=range]{width:100%;accent-color:var(--gold);margin:13px 0 5px}
+.wellbeingScale{display:flex;justify-content:space-between;font:400 9px/1.25 'IBM Plex Sans',sans-serif;color:rgba(27,67,50,.38)}
+.wellbeingField select,.wellbeingField textarea{width:100%;box-sizing:border-box;border:1px solid var(--line);background:#fff;color:var(--ink);padding:9px 10px;font:400 12px/1.35 'IBM Plex Sans',sans-serif;margin-top:9px}
+.wellbeingField textarea{min-height:76px;resize:vertical}
+.wellbeingFormNote{font:400 10.5px/1.5 'IBM Plex Sans',sans-serif;color:rgba(27,67,50,.48)}
+@media(max-width:1050px){.wellbeingMetrics{grid-template-columns:repeat(3,minmax(0,1fr))}.wellbeingGrid{grid-template-columns:1fr}}
+@media(max-width:620px){.wellbeingMetrics,.wellbeingFormGrid{grid-template-columns:1fr 1fr}.wellbeingActions{align-items:flex-start;flex-direction:column}}
 @media(max-width:1050px){.personalGrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:620px){.personalGrid{grid-template-columns:1fr}}
 
@@ -107,7 +134,7 @@ footer{display:flex;align-items:center;justify-content:space-between;gap:20px;bo
 
 <section id="card-koerper" class="card healthFull" data-module="Körper & Gesundheit" onclick="openDetail('koerper',this)"><div class="head"><h2>Körper & Gesundheit</h2><span id="healthMeta" class="sub">OPS lädt …</span></div><div id="health"><div class="skeleton skeletonBlock"></div></div></section>
 
-
+  <section id="card-wohlbefinden" class="card wellbeingCard span12" data-module="Wohlbefinden" onclick="openDetail('wohlbefinden',this)"><div class="head"><h2>Dein Wohlbefinden</h2><span id="wellbeingMeta" class="sub">OPS lädt …</span></div><div id="wellbeing"><div class="skeleton skeletonBlock"></div></div></section>
 
   <section id="card-persoenlich" class="card personalCard span12" data-module="Persönlicher Operator" onclick="openDetail('persoenlich',this)"><div class="head"><h2>Dein persönlicher Operator</h2><span id="personalMeta" class="sub">Personal Lens lädt …</span></div><div id="personalContext"><div class="skeleton skeletonBlock"></div></div></section>
 
@@ -125,9 +152,9 @@ const detailDefs={
   kalender:{eyebrow:'Kalender',title:'Woche & Termine'},briefing:{eyebrow:'Briefing',title:'Dein Tag'},persoenlich:{eyebrow:'Operator',title:'Was jetzt zählt'},aufgaben:{eyebrow:'Aufgaben',title:'Was offen ist'},
   finanzen:{eyebrow:'Finanzen',title:'Monat & Verlauf'},meldungen:{eyebrow:'Meldungen',title:'Was gerade relevant ist'},projekte:{eyebrow:'Projekte',title:'Aktive Baustellen'},
   mails:{eyebrow:'Postfach',title:'Wichtige E-Mails'},inbox:{eyebrow:'KI-Inbox',title:'Vorschläge & Entscheidungen'},koerper:{eyebrow:'Körper',title:'Gesundheit & Aktivität'},
-  system:{eyebrow:'System',title:'Verbindungen & Datenfrische'},ziele:{eyebrow:'Ziele',title:'Ziele & Fortschritt'}
+  wellbeing:{eyebrow:'Wohlbefinden',title:'Stimmung & Energie'},system:{eyebrow:'System',title:'Verbindungen & Datenfrische'},ziele:{eyebrow:'Ziele',title:'Ziele & Fortschritt'}
 };
-const detailOrder=['kalender','briefing','persoenlich','aufgaben','finanzen','meldungen','projekte','mails','inbox','koerper','system','ziele'];
+const detailOrder=['kalender','briefing','aufgaben','finanzen','meldungen','projekte','mails','inbox','koerper','wohlbefinden','persoenlich','system','ziele'];
 function esc(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
 function callServer(name,...args){return new Promise((resolve,reject)=>{google.script.run.withSuccessHandler(resolve).withFailureHandler(e=>reject(new Error(e&&e.message?e.message:String(e))))[name](...args)})}
 function isoWeek(d){const x=new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()));x.setUTCDate(x.getUTCDate()+4-(x.getUTCDay()||7));const y=new Date(Date.UTC(x.getUTCFullYear(),0,1));return Math.ceil((((x-y)/86400000)+1)/7)}
@@ -135,10 +162,10 @@ function updateClock(){const n=new Date();document.getElementById('weekday').tex
 setInterval(updateClock,1000);updateClock();
 function showToast(text,undo){clearTimeout(toastTimer);toastUndoFn=undo||null;document.getElementById('toastText').textContent=text;const b=document.getElementById('toastUndo');b.style.display=undo?'inline-block':'none';b.onclick=()=>{if(toastUndoFn){const f=toastUndoFn;toastUndoFn=null;f()}hideToast()};document.getElementById('toast').classList.add('show');toastTimer=setTimeout(hideToast,5400)}
 function hideToast(){document.getElementById('toast').classList.remove('show')}
-const LOAD_STATE={base:'idle',personal:'idle',finance:'idle',health:'idle',calendar:'idle',mail:'idle'};
+const LOAD_STATE={base:'idle',personal:'idle',finance:'idle',health:'idle',wellbeing:'idle',calendar:'idle',mail:'idle'};
 function setLoadState(part,state,ms){
   LOAD_STATE[part]=state+(ms!=null?' '+Math.round(ms)+'ms':'');
-  const names={base:'OPS',personal:'SB',finance:'Fin',health:'Health',calendar:'Cal',mail:'Mail'};
+  const names={base:'OPS',personal:'SB',finance:'Fin',health:'Health',wellbeing:'Wohlbefinden',calendar:'Cal',mail:'Mail'};
   const parts=Object.keys(names).map(k=>`${names[k]} ${LOAD_STATE[k]}`);
   document.getElementById('footerSync').innerHTML=`<span class="liveDot"></span>${parts.join(' · ')}`;
 }
@@ -162,6 +189,10 @@ function moduleError(part,message){
   if(part==='health'){
     document.getElementById('health').innerHTML=`<div class="empty">Health-Daten konnten nicht geladen werden.<br><small>${msg}</small></div>`;
     document.getElementById('healthMeta').textContent='Ladefehler';
+  }
+  if(part==='wellbeing'){
+    document.getElementById('wellbeing').innerHTML=`<div class="empty">Wohlbefinden konnte nicht geladen werden.<br><small>${msg}</small></div>`;
+    document.getElementById('wellbeingMeta').textContent='Ladefehler';
   }
 }
 async function loadDashboard(force=false){
@@ -202,6 +233,10 @@ async function loadDashboard(force=false){
       DATA=Object.assign({},DATA||{},{health:value.health});
       renderHealth();saveSnapshot();return value.timingMs;
     }],
+    ['wellbeing',callServer('getWellbeingV1',force),value=>{
+      DATA=Object.assign({},DATA||{},{wellbeing:value});
+      renderWellbeing();renderPersonal();saveSnapshot();return value&&value.timingMs;
+    }],
     ['calendar',callServer('getCalendarWeekV3',force),value=>{
       DATA=Object.assign({},DATA||{},{calendar:value});renderCalendar();saveSnapshot();return null;
     }],
@@ -233,7 +268,7 @@ async function loadDashboard(force=false){
   if(activeDetail)renderDetail(activeDetail);
 }
 function saveSnapshot(){try{if(DATA)localStorage.setItem(SNAPSHOT_KEY,JSON.stringify(DATA))}catch(e){}}
-function renderBase(){if(!DATA)return;renderVisibility();renderBriefing();renderPersonal();renderTasks();renderAlerts();renderProjects();renderInbox();renderSync();renderGoals()}
+function renderBase(){if(!DATA)return;renderVisibility();renderBriefing();renderPersonal();renderTasks();renderAlerts();renderProjects();renderInbox();renderSync();renderGoals();renderWellbeing()}
 function renderCore(){if(!DATA)return;renderBase();if(DATA.finance)renderFinance();if(DATA.health)renderHealth()}
 function renderAll(){if(!DATA)return;renderCore();if(DATA.calendar)renderCalendar();if(DATA.mail)renderMail()}
 function renderVisibility(){const map=new Map((DATA.dashboardState||[]).map(x=>[x.module_name,String(x.enabled).toUpperCase()!=='FALSE']));document.querySelectorAll('[data-module]').forEach(el=>{if(map.has(el.dataset.module))el.style.display=map.get(el.dataset.module)?'block':'none'})}
@@ -252,6 +287,40 @@ function renderHealth(){const el=document.getElementById('health');if(!el)return
 function renderSync(){const el=document.getElementById('sync');if(!el)return;const rows=DATA?.syncState||[];el.innerHTML=rows.slice(0,8).map(s=>`<div class="status"><span class="statusDot ${s.status==='OK'?'ok':s.status==='DEGRADED'?'warn':'err'}"></span><div class="grow"><div class="rowTitle">${esc(s.system_name)}</div><div class="rowMeta">${esc(s.connection_state||'')} · ${esc(s.data_freshness||'')}</div></div><span class="pill">${esc(s.status||'UNKNOWN')}</span></div>`).join('')}
 function renderGoals(){const el=document.getElementById('goals');if(!el)return;const rows=DATA?.goals||[];el.innerHTML=rows.length?rows.slice(0,5).map(g=>`<div class="row"><div class="grow"><div class="rowTitle">${esc(g.title)}</div><div class="rowMeta">${esc(g.area||'')} ${g.targetDate?'· Ziel '+esc(g.targetDate):''}</div></div><span class="pill">${esc(g.status||'')}</span></div>`).join(''):'<div class="empty">Noch keine Ziele im OPS hinterlegt.</div>'}
 
+function renderWellbeing(){
+  const el=document.getElementById('wellbeing');if(!el)return;
+  const w=DATA&&DATA.wellbeing;
+  if(!w){return}
+  if(w.available===false){
+    document.getElementById('wellbeingMeta').textContent='Einrichtung offen';
+    el.innerHTML='<div class="empty">Der OPS-Tab WELLBEING_LOG ist noch nicht eingerichtet.<br><small>Einmal <b>ensureWellbeingLogV1()</b> in Apps Script ausführen.</small></div>';
+    return;
+  }
+  const s=w.summary||{},a=s.averages||{},latest=s.latest||{},g=w.morningGuidance||{};
+  document.getElementById('wellbeingMeta').textContent=(s.count||0)+' Einträge · 7-Tage-Verlauf';
+  const metrics=[['Stimmung',a.mood],['Energie',a.energy],['Druck',a.innerPressure],['Schlaf',a.sleepQuality],['Motivation',a.motivation],['Erholung',a.recovery]];
+  const metricHtml=metrics.map(function(x){return '<div class="wellbeingMetric"><div class="metricLabel">'+esc(x[0])+'</div><div class="metricValue">'+(x[1]!=null?esc(Number(x[1]).toLocaleString('de-DE')):'–')+'</div><div class="metricScale">Ø letzte 7 Tage</div></div>'}).join('');
+  const state=latest.feeling?'<span class="pill '+(/ruhig|zufrieden|motiviert/i.test(latest.feeling)?'green':'gold')+'">'+esc(latest.feeling)+(latest.feelingIntensity?' · '+esc(latest.feelingIntensity)+'/5':'')+'</span>':'<span class="pill">Noch kein Hauptgefühl</span>';
+  const hint=g.active?'<div class="wellbeingHint"><b>Für heute:</b> '+esc(g.message)+'</div>':'<div class="sourceNote">Die Werte zeigen deinen persönlichen Verlauf; einzelne Tage werden nicht überinterpretiert.</div>';
+  el.innerHTML='<div class="wellbeingTop"><div><div class="label">Letzter Abendcheck</div><div class="bigText">'+(latest.date?esc(latest.date):'Noch kein Eintrag')+'</div></div>'+state+'</div><div class="wellbeingMetrics">'+metricHtml+'</div><div class="wellbeingGrid" style="margin-top:18px"><div class="wellbeingChart">'+wellbeingChartSvg_(w.history||[],7)+'</div><div>'+hint+'<div class="wellbeingActions"><span class="rowMeta">'+(latest.influenceFactor?'Einfluss: '+esc(latest.influenceFactor):'Ein Einflussfaktor kann im Check markiert werden.')+'</span><button class="btn primary" onclick="event.stopPropagation();openWellbeingCheck()">Abendcheck starten</button></div></div></div>';
+}
+function wellbeingChartSvg_(history,limit){
+  const rows=(history||[]).slice(0,limit).reverse();
+  if(rows.length<2)return '<div class="empty">Noch nicht genug Verlaufsdaten für eine Kurve.</div>';
+  const labels=rows.map(function(row){return row.date?row.date.slice(5):'–';});
+  const metrics=[{key:'mood',stroke:'var(--ink)'},{key:'energy',stroke:'var(--green)'},{key:'innerPressure',stroke:'var(--gold)'}];
+  const polylines=metrics.map(function(metric){
+    const points=rows.map(function(row,index){
+      const value=Number(row[metric.key]);
+      if(!Number.isFinite(value))return null;
+      const x=rows.length===1?0:index/(rows.length-1)*600;
+      const y=82-(Math.max(1,Math.min(10,value))-1)/9*62;
+      return x.toFixed(1)+','+y.toFixed(1);
+    }).filter(Boolean);
+    return points.length>=2?'<polyline points="'+points.join(' ')+'" fill="none" stroke="'+metric.stroke+'" stroke-width="1.6" vector-effect="non-scaling-stroke" stroke-linejoin="round"/>':'';
+  }).join('');
+  return '<svg class="lineSvg" viewBox="0 0 600 92" preserveAspectRatio="none"><line x1="0" y1="82" x2="600" y2="82" stroke="rgba(27,67,50,.1)" stroke-width="1"/>'+polylines+'</svg><div style="display:flex;justify-content:space-between;margin-top:8px;font:400 10px/1 \'IBM Plex Sans\',sans-serif;color:rgba(27,67,50,.4)"><span>'+esc(labels[0])+'</span><span>'+esc(labels[labels.length-1])+'</span></div><div class="wellbeingLegend"><span>Stimmung</span><span class="energy">Energie</span><span class="pressure">Innerer Druck</span></div>';
+}
 function personalList_(items,max){return (items||[]).slice(0,max||5).map(x=>'<li>'+esc(x)+'</li>').join('')||'<li>Keine Einträge aus dem Second Brain verfügbar.</li>'}
 function personalOperatorTopTask_(){
   const rows=(DATA&&Array.isArray(DATA.tasks)?DATA.tasks:[]).filter(function(task){
@@ -284,7 +353,8 @@ function renderPersonal(){
   const next=task&&(task.nextAction||task.title)||'Einen sichtbaren nächsten Schritt aus OPS auswählen.';
   const why=personalOperatorProjectText_(project)||((task&&task.reason)||((p.priorities||[])[0]||p.compass||'Die aktuellen Quellen liefern noch keinen zusätzlichen Grund.'));
   const notNow=(p.ideaRules||[])[0]||(p.focusRules||[])[0]||'Keine neue Baustelle eröffnen, bevor der sichtbare Schritt abgeschlossen ist.';
-  const workmode=(p.dayStructure||[])[0]||(p.focusRules||[])[0]||'Eine klare Sache fertig machen und Puffer lassen.';
+  const wbGuidance=DATA&&DATA.wellbeing&&DATA.wellbeing.morningGuidance;
+  const workmode=wbGuidance&&wbGuidance.active?wbGuidance.message:((p.dayStructure||[])[0]||(p.focusRules||[])[0]||'Eine klare Sache fertig machen und Puffer lassen.');
   document.getElementById('personalMeta').textContent='Personal Lens · '+(data.sourceCount||0)+' Quellen · '+(data.timingMs||0)+' ms · read-only';
   el.innerHTML='<div class="personalLead"><div><div class="label">Entscheidungs-Kompass</div><div class="bigText">'+esc(p.compass||'Der persönliche Operator ist verbunden.')+'</div></div><span class="pill green">CURATED</span></div><div class="personalGrid"><div class="personalBlock"><div class="label">Nächster sichtbarer Schritt</div><div class="rowTitle" style="margin-top:9px">'+esc(next)+'</div>'+(task&&task.deadline?'<div class="rowMeta">Deadline '+esc(task.deadline)+'</div>':'')+'</div><div class="personalBlock"><div class="label">Warum</div><div class="rowMeta" style="font-size:11.5px;line-height:1.55;margin-top:9px">'+esc(why)+'</div></div><div class="personalBlock"><div class="label">Bewusst nicht jetzt</div><div class="rowMeta" style="font-size:11.5px;line-height:1.55;margin-top:9px">'+esc(notNow)+'</div></div><div class="personalBlock"><div class="label">Arbeitsmodus</div><div class="rowMeta" style="font-size:11.5px;line-height:1.55;margin-top:9px">'+esc(workmode)+'</div></div></div><div class="sourceNote">OPS liefert den aktuellen Schritt. Der Personal Operator ergänzt nur den passenden Langzeitkontext; der vollständige Vault wird erst bei einer Suche gelesen.</div>';
 }
@@ -296,8 +366,8 @@ function openDetail(key,card){if(!DATA)return;activeDetail=key;lastCardRect=card
 function closeDetail(){const sh=document.getElementById('detailShell'),scr=document.getElementById('detailScrim');scr.classList.remove('open');sh.classList.remove('open');if(lastCardRect){const sx=Math.max(.04,lastCardRect.width/innerWidth),sy=Math.max(.04,lastCardRect.height/innerHeight);sh.style.transform=`translate(${lastCardRect.left}px,${lastCardRect.top}px) scale(${sx},${sy})`;sh.style.opacity='.35'}else{sh.style.transform='scale(.985)';sh.style.opacity='.35'}setTimeout(()=>{document.documentElement.classList.remove('detail-open');activeDetail=null;sh.style.transform='';sh.style.opacity=''},520)}
 function gotoDetail(key){activeDetail=key;renderDetail(key)}
 function renderDetail(key){const d=detailDefs[key];if(!d)return;document.getElementById('detailEyebrow').textContent=d.eyebrow;document.getElementById('detailTitle').textContent=d.title;document.getElementById('detailSub').textContent=detailSub(key);document.getElementById('detailNav').innerHTML=detailOrder.map(k=>`<button class="${k===key?'active':''}" onclick="gotoDetail('${k}')">${esc(detailDefs[k].eyebrow)}</button>`).join('');document.getElementById('detailBody').innerHTML=detailContent(key)}
-function detailSub(key){if(!DATA)return'';if(key==='kalender')return `${DATA.calendar.events.length} Termine · Google Calendar`;if(key==='briefing')return DATA.briefing?`${DATA.briefing.type} · ${DATA.briefing.createdAt}`:'kein Briefing';if(key==='aufgaben')return `${DATA.tasks.length} offene Aufgaben`;if(key==='finanzen')return DATA.finance?`${DATA.finance.transactionCount} Transaktionen`:'Finanzdaten laden …';if(key==='meldungen')return `${DATA.alerts.length} aktive Meldungen`;if(key==='projekte')return `${DATA.projects.length} aktive Projekte`;if(key==='mails')return DATA.mail.available?`${DATA.mail.messages.length} relevante Nachrichten`:'Gmail nicht verfügbar';if(key==='inbox')return `${DATA.aiInbox.length} offene Entscheidungen`;if(key==='koerper')return DATA.health?`Stand ${DATA.health.latestDate||'–'}`:'Health-Daten laden …';if(key==='system')return 'OPS · SYNC_STATE';if(key==='persoenlich')return DATA.personal&&DATA.personal.ok?'Personal Lens · '+(DATA.personal.sourceCount||0)+' Quellen · '+(DATA.personal.timingMs||0)+' ms':'Personal Lens nicht verfügbar';if(key==='ziele')return `${DATA.goals.length} Ziele`;return''}
-function detailContent(key){if(key==='kalender')return calendarDetail();if(key==='briefing')return briefingDetail();if(key==='persoenlich')return personalDetail();if(key==='aufgaben')return tasksDetail();if(key==='finanzen')return financeDetail();if(key==='meldungen')return alertsDetail();if(key==='projekte')return projectsDetail();if(key==='mails')return mailsDetail();if(key==='inbox')return inboxDetail();if(key==='koerper')return healthDetail();if(key==='system')return syncDetail();if(key==='ziele')return goalsDetail();return''}
+function detailSub(key){if(!DATA)return'';if(key==='kalender')return `${DATA.calendar.events.length} Termine · Google Calendar`;if(key==='briefing')return DATA.briefing?`${DATA.briefing.type} · ${DATA.briefing.createdAt}`:'kein Briefing';if(key==='aufgaben')return `${DATA.tasks.length} offene Aufgaben`;if(key==='finanzen')return DATA.finance?`${DATA.finance.transactionCount} Transaktionen`:'Finanzdaten laden …';if(key==='meldungen')return `${DATA.alerts.length} aktive Meldungen`;if(key==='projekte')return `${DATA.projects.length} aktive Projekte`;if(key==='mails')return DATA.mail.available?`${DATA.mail.messages.length} relevante Nachrichten`:'Gmail nicht verfügbar';if(key==='inbox')return `${DATA.aiInbox.length} offene Entscheidungen`;if(key==='koerper')return DATA.health?`Stand ${DATA.health.latestDate||'–'}`:'Health-Daten laden …';if(key==='wohlbefinden')return DATA.wellbeing&&DATA.wellbeing.available?`${DATA.wellbeing.summary&&DATA.wellbeing.summary.count||0} Einträge · OPS`:'Wohlbefinden noch nicht eingerichtet';if(key==='system')return 'OPS · SYNC_STATE';if(key==='persoenlich')return DATA.personal&&DATA.personal.ok?'Personal Lens · '+(DATA.personal.sourceCount||0)+' Quellen · '+(DATA.personal.timingMs||0)+' ms':'Personal Lens nicht verfügbar';if(key==='ziele')return `${DATA.goals.length} Ziele`;return''}
+function detailContent(key){if(key==='kalender')return calendarDetail();if(key==='briefing')return briefingDetail();if(key==='persoenlich')return personalDetail();if(key==='aufgaben')return tasksDetail();if(key==='finanzen')return financeDetail();if(key==='meldungen')return alertsDetail();if(key==='projekte')return projectsDetail();if(key==='mails')return mailsDetail();if(key==='inbox')return inboxDetail();if(key==='koerper')return healthDetail();if(key==='wohlbefinden')return wellbeingDetail();if(key==='system')return syncDetail();if(key==='ziele')return goalsDetail();return''}
 function calendarDetail(){const evs=DATA.calendar.events||[];return `<div class="detailGrid"><div class="detailCard span8"><h3>Wochenübersicht</h3><div class="timeline">${evs.length?evs.map(e=>{const s=new Date(e.start),en=new Date(e.end);return `<div class="timelineItem"><div class="timelineTime">${e.allDay?s.toLocaleDateString('de-DE',{weekday:'short',day:'2-digit',month:'2-digit'}):s.toLocaleDateString('de-DE',{weekday:'short'})+' · '+s.toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'})}</div><div class="timelineBar" style="background:${esc(e.color||'#C9A227')}"></div><div class="grow"><div class="rowTitle">${esc(e.title)}</div><div class="rowMeta">${e.allDay?'ganztägig':en.toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'})}${e.calendar?' · '+esc(e.calendar):''}${e.location?' · '+esc(e.location):''}</div></div></div>`}).join(''):'<div class="empty">Keine Termine in dieser Woche.</div>'}</div></div><div class="detailCard span4"><h3>Kalenderstatus</h3><div class="metricRow" style="grid-template-columns:1fr 1fr"><div class="metric"><div class="label">Termine</div><div class="n">${evs.length}</div></div><div class="metric"><div class="label">Ganztägig</div><div class="n">${evs.filter(e=>e.allDay).length}</div></div></div><div class="sourceNote">Google Calendar bleibt Source of Truth. Änderungen werden hier nicht automatisch vorgenommen.</div></div></div>`}
 function briefingDetail(){const b=DATA.briefing;if(!b)return'<div class="detailCard"><div class="empty">Kein Briefing vorhanden.</div></div>';const fields=[['Kalender',b.calendarSummary],['Aufgaben',b.taskSummary],['Projekte',b.projectSummary],['E-Mails',b.mailSummary],['Finanzen',b.financeSummary],['Gesundheit',b.healthSummary],['AI-Inbox',b.aiInboxSummary],['Alerts',b.alertsSummary]].filter(x=>x[1]);return `<div class="detailGrid"><div class="detailCard gold span8"><h3>Lage</h3><div class="bigText">${esc(b.summary)}</div>${b.topPriorities?`<div style="margin-top:22px;padding-top:18px;border-top:1px solid rgba(201,162,39,.25)"><div class="label">Top-Prioritäten</div><div class="rowMeta" style="font-size:13px;line-height:1.65;margin-top:8px">${esc(b.topPriorities)}</div></div>`:''}<div class="rec"><b>Empfehlung</b><br>${esc(b.recommendation||'–')}</div></div><div class="detailCard span4"><h3>Datenfrische</h3><div class="rowMeta" style="font-size:12px;line-height:1.6">${esc(b.freshness||'Keine Angabe')}</div></div><div class="detailCard span12"><h3>Bereiche</h3><div class="detailGrid">${fields.map(x=>`<div class="span6" style="padding:14px 0;border-top:1px solid rgba(27,67,50,.08)"><div class="label">${esc(x[0])}</div><div class="rowMeta" style="font-size:12px;line-height:1.6;margin-top:7px">${esc(x[1])}</div></div>`).join('')}</div></div></div>`}
 function tasksDetail(){const rows=DATA.tasks||[];const waiting=rows.filter(t=>t.status==='WAITING').length,urgent=rows.filter(t=>t.aiPriority>=80).length;return `<div class="detailGrid"><div class="detailCard span8"><h3>Offene Aufgaben</h3>${rows.length?rows.map(t=>taskHtml(t,true)).join(''):'<div class="empty">Keine offenen Aufgaben.</div>'}</div><div class="detailCard span4"><h3>Lage</h3><div class="metricRow" style="grid-template-columns:1fr 1fr"><div class="metric"><div class="label">Offen</div><div class="n">${rows.length}</div></div><div class="metric"><div class="label">AI ≥ 80</div><div class="n">${urgent}</div></div><div class="metric"><div class="label">Waiting</div><div class="n">${waiting}</div></div><div class="metric"><div class="label">Mit Deadline</div><div class="n">${rows.filter(t=>t.deadline).length}</div></div></div><div class="sourceNote">Sortierung nach AI-Priorität; explizite Nutzerpriorität wird nicht überschrieben.</div></div></div>`}
@@ -310,6 +380,50 @@ function healthDetail(){const h=DATA.health;if(!h)return'<div class="detailCard 
 function syncDetail(){const rows=DATA.syncState||[];return `<div class="detailGrid"><div class="detailCard span12"><h3>Systemzustand</h3><table class="detailTable"><thead><tr><th>System</th><th>Status</th><th>Verbindung</th><th>Datenfrische</th><th>Letzter Erfolg</th><th>Hinweis</th></tr></thead><tbody>${rows.map(s=>`<tr><td>${esc(s.system_name)}</td><td><span class="pill ${s.status==='OK'?'green':s.status==='DEGRADED'?'gold':s.status==='ERROR'?'red':''}">${esc(s.status||'UNKNOWN')}</span></td><td>${esc(s.connection_state||'')}</td><td>${esc(s.data_freshness||'')}</td><td>${esc(s.last_success_at||'')}</td><td>${esc(s.note||'')}</td></tr>`).join('')}</tbody></table></div></div>`}
 function goalsDetail(){const rows=DATA.goals||[];return `<div class="detailGrid">${rows.length?rows.map(g=>{const cur=Number(g.currentValue),tar=Number(g.targetValue),pct=Number.isFinite(cur)&&Number.isFinite(tar)&&tar?Math.max(0,Math.min(100,cur/tar*100)):null;return `<div class="detailCard span6"><div style="display:flex;justify-content:space-between;gap:12px"><div><h3>${esc(g.area||'Ziel')}</h3><div style="font-family:'Source Serif 4',serif;font-size:24px">${esc(g.title)}</div></div><span class="pill">${esc(g.status||'')}</span></div>${pct!=null?`<div class="progress" style="margin-top:18px"><i style="width:${pct}%"></i></div><div class="rowMeta">${Math.round(pct)} %</div>`:''}${g.assessment?`<div class="rowMeta" style="font-size:12px;line-height:1.6;margin-top:14px">${esc(g.assessment)}</div>`:''}${g.targetDate?`<div class="sourceNote">Zieldatum ${esc(g.targetDate)}</div>`:''}</div>`}).join(''):'<div class="detailCard span12"><div class="empty">Noch keine Ziele im OPS hinterlegt.</div></div>'}</div>`}
 
+function wellbeingDetail(){
+  const w=DATA&&DATA.wellbeing;
+  if(!w||w.available===false)return '<div class="detailGrid"><div class="detailCard gold span8"><h3>Einmalige Einrichtung</h3><div class="bigText">Der Verlauf liegt im OPS-Tab <b>WELLBEING_LOG</b>.</div><div class="rowMeta" style="font-size:12px;line-height:1.6;margin-top:14px">Führe in Apps Script einmal <b>ensureWellbeingLogV1()</b> aus. Danach kann der Abendcheck hier direkt gespeichert werden.</div></div><div class="detailCard span4"><h3>Datenschutz</h3><div class="sourceNote">Die täglichen Werte bleiben im OPS. Bestätigte langfristige Muster werden später separat ins Second Brain übernommen.</div></div></div>';
+  const s=w.summary||{},a=s.averages||{},p=w.pattern||{},g=w.morningGuidance||{};
+  const metricRows=[['Stimmung',a.mood],['Energie',a.energy],['Innerer Druck',a.innerPressure],['Schlafqualität',a.sleepQuality],['Motivation',a.motivation],['Erholung',a.recovery]].map(function(row){return '<div class="metric"><div class="label">'+esc(row[0])+'</div><div class="n">'+(row[1]!=null?esc(Number(row[1]).toLocaleString('de-DE')):'–')+'</div><div class="rowMeta">Ø letzte 7 Tage</div></div>';}).join('');
+  const patternHtml=p.candidate?'<div class="wellbeingHint"><b>Muster-Vorschlag für den Wochenreset:</b> '+esc(p.reason)+'. Wird erst nach deiner Bestätigung weiterverwendet.</div>':'<div class="sourceNote">Noch kein bestätigungspflichtiger Muster-Vorschlag aus den letzten drei Einträgen.</div>';
+  const guidanceHtml=g.active?'<div class="rec"><b>Morgendlicher Hinweis</b><br>'+esc(g.message)+'</div>':'';
+  return '<div class="detailGrid"><div class="detailCard gold span8"><h3>7-Tage-Verlauf</h3>'+wellbeingChartSvg_(w.history||[],7)+guidanceHtml+'</div><div class="detailCard span4"><h3>Durchschnittswerte</h3><div class="metricRow" style="grid-template-columns:1fr 1fr">'+metricRows+'</div></div><div class="detailCard span12"><h3>30-Tage-Verlauf</h3>'+wellbeingChartSvg_(w.history||[],30)+'</div><div class="detailCard span12">'+patternHtml+'</div><div class="detailCard gold span12"><h3>Abendcheck</h3>'+wellbeingFormHtml_(w.options||{})+'</div></div>';
+}
+function wellbeingFormHtml_(options){
+  const fields=[['mood','Stimmung','1 schlecht · 10 gut'],['energy','Energie','1 niedrig · 10 hoch'],['innerPressure','Innerer Druck','1 ruhig · 10 sehr hoch'],['sleepQuality','Schlafqualität','1 schlecht · 10 gut'],['motivation','Motivation / Antrieb','1 niedrig · 10 hoch'],['recovery','Erholung / Regeneration','1 niedrig · 10 gut']];
+  const fieldHtml=fields.map(function(field){return '<div class="wellbeingField"><label for="wb-'+field[0]+'"><span>'+esc(field[1])+'</span><output id="wb-'+field[0]+'-value">–</output></label><input id="wb-'+field[0]+'" type="range" min="0" max="10" value="0" oninput="wellbeingRangeLabel(\''+field[0]+'\',this.value)"><div class="wellbeingScale"><span>Heute nicht angeben</span><span>'+esc(field[2])+'</span></div></div>';}).join('');
+  const feelings=(options.feelings||[]).map(function(value){return '<option value="'+esc(value)+'">'+esc(value)+'</option>';}).join('');
+  const influences=(options.influences||[]).map(function(value){return '<option value="'+esc(value)+'">'+esc(value)+'</option>';}).join('');
+  return '<div class="wellbeingForm"><div class="wellbeingFormGrid">'+fieldHtml+'</div><div class="wellbeingFormGrid"><div class="wellbeingField"><label for="wb-feeling"><span>Hauptgefühl</span><output>1 Auswahl</output></label><select id="wb-feeling"><option value="">Heute nicht angeben</option>'+feelings+'</select></div><div class="wellbeingField"><label for="wb-feelingIntensity"><span>Gefühlsintensität</span><output>1–5</output></label><select id="wb-feelingIntensity"><option value="">Heute nicht angeben</option><option value="1">1 · sehr leicht</option><option value="2">2 · leicht</option><option value="3">3 · mittel</option><option value="4">4 · deutlich</option><option value="5">5 · sehr stark</option></select></div><div class="wellbeingField"><label for="wb-influence"><span>Wichtigster Einfluss</span><output>1 Auswahl</output></label><select id="wb-influence"><option value="">Heute nicht angeben</option>'+influences+'</select></div><div class="wellbeingField"><label for="wb-reflection"><span>Optionaler Satz</span><output>max. 500 Zeichen</output></label><textarea id="wb-reflection" maxlength="500" placeholder="Was hat heute am meisten zu deinem Zustand beigetragen?"></textarea></div></div><div class="wellbeingFormNote">Jede Angabe ist freiwillig. Die Werte werden im OPS als Tagesverlauf gespeichert; einzelne Tage werden nicht diagnostisch interpretiert.</div><div class="wellbeingActions"><span class="rowMeta">Ein Eintrag pro Tag · später im Wochenreset prüfbar</span><button id="wellbeingSaveButton" class="btn primary" onclick="saveWellbeing()">Abendcheck speichern</button></div></div>';
+}
+function wellbeingRangeLabel(key,value){
+  const out=document.getElementById('wb-'+key+'-value');if(out)out.textContent=Number(value)>0?String(value):'–';
+}
+function wellbeingFormNumber(id){
+  const el=document.getElementById(id);if(!el)return null;const n=Number(el.value);return n>0?n:null;
+}
+function wellbeingFormPayload(){
+  const select=function(id){const el=document.getElementById(id);return el&&el.value?el.value:null;};
+  return {mood:wellbeingFormNumber('wb-mood'),energy:wellbeingFormNumber('wb-energy'),innerPressure:wellbeingFormNumber('wb-innerPressure'),sleepQuality:wellbeingFormNumber('wb-sleepQuality'),motivation:wellbeingFormNumber('wb-motivation'),recovery:wellbeingFormNumber('wb-recovery'),feeling:select('wb-feeling'),feelingIntensity:select('wb-feelingIntensity'),influenceFactor:select('wb-influence'),reflection:(document.getElementById('wb-reflection')||{}).value||''};
+}
+async function saveWellbeing(){
+  const button=document.getElementById('wellbeingSaveButton');if(button){button.disabled=true;button.textContent='Speichert …';}
+  try{
+    const result=await callServer('saveWellbeingEntryV1',wellbeingFormPayload());
+    if(!result||!result.ok)throw new Error(result&&result.error?result.error:'Wohlbefinden konnte nicht gespeichert werden.');
+    DATA.wellbeing=result.data;
+    renderWellbeing();renderPersonal();saveSnapshot();
+    showToast('Abendcheck gespeichert');
+    if(activeDetail==='wohlbefinden')renderDetail('wohlbefinden');
+  }catch(e){
+    if(button){button.disabled=false;button.textContent='Abendcheck speichern';}
+    showToast(e.message||String(e));
+  }
+}
+function openWellbeingCheck(){
+  const card=document.getElementById('card-wohlbefinden');
+  if(card)openDetail('wohlbefinden',card);
+}
 function personalDetail(){
   const data=DATA&&DATA.personal;
   if(!data||data.ok===false)return '<div class="detailCard span12"><div class="empty">'+esc(data&&data.message?data.message:'Personal Lens ist noch nicht verfügbar.')+'</div></div>';
