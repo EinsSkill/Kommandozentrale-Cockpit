@@ -346,6 +346,18 @@ function ensureWellbeingLogV1() {
   const created = !sh;
   if (!sh) sh = ss.insertSheet(WELLBEING_SHEET);
   ensureWellbeingHeaders_(sh);
+  appendAudit_(ss, {
+    action_type: 'WELLBEING_LOG_SETUP',
+    target_system: 'OPS Sheet',
+    target_id: WELLBEING_SHEET,
+    trigger_type: 'USER_RUN_FUNCTION',
+    permission_class: 'USER_APPROVED',
+    status: 'SUCCESS',
+    previous_value: created ? 'missing' : 'existing',
+    new_value: 'headers_ready',
+    rollback_available: true,
+    note: 'WELLBEING_LOG durch den Nutzer eingerichtet; keine echten Werte wurden angelegt.'
+  });
   return {
     ok: true,
     sheetName: WELLBEING_SHEET,
@@ -394,7 +406,7 @@ function saveWellbeingEntryV1(payload) {
       setByHeader_(sh, table, existing.__row, header, record[header] != null ? record[header] : '');
     });
   } else {
-    sh.appendRow(WELLBEING_HEADERS.map(function (header) {
+    sh.appendRow(table.headers.map(function (header) {
       return record[header] != null ? record[header] : '';
     }));
   }
@@ -563,17 +575,20 @@ function wellbeingPattern_(history) {
   const lowMood = recent.every(function (row) { return row.mood != null && row.mood <= 4; });
   const lowEnergy = recent.every(function (row) { return row.energy != null && row.energy <= 4; });
   const highPressure = recent.every(function (row) { return row.innerPressure != null && row.innerPressure >= 7; });
+  const candidate = highPressure && (lowMood || lowEnergy);
   const reasons = [];
-  if (lowMood) reasons.push('niedrige Stimmung');
-  if (lowEnergy) reasons.push('wenig Energie');
-  if (highPressure) reasons.push('hoher innerer Druck');
+  if (candidate) {
+    if (lowMood) reasons.push('niedrige Stimmung');
+    if (lowEnergy) reasons.push('wenig Energie');
+    reasons.push('hoher innerer Druck');
+  }
 
   return {
-    candidate: reasons.length > 0,
-    status: reasons.length > 0 ? 'PROPOSAL' : 'NO_CLEAR_PATTERN',
+    candidate: candidate,
+    status: candidate ? 'PROPOSAL' : 'NO_CLEAR_PATTERN',
     days: recent.length,
     reason: reasons.join(', '),
-    requiresConfirmation: reasons.length > 0
+    requiresConfirmation: candidate
   };
 }
 
