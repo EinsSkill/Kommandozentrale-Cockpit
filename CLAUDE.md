@@ -50,4 +50,4 @@ Jede Übergabe nennt:
 
 ## Phase-4-Sonderregel
 
-Wenn `src/SecondBrain.gs` oder die persönliche Kontextanzeige geändert wird, zuerst `docs/phase4-personal-context.md` lesen. Der Vault bleibt außerhalb des Repositories; Tests und Fixtures dürfen keine echten persönlichen Inhalte enthalten.
+Wenn `src/SecondBrain.gs`, `src/PersonalOperator.gs` oder die persönliche Kontextanzeige geändert wird, zuerst `docs/phase4-personal-context.md` und `docs/phase4b-personal-operator.md` lesen. Der Vault bleibt außerhalb des Repositories; Tests und Fixtures dürfen keine echten persönlichen Inhalte enthalten.

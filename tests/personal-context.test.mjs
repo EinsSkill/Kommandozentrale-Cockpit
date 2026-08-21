@@ -25,9 +25,11 @@ test('personal context scans broadly but blocks sensitive search results by defa
   assert.match(secondBrain, /gesamter Vault als Suchraum/);
 });
 
-test('frontend loads and exposes the personal context without copying the vault', () => {
+test('frontend loads the curated personal operator without copying the vault', () => {
   assert.match(html, /card-persoenlich/);
-  assert.match(html, /callServer\('getPersonalContextV1',force\)/);
+  assert.match(html, /Persönlicher Operator/);
+  assert.match(html, /Nächster sichtbarer Schritt/);
+  assert.match(html, /callServer\('getPersonalOperatorContextV1',force\)/);
   assert.match(html, /callServer\('searchSecondBrainV1',query,false\)/);
   assert.match(html, /read-only/);
   assert.doesNotMatch(html, /SECOND_BRAIN_ROOT_ID\s*=\s*['"][^'"]+['"]/);
