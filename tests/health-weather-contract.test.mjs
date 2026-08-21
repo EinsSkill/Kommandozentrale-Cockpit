@@ -35,5 +35,4 @@ assert.match(index, /function renderWeather\(\)/);
 assert.match(index, /Veralteter Stand/);
 assert.doesNotMatch(index, /api\.open-meteo\.com/);
 assert.doesNotMatch(health + weather + code, /1vfQZN9qLmGeE__Nyt2PdpxBw3bSiBgIR|1sYn_RuXoxx8d3Jk3zaXfleq0euvNqB4G|1PPQgjurSpUYgCiwBrnwYS6vBqZ59BOeT|1wIgebOEGKY5Oufb3Qp8o8z7r33SN0g7jEHXAq2Mwp1w/);
-assert.doesNotMatch(health + weather + code, /1vfQZN9qLmGeE__Nyt2PdpxBw3bSiBgIR|1sYn_RuXoxx8d3Jk3zaXfleq0euvNqB4G|1PPQgjurSpUYgCiwBrnwYS6vBqZ59BOeT|1wIgebOEGKY5Oufb3Qp8o8z7r33SN0g7jEHXAq2Mwp1w/);
 console.log('health/weather integration contract: ok');
