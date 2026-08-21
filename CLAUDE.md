@@ -47,3 +47,7 @@ Jede Übergabe nennt:
 - bewusste Nicht-Änderungen
 - Risiken oder offene Voraussetzungen
 - konkreten nächsten Review-Schritt
+
+## Phase-4-Sonderregel
+
+Wenn `src/SecondBrain.gs` oder die persönliche Kontextanzeige geändert wird, zuerst `docs/phase4-personal-context.md` lesen. Der Vault bleibt außerhalb des Repositories; Tests und Fixtures dürfen keine echten persönlichen Inhalte enthalten.
