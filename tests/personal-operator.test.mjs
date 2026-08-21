@@ -34,6 +34,7 @@ test('frontend shows decisions and keeps full-vault search on demand', () => {
   assert.match(html, /Persönlicher Operator/);
   assert.match(html, /Nächster sichtbarer Schritt/);
   assert.match(html, /Bewusst nicht jetzt/);
+  assert.ok(html.indexOf('card-persoenlich') < html.indexOf('<footer'), 'personal operator card should render directly before the footer');
   assert.match(html, /searchSecondBrainV1/);
   assert.doesNotMatch(html, /getPersonalContextV1/);
 });
