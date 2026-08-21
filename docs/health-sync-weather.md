@@ -39,17 +39,24 @@ Verwendete Konfiguration:
 - `weather_timezone`
 - `weather_forecast_hours`
 
-Der Browser ruft keinen Wetterdienst auf. Er zeigt nur den zuletzt erfolgreich in OPS gespeicherten Stand und kennzeichnet einen fehlenden oder veralteten Stand.
+Der Browser ruft keinen Wetterdienst auf. Er zeigt nur den zuletzt erfolgreich in OPS gespeicherten Stand. Wenn der letzte Lauf fehlgeschlagen ist oder länger als 90 Minuten zurückliegt, wird der Stand im Cockpit ausdrücklich als `Veralteter Stand` markiert; der Fehler steht zusätzlich als Tooltip am Wetterblock.
+
+### Schutz vor Open-Meteo-429
+
+Jeder Apps-Script-Lauf prüft vor dem Provider-Aufruf eine Script-Property-Sperre. Zwischen zwei Requests liegen mindestens zehn Minuten. Nach HTTP 429 wird zusätzlich eine Pause von mindestens 30 Minuten gesetzt; ein vorhandener `Retry-After`-Header wird zwischen fünf und 60 Minuten berücksichtigt. Ein blockierter Lauf schreibt keine neuen Wetterwerte und erzeugt keinen weiteren Provider-Request.
+
+Die bisher gespeicherten Wetterwerte bleiben bei einem Fehler erhalten, werden aber über `SYNC_STATE` als `ERROR` und im Cockpit als veraltet ausgewiesen. Dadurch erscheint ein alter Stand nicht stillschweigend als aktuell.
 
 ## Einmalige Apps-Script-Aktivierung
 
-Nach dem Einspielen der Dateien und dem Setzen des bestehenden Script-Properties-Schlüssels `OPS_SPREADSHEET_ID` wird im Apps-Script-Editor einmalig `setupLiveDataV1()` ausgeführt und autorisiert. Diese Funktion legt die Wetter-Tabs an, installiert die Zeit-Trigger, führt einen ersten Health-Sync und einen ersten Wetter-Refresh aus.
+Nach dem Einspielen der Dateien und dem Setzen des bestehenden Script-Properties-Schlüssels `OPS_SPREADSHEET_ID` wird im Apps-Script-Editor einmalig `setupLiveDataV1()` ausgeführt und autorisiert. Diese Funktion legt die Wetter-Tabs an, entfernt doppelte Wetter- bzw. veraltete Sammeltrigger, installiert genau einen Wetter-Zeit-Trigger, führt einen ersten Health-Sync und einen ersten Wetter-Refresh aus.
 
 Danach laufen:
 
 - Health Sync alle 15 Minuten
 - Wetter alle 30 Minuten
 - manueller Sammellauf über `runLiveDataSyncV1()`
+- Trigger-Diagnose über `weatherTriggerStatusV1()`
 
 Der Status ist in `SYNC_STATE` unter `Fitness Source` und `Weather` sichtbar. Jeder erfolgreiche oder fehlgeschlagene Lauf wird zusätzlich in `AUDIT_LOG` protokolliert.
 
