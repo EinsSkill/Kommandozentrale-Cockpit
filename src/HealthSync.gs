@@ -326,7 +326,7 @@ function healthSyncParseStepsV1_(files, lookbackDays) {
 }
 
 function healthSyncTagValuesV1_(xml, tag) {
-  var pattern = new RegExp('<(?:[A-Za-z0-9_]+:)?' + tag + '(?:\s[^>]*)?>([\\s\\S]*?)<\\/(?:[A-Za-z0-9_]+:)?' + tag + '>', 'gi');
+  var pattern = new RegExp('<(?:[A-Za-z0-9_]+:)?' + tag + '(?:\\s[^>]*)?>([\\s\\S]*?)<\\/(?:[A-Za-z0-9_]+:)?' + tag + '>', 'gi');
   var values = [];
   var match;
   while ((match = pattern.exec(xml)) !== null) values.push(String(match[1]).trim());
