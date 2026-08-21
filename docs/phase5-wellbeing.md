@@ -4,7 +4,7 @@
 
 Die Kommandozentrale bekommt einen kleinen, freiwilligen Abendcheck, der über mehrere Tage einen persönlichen Wohlbefindensverlauf sichtbar macht. Der Second-Brain-Kontext wird dabei nicht als täglicher Vollimport verwendet. Er liefert nur die Regeln, nach denen der Check und spätere Hinweise persönlich, vorsichtig und nicht überfordernd bleiben.
 
-Die operative Tageschronik liegt im OPS-Tab \`WELLBEING_LOG\`. Ein bestätigtes langfristiges Muster darf später separat ins Second Brain übernommen werden. Das passiert in dieser Phase nicht automatisch.
+Die operative Tageschronik liegt im OPS-Tab `WELLBEING_LOG`. Ein bestätigtes langfristiges Muster darf später separat ins Second Brain übernommen werden. Das passiert in dieser Phase nicht automatisch.
 
 ## Nutzerfluss
 
@@ -61,28 +61,28 @@ Die Kommandozentrale darf daraus einen ruhigen morgendlichen Hinweis ableiten. S
 
 | Information | Quelle / Ziel |
 |---|---|
-| tägliche Werte und Antworten | OPS-Tab \`WELLBEING_LOG\` |
+| tägliche Werte und Antworten | OPS-Tab `WELLBEING_LOG` |
 | aktuelle Aufgaben und Tagesabschluss-Kontext | OPS Sheet |
 | langfristige, bestätigte Muster | Second Brain nach ausdrücklicher Bestätigung |
 | UI und technische Logik | Repository / Apps Script |
 | Diagnosen oder medizinische Bewertung | nicht Bestandteil der Kommandozentrale |
 
-Der Schreibpfad \`saveWellbeingEntryV1\` schreibt nur in OPS und protokolliert die Aktion im Audit-Log. Es gibt keinen automatischen Second-Brain-Schreibzugriff.
+Der Schreibpfad `saveWellbeingEntryV1` schreibt nur in OPS und protokolliert die Aktion im Audit-Log. Es gibt keinen automatischen Second-Brain-Schreibzugriff.
 
 ## Apps-Script-Einrichtung
 
-Die aktuelle GitHub-Änderung ist noch nicht automatisch im laufenden Apps-Script-Projekt. Nach Merge in \`main\`:
+Die aktuelle GitHub-Änderung ist noch nicht automatisch im laufenden Apps-Script-Projekt. Nach Merge in `main`:
 
 1. In Apps Script das Projekt **Kommandozentrale** öffnen.
-2. Den Inhalt von \`src/Code.gs\` vollständig in die vorhandene Datei \`Code.gs\` kopieren. Darin steckt der neue Backend-Endpunkt samt OPS-Logik.
-3. Den Inhalt von \`src/Index.html\` vollständig in \`Index.html\` kopieren.
-4. \`SecondBrain.gs\` und \`PersonalOperator.gs\` unverändert im Projekt lassen.
-5. Prüfen, dass die Script Property \`OPS_SPREADSHEET_ID\` weiterhin gesetzt ist.
+2. Den Inhalt von `src/Code.gs` vollständig in die vorhandene Datei `Code.gs` kopieren. Darin steckt der neue Backend-Endpunkt samt OPS-Logik.
+3. Den Inhalt von `src/Index.html` vollständig in `Index.html` kopieren.
+4. `SecondBrain.gs` und `PersonalOperator.gs` unverändert im Projekt lassen.
+5. Prüfen, dass die Script Property `OPS_SPREADSHEET_ID` weiterhin gesetzt ist.
 6. Speichern.
-7. Im Funktionsmenü \`ensureWellbeingLogV1\` auswählen und einmal mit **Ausführen** starten. Die Berechtigungen bestätigen.
-8. Im OPS Sheet prüfen, dass der Tab \`WELLBEING_LOG\` mit der Kopfzeile angelegt wurde. Es werden dabei keine echten Werte eingetragen.
+7. Im Funktionsmenü `ensureWellbeingLogV1` auswählen und einmal mit **Ausführen** starten. Die Berechtigungen bestätigen.
+8. Im OPS Sheet prüfen, dass der Tab `WELLBEING_LOG` mit der Kopfzeile angelegt wurde. Es werden dabei keine echten Werte eingetragen.
 9. Unter **Bereitstellen → Bereitstellungen verwalten** eine neue Version der bestehenden Web-App-Bereitstellung erstellen. Den vorhandenen Zugriff unverändert lassen.
-10. Den bestehenden \`/exec\`-Link öffnen und zuerst die Einrichtungskarte, danach einen Testeintrag mit anonymisierten Testwerten prüfen. Den Testeintrag anschließend nur löschen, wenn du ihn bewusst aus dem echten OPS entfernen möchtest; besser ist ein kontrollierter Testtag.
+10. Den bestehenden `/exec`-Link öffnen und zuerst die Einrichtungskarte, danach einen Testeintrag mit anonymisierten Testwerten prüfen. Den Testeintrag anschließend nur löschen, wenn du ihn bewusst aus dem echten OPS entfernen möchtest; besser ist ein kontrollierter Testtag.
 
 Der vorhandene Web-App-Link bleibt derselbe, sofern die bestehende Bereitstellung aktualisiert wird. Ich kann das Apps-Script-Projekt aus diesem Arbeitsbereich nicht direkt speichern oder bereitstellen; die beiden Dateien müssen deshalb in Apps Script eingefügt werden.
 
@@ -90,15 +90,15 @@ Der vorhandene Web-App-Link bleibt derselbe, sofern die bestehende Bereitstellun
 
 Lokal:
 
-\`\`\`bash
+```bash
 npm test
-\`\`\`
+```
 
-Die neuen Vertragstests liegen in \`tests/wellbeing.test.mjs\`; die anonymisierten Testdaten liegen in \`fixtures/wellbeing.json\`. Die Tests verbinden sich nicht mit Google und enthalten keine persönlichen Daten.
+Die neuen Vertragstests liegen in `tests/wellbeing.test.mjs`; die anonymisierten Testdaten liegen in `fixtures/wellbeing.json`. Die Tests verbinden sich nicht mit Google und enthalten keine persönlichen Daten.
 
 Vor dem Merge:
 
-- \`npm test\` grün
+- `npm test` grün
 - Code.gs und der Script-Block in Index.html parsebar
 - keine echte OPS-ID, keine E-Mail-Adresse und keine Second-Brain-Dateien im Repository
 - Apps Script erst nach dem Merge manuell aktualisieren
