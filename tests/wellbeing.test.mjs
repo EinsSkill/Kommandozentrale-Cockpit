@@ -17,8 +17,8 @@ test('Apps-Script-Wohlbefindenpfad erfüllt den OPS-Vertrag', () => {
   assert.match(code, /function saveWellbeingEntryV1\(payload\)/);
   assert.match(code, /WELLBEING_ENTRY_/);
   assert.match(code, /action_type: 'WELLBEING_LOG_SETUP'/);
-  assert.match(code, /sh\\.appendRow\\(table\\.headers\\.map/);
-  assert.match(code, /const candidate = highPressure && \\(lowMood \\|\\| lowEnergy\\)/);
+  assert.match(code, /sh\.appendRow\(table\.headers\.map/);
+  assert.match(code, /const candidate = highPressure && \(lowMood \|\| lowEnergy\)/);
   assert.match(code, /keine Second-Brain-Änderung/i);
   assert.doesNotMatch(code, /SECOND_BRAIN_ROOT_ID\s*=\s*['"][^'"]+['"]/);
 });
