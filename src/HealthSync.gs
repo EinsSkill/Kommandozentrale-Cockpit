@@ -249,7 +249,12 @@ function healthSyncDateV1_(dateValue, timeValue) {
       second = timeMatch[3] == null ? 0 : Number(timeMatch[3]);
     }
   }
-  return new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]), hour, minute, second);
+  var localStamp = match[1] + '.' + match[2] + '.' + match[3] + ' ' + String(hour).padStart(2, '0') + ':' + String(minute).padStart(2, '0') + ':' + String(second).padStart(2, '0');
+  try {
+    return Utilities.parseDate(localStamp, TZ, 'yyyy.MM.dd HH:mm:ss');
+  } catch (ignored) {
+    return new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]), hour, minute, second);
+  }
 }
 
 function healthSyncDateKeyV1_(date) {
@@ -257,8 +262,14 @@ function healthSyncDateKeyV1_(date) {
 }
 
 function healthSyncCutoffV1_(days) {
-  var now = new Date();
-  now.setHours(0, 0, 0, 0);
+  var today = Utilities.formatDate(new Date(), TZ, 'yyyy-MM-dd');
+  var now;
+  try {
+    now = Utilities.parseDate(today, TZ, 'yyyy-MM-dd');
+  } catch (ignored) {
+    now = new Date();
+    now.setHours(0, 0, 0, 0);
+  }
   now.setDate(now.getDate() - days);
   return now.getTime();
 }
@@ -499,8 +510,12 @@ function healthSyncLatestDateV1_(days, activities, weights) {
 }
 
 function healthSyncMidnightDateV1_(dateKey) {
-  var parts = String(dateKey).split('-').map(Number);
-  return new Date(parts[0], parts[1] - 1, parts[2]);
+  try {
+    return Utilities.parseDate(String(dateKey), TZ, 'yyyy-MM-dd');
+  } catch (ignored) {
+    var parts = String(dateKey).split('-').map(Number);
+    return new Date(parts[0], parts[1] - 1, parts[2]);
+  }
 }
 
 function healthSyncWriteFieldV1_(sheet, table, rowNumber, header, value) {
