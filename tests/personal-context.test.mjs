@@ -7,6 +7,8 @@ import test from 'node:test';
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const secondBrain = await readFile(join(root, 'src', 'SecondBrain.gs'), 'utf8');
 const html = await readFile(join(root, 'src', 'Index.html'), 'utf8');
+const adapter = await readFile(join(root, 'src', 'LiveAdapter.html'), 'utf8');
+const frontend = `${html}\n${adapter}`;
 
 test('Second Brain context is read-only and property-configured', () => {
   assert.match(secondBrain, /function getPersonalContextV1\(force\)/);
@@ -26,11 +28,11 @@ test('personal context scans broadly but blocks sensitive search results by defa
 });
 
 test('frontend loads the curated personal operator without copying the vault', () => {
-  assert.match(html, /card-persoenlich/);
-  assert.match(html, /Persönlicher Operator/);
-  assert.match(html, /Nächster sichtbarer Schritt/);
-  assert.match(html, /callServer\('getPersonalOperatorContextV1',force\)/);
-  assert.match(html, /callServer\('searchSecondBrainV1',query,false\)/);
-  assert.match(html, /read-only/);
-  assert.doesNotMatch(html, /SECOND_BRAIN_ROOT_ID\s*=\s*['"][^'"]+['"]/);
+  assert.match(html, /data-tile="operator"/);
+  assert.match(html, /Personal Operator/);
+  assert.match(frontend, /Nächster sichtbarer Schritt/);
+  assert.match(adapter, /\['personal',\s*'getPersonalOperatorContextV1'/);
+  assert.match(adapter, /this\.call\('searchSecondBrainV1',\s*value,\s*false\)/);
+  assert.match(html, /Read-only/);
+  assert.doesNotMatch(frontend, /SECOND_BRAIN_ROOT_ID\s*=\s*['"][^'"]+['"]/);
 });

@@ -47,9 +47,14 @@ const WELLBEING_INFLUENCES = [
 ];
 
 function doGet() {
-  return HtmlService.createHtmlOutputFromFile('Index')
+  return HtmlService.createTemplateFromFile('Index').evaluate()
     .setTitle('Lukes Kommandozentrale')
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+}
+
+/** Includes repository-owned HTML fragments into the evaluated Apps-Script template. */
+function includeHtml_(fileName) {
+  return HtmlService.createHtmlOutputFromFile(fileName).getContent();
 }
 
 /** OPS-only payload. Fastest and most important dashboard layer. */
@@ -731,7 +736,8 @@ function getTasks_(rd, now) {
       id:r.task_id, title:r.title, status:r.status, area:r.area||'', projectId:r.project_id||'',
       aiPriority:num_(r.ai_priority), userPriority:r.user_priority||'', reason:r.ai_priority_reason||'',
       deadline:dateText_(r.deadline), dueLabel:dueLabel_(r.deadline,now), nextAction:r.next_action||'',
-      energy:r.energy_required||'', context:r.context||'', tags:r.tags||'', blockedBy:r.blocked_by||''
+      estimatedMinutes:num_(r.estimated_minutes), energy:r.energy_required||'', context:r.context||'',
+      tags:r.tags||'', blockedBy:r.blocked_by||''
     }));
 }
 
@@ -786,13 +792,14 @@ function getHealth_(rd, now) {
   const rows=rd.rows('HEALTH_DAILY').filter(r=>r.health_id).sort((a,b)=>dateSort_(a.date)-dateSort_(b.date));
   const recent=rows.slice(-14), last=recent[recent.length-1]||null;
   const latestWeight=rows.slice().reverse().find(r=>r.weight_kg!==''&&r.weight_kg!=null), latestBodyFat=rows.slice().reverse().find(r=>r.body_fat_percent!==''&&r.body_fat_percent!=null);
-  const last7=recent.slice(-7).map(r=>({date:dateText_(r.date),day:dayShort_(r.date),steps:num_(r.steps),distance:num_(r.distance_km),activeMinutes:num_(r.active_minutes),sleepMinutes:num_(r.sleep_duration_minutes),deepSleepMinutes:num_(r.deep_sleep_minutes),restingHr:numOrNull_(r.resting_hr),hrv:numOrNull_(r.hrv),weight:numOrNull_(r.weight_kg),bodyFat:numOrNull_(r.body_fat_percent)}));
+  const last14=recent.map(r=>({date:dateText_(r.date),day:dayShort_(r.date),steps:num_(r.steps),distance:num_(r.distance_km),activeMinutes:num_(r.active_minutes),sleepMinutes:num_(r.sleep_duration_minutes),deepSleepMinutes:num_(r.deep_sleep_minutes),restingHr:numOrNull_(r.resting_hr),hrv:numOrNull_(r.hrv),weight:numOrNull_(r.weight_kg),bodyFat:numOrNull_(r.body_fat_percent)}));
+  const last7=last14.slice(-7);
   const avgSteps=last7.length?Math.round(last7.reduce((s,r)=>s+r.steps,0)/last7.length):0;
   const workoutRows=rd.rows('WORKOUTS').filter(r=>r.workout_id).sort((a,b)=>dateSort_(b.date)-dateSort_(a.date)).slice(0,7);
   const weightRows=rows.filter(r=>r.weight_kg!==''&&r.weight_kg!=null).slice(-10);
   const weightSeries=weightRows.map(r=>({date:dateText_(r.date),weight:numOrNull_(r.weight_kg),bodyFat:numOrNull_(r.body_fat_percent)}));
   const sleepSeries=rows.filter(r=>num_(r.sleep_duration_minutes)>0).slice(-7).map(r=>({date:dateText_(r.date),day:dayShort_(r.date),minutes:num_(r.sleep_duration_minutes),deep:num_(r.deep_sleep_minutes)}));
-  return {latestDate:last?dateText_(last.date):'',latestSteps:last?num_(last.steps):0,latestDistance:last?num_(last.distance_km):0,avgSteps7:avgSteps,latestWeight:latestWeight?numOrNull_(latestWeight.weight_kg):null,latestWeightDate:latestWeight?dateText_(latestWeight.date):'',latestBodyFat:latestBodyFat?numOrNull_(latestBodyFat.body_fat_percent):null,sleepAvailable:sleepSeries.length>0,hrAvailable:last7.some(r=>r.restingHr!==null&&r.restingHr>0),last7:last7,sleepSeries:sleepSeries,weightSeries:weightSeries,sync:healthSyncDashboard_(rd),workouts:workoutRows.map(r=>({date:dateText_(r.date),type:r.workout_type||'',duration:num_(r.duration_minutes),distance:num_(r.distance_km),avgHr:numOrNull_(r.avg_hr),notes:r.notes||''}))};
+  return {latestDate:last?dateText_(last.date):'',latestSteps:last?num_(last.steps):0,latestDistance:last?num_(last.distance_km):0,avgSteps7:avgSteps,latestWeight:latestWeight?numOrNull_(latestWeight.weight_kg):null,latestWeightDate:latestWeight?dateText_(latestWeight.date):'',latestBodyFat:latestBodyFat?numOrNull_(latestBodyFat.body_fat_percent):null,sleepAvailable:sleepSeries.length>0,hrAvailable:last7.some(r=>r.restingHr!==null&&r.restingHr>0),last7:last7,last14:last14,sleepSeries:sleepSeries,weightSeries:weightSeries,sync:healthSyncDashboard_(rd),workouts:workoutRows.map(r=>({date:dateText_(r.date),type:r.workout_type||'',duration:num_(r.duration_minutes),distance:num_(r.distance_km),avgHr:numOrNull_(r.avg_hr),notes:r.notes||''}))};
 }
 
 function healthSyncDashboard_(rd) {

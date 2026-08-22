@@ -1,0 +1,585 @@
+<script>
+(function () {
+  'use strict';
+
+  const SOURCE_KEYS = ['base', 'personal', 'finance', 'health', 'wellbeing', 'calendar', 'mail'];
+  const SOURCE_LABELS = {
+    base: 'OPS', personal: 'Second Brain', finance: 'Finanzen', health: 'Health',
+    wellbeing: 'Wohlbefinden', calendar: 'Kalender', mail: 'E-Mail-Referenzen'
+  };
+  const DAY = ['SO', 'MO', 'DI', 'MI', 'DO', 'FR', 'SA'];
+  const monthFmt = new Intl.DateTimeFormat('de-DE', { month: 'short' });
+  const dateFmt = new Intl.DateTimeFormat('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
+  const timeFmt = new Intl.DateTimeFormat('de-DE', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Berlin' });
+
+  const asArray = value => Array.isArray(value) ? value : [];
+  const text = value => value == null ? '' : String(value);
+  const number = value => {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : 0;
+  };
+  const date = value => {
+    const parsed = value instanceof Date ? value : new Date(value);
+    return Number.isFinite(parsed.getTime()) ? parsed : null;
+  };
+  const compact = value => text(value).replace(/\s+/g, ' ').trim();
+  const statusUpper = value => text(value).toUpperCase();
+  const safeDate = value => {
+    const parsed = date(value);
+    return parsed ? dateFmt.format(parsed) : '';
+  };
+  const safeTime = value => {
+    const parsed = date(value);
+    return parsed ? timeFmt.format(parsed) : '';
+  };
+  const currentMonthLabel = () => new Intl.DateTimeFormat('de-DE', { month: 'short', year: 'numeric' }).format(new Date()).toUpperCase();
+
+  function mondayOfCurrentWeek() {
+    const now = new Date();
+    const day = now.getDay() || 7;
+    const monday = new Date(now);
+    monday.setHours(0, 0, 0, 0);
+    monday.setDate(monday.getDate() - day + 1);
+    return monday;
+  }
+
+  function emptyWeek() {
+    const start = mondayOfCurrentWeek();
+    return Array.from({ length: 7 }, (_, index) => {
+      const current = new Date(start);
+      current.setDate(start.getDate() + index);
+      return {
+        wd: DAY[current.getDay()], n: String(current.getDate()).padStart(2, '0'),
+        today: current.toDateString() === new Date().toDateString(), ev: []
+      };
+    });
+  }
+
+  function emptyData() {
+    return {
+      operator: {
+        step: 'Der aktuelle OPS-Stand wird geladen.',
+        why: 'Die verbundenen Quellen werden gerade geprüft.',
+        notNow: [], mode: 'Datenverbindung wird aufgebaut'
+      },
+      tasks: [], projects: [], inbox: [], alerts: [], week: emptyWeek(), weekMeta: 'KALENDER LÄDT',
+      mails: [],
+      fin: {
+        available: false, meta: currentMonthLabel(), in: 0, out: 0,
+        months: [], income: [], expense: [], budgets: [], cats: [], tx: []
+      },
+      hea: {
+        available: false, steps: 0, stepGoal: 0, sleep: null, sleepGoal: 0,
+        weight: null, active: 0, activeGoal: 0, workouts: 0,
+        week: [], wdl: [], steps14: [], stepLabels: [], weights: [], weightLabels: [],
+        sleep7: [], workoutsList: [], sync: {}
+      },
+      weather: {
+        available: false, stale: false, place: 'Wetterquelle wird geladen', temp: null,
+        feelsLike: null, cond: 'lädt', hours: [], error: ''
+      },
+      goals: [],
+      briefing: {
+        available: false, meta: 'BRIEFING LÄDT',
+        core: 'Der aktuelle Briefing-Stand wird aus dem OPS geladen.', rec: ''
+      },
+      system: [],
+      wb: {
+        available: false,
+        labels: ['Stimmung', 'Energie', 'Innerer Druck', 'Schlafqualität', 'Motivation', 'Erholung'],
+        values: [null, null, null, null, null, null], mood: '', factor: '', last7: [],
+        historyLabels: [], options: { feelings: [], influences: [] }, pattern: {}, guidance: {}, latest: {}
+      }
+    };
+  }
+
+  const adapter = {
+    component: null,
+    raw: {},
+    loads: Object.fromEntries(SOURCE_KEYS.map(key => [key, { state: 'idle', ms: 0, error: '' }])),
+    emptyData,
+
+    sourceCount() {
+      return SOURCE_KEYS.length;
+    },
+
+    connect(component) {
+      this.component = component;
+      this.load(false);
+    },
+
+    disconnect(component) {
+      if (this.component === component) this.component = null;
+    },
+
+    call(name, ...args) {
+      return new Promise((resolve, reject) => {
+        if (!window.google || !google.script || !google.script.run) {
+          reject(new Error('Apps-Script-Verbindung ist in dieser Vorschau nicht verfügbar.'));
+          return;
+        }
+        google.script.run
+          .withSuccessHandler(resolve)
+          .withFailureHandler(error => reject(new Error(error && error.message ? error.message : String(error))))[name](...args);
+      });
+    },
+
+    async load(force) {
+      const jobs = [
+        ['base', 'getDashboardBaseV31', value => {
+          this.applyBase(value);
+          const partialErrors = value && value.errors ? Object.entries(value.errors).filter(entry => entry[1]) : [];
+          if (partialErrors.length) throw new Error(partialErrors.map(entry => `${entry[0]}: ${entry[1]}`).join(' · '));
+        }],
+        ['personal', 'getPersonalOperatorContextV1', value => {
+          if (!value || value.ok === false) throw new Error(value && value.message ? value.message : 'Personal Operator nicht verfügbar.');
+          this.applyPersonal(value);
+        }],
+        ['finance', 'getFinanceV33', value => {
+          if (!value || value.ok === false) throw new Error(value && value.error ? value.error : 'Finanzdaten nicht verfügbar.');
+          this.applyFinance(value.finance);
+        }],
+        ['health', 'getHealthV31', value => {
+          if (!value || value.ok === false) throw new Error(value && value.error ? value.error : 'Health-Daten nicht verfügbar.');
+          this.applyHealth(value.health);
+        }],
+        ['wellbeing', 'getWellbeingV1', value => {
+          if (!value || value.ok === false) throw new Error(value && (value.error || value.message) ? (value.error || value.message) : 'Wohlbefinden nicht verfügbar.');
+          this.applyWellbeing(value);
+        }],
+        ['calendar', 'getCalendarWeekV3', value => this.applyCalendar(value)],
+        ['mail', 'getMailV3', value => {
+          if (!value || value.available === false) throw new Error(value && value.error ? value.error : 'E-Mail-Referenzen nicht verfügbar.');
+          this.applyMail(value);
+        }]
+      ];
+
+      SOURCE_KEYS.forEach(key => { this.loads[key] = { state: 'loading', ms: 0, error: '' }; });
+      this.refreshSystem();
+
+      await Promise.all(jobs.map(async ([key, endpoint, apply]) => {
+        const started = performance.now();
+        try {
+          const value = await this.call(endpoint, !!force);
+          apply(value || {});
+          this.loads[key] = { state: 'ok', ms: Math.round(performance.now() - started), error: '' };
+        } catch (error) {
+          this.loads[key] = {
+            state: 'error', ms: Math.round(performance.now() - started),
+            error: compact(error && error.message ? error.message : error)
+          };
+        }
+        this.refreshSystem();
+        this.touch();
+      }));
+
+      this.applyOperator();
+      this.refreshSystem();
+      this.touch();
+    },
+
+    reload(component) {
+      if (component) this.component = component;
+      return this.load(true);
+    },
+
+    touch(extra) {
+      if (!this.component) return;
+      this.component.setState(state => Object.assign({ tick: state.tick + 1 }, extra || {}));
+    },
+
+    applyBase(value) {
+      this.raw.base = value || {};
+      const data = this.component.D;
+      data.tasks = asArray(value.tasks).map(task => ({
+        id: text(task.id), title: text(task.title) || '(ohne Titel)',
+        next: text(task.nextAction) || 'Kein nächster Schritt im OPS hinterlegt',
+        due: text(task.dueLabel || task.deadline) || '–', deadline: text(task.deadline),
+        prio: number(task.aiPriority) >= 80 ? 'HOCH' : number(task.aiPriority) >= 50 ? 'MITTEL' : 'NIEDRIG',
+        status: ['IN_PROGRESS', 'NEXT'].includes(statusUpper(task.status)) ? 'in Arbeit' : statusUpper(task.status).toLowerCase(),
+        aiPriority: number(task.aiPriority), reason: text(task.reason), area: text(task.area),
+        blockedBy: text(task.blockedBy), estimatedMinutes: number(task.estimatedMinutes),
+        energy: text(task.energy), context: text(task.context)
+      }));
+      data.projects = asArray(value.projects).map(project => ({
+        id: text(project.id), title: text(project.title) || '(ohne Titel)', pct: number(project.progress),
+        health: this.healthLabel(project.health), blocker: text(project.blocker || project.nextAction || project.reason),
+        nextAction: text(project.nextAction), deadline: text(project.deadline || project.targetDate),
+        area: text(project.area), reason: text(project.reason), status: text(project.status)
+      }));
+      data.inbox = asArray(value.aiInbox).map(item => ({
+        id: text(item.id), text: text(item.information), source: text(item.sourceType || item.type || 'OPS AI-Inbox'),
+        conf: number(item.confidence), reasoning: text(item.reasoning), impact: text(item.impact),
+        proposedAction: text(item.proposedAction), type: text(item.type), due: text(item.dueCandidate)
+      }));
+      data.alerts = asArray(value.alerts).map(alert => ({
+        id: text(alert.id), severity: statusUpper(alert.severity), sev: this.severityNumber(alert.severity),
+        title: text(alert.title), meta: [alert.category, alert.createdAt].filter(Boolean).join(' · '),
+        message: text(alert.message), action: text(alert.recommendedAction), status: statusUpper(alert.status)
+      }));
+      data.goals = asArray(value.goals).map(goal => ({
+        id: text(goal.id), label: text(goal.title), area: text(goal.area), status: text(goal.status),
+        actual: number(goal.currentValue), target: number(goal.targetValue), unit: text(goal.unit),
+        down: /gewicht|druck|schmerz/i.test(text(goal.metric || goal.title)),
+        targetDate: text(goal.targetDate), assessment: text(goal.assessment), metric: text(goal.metric)
+      }));
+      data.briefing = this.mapBriefing(value.briefing);
+      data.weather = this.mapWeather(value.weather);
+      this.applySyncRows(value.syncState);
+      this.applyOperator();
+      if (this.raw.health) this.applyHealth(this.raw.health);
+    },
+
+    mapBriefing(briefing) {
+      if (!briefing) {
+        return { available: false, meta: 'KEIN ERFOLGREICHES BRIEFING', core: 'Im OPS liegt noch kein erfolgreich erzeugtes Briefing vor.', rec: '' };
+      }
+      return {
+        available: true,
+        meta: [text(briefing.type), text(briefing.createdAt)].filter(Boolean).join(' · '),
+        core: text(briefing.summary) || 'Das Briefing enthält noch keine Zusammenfassung.',
+        rec: text(briefing.recommendation), priorities: text(briefing.topPriorities),
+        calendar: text(briefing.calendarSummary), tasks: text(briefing.taskSummary),
+        projects: text(briefing.projectSummary), mail: text(briefing.mailSummary),
+        finance: text(briefing.financeSummary), health: text(briefing.healthSummary),
+        inbox: text(briefing.aiInboxSummary), alerts: text(briefing.alertsSummary),
+        freshness: text(briefing.freshness)
+      };
+    },
+
+    mapWeather(weather) {
+      const current = weather && weather.current;
+      const available = !!(weather && weather.available && current);
+      return {
+        available, stale: !!(weather && weather.stale),
+        place: text(weather && weather.location) || (available ? 'Standort aus OPS' : 'Wetterquelle nicht verfügbar'),
+        temp: available && current.temperatureC != null ? number(current.temperatureC) : null,
+        feelsLike: available && current.feelsLikeC != null ? number(current.feelsLikeC) : null,
+        cond: available ? text(current.text || 'Wetter') : (weather && weather.stale ? 'veraltet' : 'nicht verfügbar'),
+        error: text(weather && weather.lastError), lastSuccessAt: text(weather && weather.lastSuccessAt),
+        hours: asArray(weather && weather.hours).map(hour => ({
+          t: safeTime(hour.time) || '–', time: text(hour.time), v: number(hour.temperatureC),
+          code: number(hour.code), rain: hour.precipitationProbability == null ? null : number(hour.precipitationProbability),
+          text: text(hour.text)
+        }))
+      };
+    },
+
+    applyFinance(finance) {
+      this.raw.finance = finance || {};
+      const series = asArray(finance && finance.monthSeries);
+      this.component.D.fin = {
+        available: true,
+        meta: series.length && series[series.length - 1].key
+          ? new Intl.DateTimeFormat('de-DE', { month: 'short', year: 'numeric' }).format(new Date(series[series.length - 1].key + '-01')).toUpperCase()
+          : currentMonthLabel(),
+        in: number(finance && finance.current && finance.current.income),
+        out: number(finance && finance.current && finance.current.expense),
+        months: series.map(item => text(item.label || item.key)),
+        income: series.map(item => number(item.income)),
+        expense: series.map(item => number(item.expense)),
+        budgets: asArray(finance && finance.budgets).map(budget => ({
+          id: text(budget.id), label: text(budget.category), spent: number(budget.actual),
+          limit: number(budget.planned), remaining: number(budget.remaining), status: text(budget.status)
+        })),
+        cats: asArray(finance && finance.categorySpend).map(category => ({ label: text(category.category), v: number(category.amount) })),
+        tx: asArray(finance && finance.recent).map(item => ({
+          date: text(item.date), label: text(item.merchant || item.category), cat: text(item.category),
+          v: statusUpper(item.direction) === 'EXPENSE' ? -Math.abs(number(item.amount))
+            : statusUpper(item.direction) === 'INCOME' ? Math.abs(number(item.amount)) : number(item.amount),
+          direction: text(item.direction), pending: !!item.pending
+        })),
+        transactionCount: number(finance && finance.transactionCount)
+      };
+    },
+
+    applyHealth(health) {
+      this.raw.health = health || {};
+      const last7 = asArray(health && health.last7);
+      const last14 = asArray(health && health.last14).length ? asArray(health.last14) : last7;
+      const sleep = asArray(health && health.sleepSeries);
+      const weights = asArray(health && health.weightSeries);
+      const latest = last7[last7.length - 1] || {};
+      const goals = this.component.D.goals || [];
+      const stepGoal = this.findGoal(goals, /schritt|steps/i);
+      const sleepGoal = this.findGoal(goals, /schlaf|sleep/i);
+      const activeGoal = this.findGoal(goals, /aktiv|minuten|activity/i);
+
+      this.component.D.hea = {
+        available: true,
+        steps: number(health && health.latestSteps), stepGoal,
+        sleep: latest.sleepMinutes ? number(latest.sleepMinutes) / 60 : null,
+        sleepGoal, weight: health && health.latestWeight != null ? number(health.latestWeight) : null,
+        active: number(latest.activeMinutes), activeGoal,
+        workouts: asArray(health && health.workouts).length,
+        week: last7.map(row => number(row.steps)),
+        wdl: last7.map(row => text(row.day) || DAY[(date(row.date) || new Date()).getDay()]),
+        steps14: last14.map(row => number(row.steps)),
+        stepLabels: last14.map(row => text(row.day || safeDate(row.date))),
+        weights: weights.filter(row => row.weight != null && Number.isFinite(Number(row.weight))).map(row => number(row.weight)),
+        weightLabels: weights.filter(row => row.weight != null && Number.isFinite(Number(row.weight))).map(row => text(row.date)),
+        sleep7: sleep.map(row => {
+          const total = number(row.minutes) / 60;
+          const deep = number(row.deep) / 60;
+          return { total, deep, light: Math.max(0, total - deep), rem: 0, label: text(row.day || safeDate(row.date)), date: text(row.date) };
+        }),
+        workoutsList: asArray(health && health.workouts).map(workout => ({
+          day: text(workout.date), type: text(workout.type || 'Training'),
+          dur: number(workout.duration) ? number(workout.duration) + ' Min' : '',
+          distance: number(workout.distance), avgHr: workout.avgHr == null ? null : number(workout.avgHr),
+          load: number(workout.duration) >= 60 ? 'hoch' : number(workout.duration) >= 30 ? 'mittel' : 'leicht'
+        })),
+        sync: health && health.sync ? health.sync : {}
+      };
+    },
+
+    findGoal(goals, pattern) {
+      const match = asArray(goals).find(goal => pattern.test([goal.metric, goal.label].join(' ')));
+      return match ? number(match.target) : 0;
+    },
+
+    applyWellbeing(value) {
+      this.raw.wellbeing = value || {};
+      const history = asArray(value && value.history);
+      const summary = value && value.summary || {};
+      const latest = summary.latest || history[0] || {};
+      const averages = summary.averages || {};
+      const metricValue = (key, averageKey) => latest[key] != null ? number(latest[key]) : (averages[averageKey || key] != null ? number(averages[averageKey || key]) : null);
+      const recent = history.slice(0, 7).reverse();
+
+      this.component.D.wb = {
+        available: value && value.available !== false,
+        labels: ['Stimmung', 'Energie', 'Innerer Druck', 'Schlafqualität', 'Motivation', 'Erholung'],
+        values: [
+          metricValue('mood'), metricValue('energy'), metricValue('innerPressure'),
+          metricValue('sleepQuality'), metricValue('motivation'), metricValue('recovery')
+        ],
+        mood: text(latest.feeling), factor: text(latest.influenceFactor),
+        last7: recent.map(this.wellbeingScore),
+        historyLabels: recent.map(row => text(row.date).slice(5) || '–'),
+        options: value && value.options || { feelings: [], influences: [] },
+        pattern: value && value.pattern || {}, guidance: value && value.morningGuidance || {}, latest
+      };
+      this.applyOperator();
+    },
+
+    wellbeingScore(row) {
+      const values = [row.mood, row.energy, row.sleepQuality, row.motivation, row.recovery]
+        .map(Number).filter(Number.isFinite);
+      if (Number.isFinite(Number(row.innerPressure))) values.push(11 - Number(row.innerPressure));
+      if (!values.length) return 0;
+      return Math.round(values.reduce((sum, value) => sum + value, 0) / values.length * 10) / 10;
+    },
+
+    applyCalendar(value) {
+      this.raw.calendar = value || {};
+      const start = date(value && value.weekStart) || mondayOfCurrentWeek();
+      const events = asArray(value && value.events);
+      const week = Array.from({ length: 7 }, (_, index) => {
+        const current = new Date(start);
+        current.setDate(start.getDate() + index);
+        const dayEvents = events.filter(event => {
+          const eventDate = date(event.start);
+          return eventDate && eventDate.toDateString() === current.toDateString();
+        });
+        return {
+          wd: DAY[current.getDay()], n: String(current.getDate()).padStart(2, '0'),
+          today: current.toDateString() === new Date().toDateString(),
+          ev: dayEvents.map((event, eventIndex) => ({
+            id: text(event.id), t: event.allDay ? 'GANZTAG' : safeTime(event.start),
+            l: text(event.title) || '(ohne Titel)',
+            k: this.calendarKind(dayEvents, event, eventIndex), start: text(event.start), end: text(event.end),
+            calendar: text(event.calendar), location: text(event.location), allDay: !!event.allDay
+          }))
+        };
+      });
+      const end = new Date(start); end.setDate(start.getDate() + 6);
+      this.component.D.week = week;
+      this.component.D.weekMeta = `${safeDate(start).slice(0, 5)}–${safeDate(end).slice(0, 5)} · ${events.length} TERMINE`;
+    },
+
+    calendarKind(dayEvents, current, index) {
+      if (current.allDay) return 'n';
+      const start = date(current.start), end = date(current.end);
+      const collides = dayEvents.some((other, otherIndex) => {
+        if (otherIndex === index || other.allDay) return false;
+        const otherStart = date(other.start), otherEnd = date(other.end);
+        return start && end && otherStart && otherEnd && start < otherEnd && otherStart < end;
+      });
+      if (collides) return 'r';
+      return start && start.toDateString() === new Date().toDateString() ? 'g' : 'n';
+    },
+
+    applyMail(value) {
+      this.raw.mail = value || {};
+      this.component.D.mails = asArray(value && value.messages).map(message => ({
+        id: text(message.refId), from: text(message.from), subject: text(message.subject || '(ohne Betreff)'),
+        reason: text(message.reason || message.summary || 'Operativ relevant'), category: text(message.category),
+        date: text(message.date), relevance: number(message.relevanceScore), followUp: !!message.followUpRequired
+      }));
+    },
+
+    applyPersonal(value) {
+      this.raw.personal = value || {};
+      this.applyOperator();
+    },
+
+    applyOperator() {
+      if (!this.component) return;
+      const data = this.component.D;
+      const tasks = asArray(data.tasks);
+      const task = tasks[0];
+      const personal = this.raw.personal && this.raw.personal.ok !== false ? (this.raw.personal.personal || {}) : {};
+      const wellbeing = data.wb || {};
+      const guidance = wellbeing.guidance || {};
+      data.operator = {
+        step: task ? (task.next && !/^Kein nächster Schritt/.test(task.next) ? task.next : task.title) : 'Keine offene Aufgabe im OPS.',
+        why: task
+          ? (task.reason || [task.due !== '–' ? task.due : '', task.blockedBy].filter(Boolean).join(' · ') || 'Die Aufgabe steht im OPS aktuell an erster Stelle.')
+          : 'Der aktuelle OPS-Stand enthält keine offene Aufgabe.',
+        notNow: tasks.slice(1, 4).map(item => item.title),
+        mode: guidance.active
+          ? text(guidance.message)
+          : text(asArray(personal.dayStructure)[0] || asArray(personal.focusRules)[0] || 'Einen sichtbaren Schritt abschließen und Puffer lassen.')
+      };
+    },
+
+    applySyncRows(rows) {
+      this.raw.syncRows = asArray(rows);
+      this.refreshSystem();
+    },
+
+    refreshSystem() {
+      if (!this.component) return;
+      const sourceRows = asArray(this.raw.syncRows).map(row => ({
+        name: text(row.system_name || 'System'),
+        state: statusUpper(row.status) === 'OK' ? 'ok' : statusUpper(row.status) === 'ERROR' ? 'error' : 'warn',
+        last: text(row.data_freshness || row.last_success_at || 'kein Stand'),
+        note: text(row.last_error || row.note || row.connection_state),
+        status: statusUpper(row.status || 'UNKNOWN'), connection: text(row.connection_state)
+      }));
+      const frontendRows = SOURCE_KEYS.map(key => {
+        const load = this.loads[key];
+        return {
+          name: 'Datenpfad · ' + SOURCE_LABELS[key], state: load.state,
+          last: load.state === 'ok' ? `${load.ms} ms` : load.state === 'loading' ? 'lädt' : load.state === 'error' ? 'Fehler' : 'wartet',
+          note: load.error, status: load.state.toUpperCase(), connection: 'Browser ↔ Apps Script'
+        };
+      });
+      this.component.D.system = sourceRows.length ? sourceRows.concat(frontendRows) : frontendRows;
+    },
+
+    sourceState() {
+      const ok = SOURCE_KEYS.filter(key => this.loads[key].state === 'ok').length;
+      const errors = SOURCE_KEYS.filter(key => this.loads[key].state === 'error').length;
+      const loading = SOURCE_KEYS.filter(key => this.loads[key].state === 'loading').length;
+      const waiting = SOURCE_KEYS.filter(key => this.loads[key].state === 'idle').length;
+      if (errors) return { label: `${ok}/${SOURCE_KEYS.length} Datenpfade bereit · ${errors} Fehler`, color: '#C56E3A', glow: 'rgba(197,110,58,.75)', ok, errors, loading };
+      if (loading) return { label: `${ok}/${SOURCE_KEYS.length} Datenpfade bereit`, color: '#DDB65C', glow: 'rgba(221,182,92,.75)', ok, errors, loading };
+      if (waiting) return { label: `${ok}/${SOURCE_KEYS.length} Datenpfade warten`, color: '#DDB65C', glow: 'rgba(221,182,92,.75)', ok, errors, loading, waiting };
+      return { label: `Alle ${SOURCE_KEYS.length} Datenpfade bereit`, color: '#5FBF8A', glow: 'rgba(95,191,138,.8)', ok, errors, loading };
+    },
+
+    bootLog() {
+      const lines = SOURCE_KEYS.map(key => {
+        const load = this.loads[key];
+        return [SOURCE_LABELS[key].toUpperCase(), load.state === 'ok' ? 'OK' : load.state === 'error' ? 'FEHLER' : load.state === 'loading' ? 'LÄDT' : 'WARTET'];
+      });
+      lines.push(['KOMMANDOZENTRALE AKTIV', this.sourceState().errors ? 'TEILWEISE' : this.sourceState().loading ? 'LÄDT' : 'BEREIT']);
+      return lines;
+    },
+
+    healthLabel(value) {
+      const status = statusUpper(value);
+      if (status === 'GREEN') return 'gut';
+      if (status === 'YELLOW') return 'risiko';
+      if (status === 'RED' || status === 'BLOCKED') return 'kritisch';
+      return 'unbekannt';
+    },
+
+    severityNumber(value) {
+      const severity = statusUpper(value);
+      return severity === 'CRITICAL' ? 3 : severity === 'IMPORTANT' ? 2 : 1;
+    },
+
+    async completeTask(id) {
+      if (!id) return;
+      try {
+        await this.call('setTaskDone', id, true);
+        this.component.D.tasks = this.component.D.tasks.filter(task => task.id !== id);
+        this.applyOperator();
+        this.touch();
+      } catch (error) {
+        this.recordActionError(error);
+      }
+    },
+
+    async acknowledgeAlert(id) {
+      if (!id) return;
+      try {
+        await this.call('acknowledgeAlert', id);
+        const alert = this.component.D.alerts.find(item => item.id === id);
+        if (alert) alert.status = 'ACKNOWLEDGED';
+        this.touch();
+      } catch (error) {
+        this.recordActionError(error);
+      }
+    },
+
+    async reviewInbox(id, decision) {
+      if (!id) return;
+      try {
+        await this.call('reviewAiInbox', id, decision, 'Entscheidung direkt im HTML-Cockpit; externe Folgeaktion nicht automatisch ausgeführt.');
+        this.component.D.inbox = this.component.D.inbox.filter(item => item.id !== id);
+        this.touch();
+      } catch (error) {
+        this.recordActionError(error);
+      }
+    },
+
+    async saveWellbeing(component) {
+      if (!component || !component.D.wb.available) return;
+      const form = component.state.wbForm || {};
+      const payload = {
+        mood: form[0] == null ? null : form[0],
+        energy: form[1] == null ? null : form[1],
+        innerPressure: form[2] == null ? null : form[2],
+        sleepQuality: form[3] == null ? null : form[3],
+        motivation: form[4] == null ? null : form[4],
+        recovery: form[5] == null ? null : form[5],
+        feeling: component.state.wbMood || null,
+        feelingIntensity: null,
+        influenceFactor: component.state.wbFactor || null,
+        reflection: ''
+      };
+      try {
+        const result = await this.call('saveWellbeingEntryV1', payload);
+        if (!result || result.ok === false) throw new Error(result && result.error ? result.error : 'Abendcheck konnte nicht gespeichert werden.');
+        this.applyWellbeing(result.data || {});
+        component.setState({ wbSaved: true });
+      } catch (error) {
+        this.recordActionError(error);
+      }
+    },
+
+    async searchSecondBrain(query) {
+      const value = compact(query);
+      if (value.length < 2) return { ok: false, message: 'Bitte mindestens zwei Zeichen eingeben.', matches: [] };
+      try {
+        return await this.call('searchSecondBrainV1', value, false);
+      } catch (error) {
+        return { ok: false, message: compact(error && error.message ? error.message : error), matches: [] };
+      }
+    },
+
+    recordActionError(error) {
+      const message = compact(error && error.message ? error.message : error);
+      this.loads.base = { state: 'error', ms: 0, error: `Aktion fehlgeschlagen: ${message}` };
+      this.refreshSystem();
+      this.touch();
+    }
+  };
+
+  window.KZLive = adapter;
+})();
+</script>

@@ -5,7 +5,9 @@ Technische Quellbasis für das HTML-Cockpit der persönlichen Kommandozentrale.
 Dieses Repository enthält ausschließlich die Software-Schicht:
 
 - Google-Apps-Script-Backend (`src/Code.gs`)
-- HTML/CSS/JavaScript-Oberfläche (`src/Index.html`)
+- unverändert importierte Claude-Design-Laufzeit (`src/ClaudeRuntime.html`)
+- Claude-Design-Oberfläche (`src/Index.html`) mit Live-Datenbindungen
+- schmaler Apps-Script-Adapter (`src/LiveAdapter.html`)
 - anonymisierte Fixtures und statische Vertragstests
 - technische Regeln für Claude Code, Reviews und Releases
 
@@ -45,6 +47,12 @@ IDEe/Spezifikation → Claude-Code-Branch → Tests → unabhängiger Review
 ```
 
 Die Repositorybasis ist bewusst klein gehalten. Neue Abstraktionen oder zusätzliche Dienste werden erst aufgenommen, wenn sie ein konkretes Problem lösen.
+
+## Claude-Design-Cockpit
+
+Das neue Cockpit verwendet Claudes gelieferte `x-dc`-Oberfläche und deren Runtime direkt; es wurde nicht als neues Layout nachgebaut. Ausschließlich Demo-Daten und lokale Demo-Aktionen wurden an die bestehenden Kommandozentralen-Verträge angebunden.
+
+Die genaue Dateiliste zum Kopieren in Apps Script, die unveränderten Script Properties und der Smoke-Test stehen in [docs/claude-design-integration.md](docs/claude-design-integration.md).
 
 ## Phase 4 – personalisierter Second-Brain-Kontext
 

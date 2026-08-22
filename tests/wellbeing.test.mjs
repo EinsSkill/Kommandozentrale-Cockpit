@@ -7,6 +7,8 @@ import test from 'node:test';
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const code = await readFile(join(root, 'src', 'Code.gs'), 'utf8');
 const html = await readFile(join(root, 'src', 'Index.html'), 'utf8');
+const adapter = await readFile(join(root, 'src', 'LiveAdapter.html'), 'utf8');
+const runtime = await readFile(join(root, 'src', 'ClaudeRuntime.html'), 'utf8');
 const fixtures = JSON.parse(await readFile(join(root, 'fixtures', 'wellbeing.json'), 'utf8'));
 
 test('Apps-Script-Wohlbefindenpfad erfüllt den OPS-Vertrag', () => {
@@ -24,21 +26,24 @@ test('Apps-Script-Wohlbefindenpfad erfüllt den OPS-Vertrag', () => {
 });
 
 test('Frontend bietet Verlauf, freiwillige Felder und Speichern an', () => {
-  assert.match(html, /id="card-wohlbefinden"/);
-  assert.match(html, /callServer\('getWellbeingV1',force\)/);
-  assert.match(html, /callServer\('saveWellbeingEntryV1',wellbeingFormPayload\(\)\)/);
-  assert.match(html, /function wellbeingChartSvg_/);
-  assert.match(html, /function wellbeingFormHtml_/);
+  assert.match(html, /data-tile="wellbeing"/);
+  assert.match(adapter, /\['wellbeing',\s*'getWellbeingV1'/);
+  assert.match(adapter, /this\.call\('saveWellbeingEntryV1',\s*payload\)/);
+  assert.match(html, /wbSpark/);
+  assert.match(html, /wbForm/);
   assert.match(html, /Heute nicht angeben/);
   assert.match(html, /Abendcheck speichern/);
-  assert.match(html, /function saveWellbeing\(\)/);
+  assert.match(adapter, /async saveWellbeing\(component\)/);
 });
 
 test('Backend und eingebettetes Frontend sind syntaktisch parsebar', () => {
   assert.doesNotThrow(() => new Function(code));
-  const script = html.match(/<script>([\s\S]*?)<\/script>/i);
-  assert.ok(script, 'Index.html enthält keinen Script-Block');
-  assert.doesNotThrow(() => new Function(script[1]));
+  const logic = html.match(/<script type="text\/x-dc"[\s\S]*?>([\s\S]*?)<\/script>\s*<\/body>/i);
+  assert.ok(logic, 'Index.html enthält keinen x-dc-Logikblock');
+  const unwrap = source => source.replace(/^\s*<script>\s*/i, '').replace(/\s*<\/script>\s*$/i, '');
+  assert.doesNotThrow(() => new Function(logic[1]));
+  assert.doesNotThrow(() => new Function(unwrap(adapter)));
+  assert.doesNotThrow(() => new Function(unwrap(runtime)));
 });
 
 test('Wohlbefinden-Fixtures sind anonymisiert und liegen im erlaubten Wertebereich', () => {

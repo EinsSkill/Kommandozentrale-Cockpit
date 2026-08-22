@@ -6,6 +6,7 @@ const health = read('HealthSync.gs');
 const weather = read('Weather.gs');
 const code = read('Code.gs');
 const index = read('Index.html');
+const adapter = read('LiveAdapter.html');
 
 for (const name of ['previewHealthSyncV1','runHealthSyncV1','setupHealthSyncV1','healthSyncParseStepsV1_','healthSyncParseActivitiesV1_','healthSyncUpsertHealthV1_','healthSyncUpsertWorkoutsV1_','healthSyncRebuildTrendsV1_']) {
   assert.match(health, new RegExp('function\\s+' + name + '\\b'), name);
@@ -31,11 +32,11 @@ assert.match(weather, /lastSuccessAt/);
 assert.match(weather, /stale/);
 assert.match(code, /safeAssign_\(out, 'weather'/);
 assert.match(code, /sync:healthSyncDashboard_\(rd\)/);
-assert.match(index, /function renderWeather\(\)/);
-assert.match(index, /function weatherHourLabel\(/);
-assert.match(index, /function weatherUpcomingHours\(/);
-assert.match(index, /timeZone:'Europe\/Berlin'/);
-assert.match(index, /Veralteter Stand/);
-assert.doesNotMatch(index, /api\.open-meteo\.com/);
-assert.doesNotMatch(health + weather + code, /1vfQZN9qLmGeE__Nyt2PdpxBw3bSiBgIR|1sYn_RuXoxx8d3Jk3zaXfleq0euvNqB4G|1PPQgjurSpUYgCiwBrnwYS6vBqZ59BOeT|1wIgebOEGKY5Oufb3Qp8o8z7r33SN0g7jEHXAq2Mwp1w/);
+assert.match(adapter, /mapWeather\(weather\)/);
+assert.match(adapter, /safeTime\(hour\.time\)/);
+assert.match(adapter, /timeZone:\s*'Europe\/Berlin'/);
+assert.match(adapter, /stale:/);
+assert.match(index, /data-tile="weather"/);
+assert.doesNotMatch(index + adapter, /api\.open-meteo\.com/);
+assert.doesNotMatch(health + weather + code, /(?:getFolderById|openById)\(\s*['"][A-Za-z0-9_-]{20,}['"]\s*\)/);
 console.log('health/weather integration contract: ok');
