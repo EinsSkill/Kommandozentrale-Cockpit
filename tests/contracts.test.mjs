@@ -7,6 +7,8 @@ import test from 'node:test';
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const code = await readFile(join(root, 'src', 'Code.gs'), 'utf8');
 const html = await readFile(join(root, 'src', 'Index.html'), 'utf8');
+const adapter = await readFile(join(root, 'src', 'LiveAdapter.html'), 'utf8');
+const frontend = `${html}\n${adapter}`;
 const fixtures = JSON.parse(await readFile(join(root, 'fixtures', 'email_refs.json'), 'utf8'));
 
 test('backend mail endpoint uses the OPS EMAIL_REFS contract', () => {
@@ -19,12 +21,13 @@ test('backend mail endpoint uses the OPS EMAIL_REFS contract', () => {
 });
 
 test('frontend calls the compatible getMailV3 endpoint', () => {
-  assert.match(html, /callServer\('getMailV3',force\)/);
+  assert.match(adapter, /\['mail',\s*'getMailV3'/);
+  assert.match(adapter, /sourceOfTruth|OPS\.EMAIL_REFS|E-Mail-Referenzen/);
 });
 
 test('repository source contains no live OPS identifier or personal Gmail address', () => {
   assert.doesNotMatch(code, /docs\.google\.com\/spreadsheets\/d\//);
-  assert.doesNotMatch(`${code}\n${html}`, /[A-Z0-9._%+-]+@gmail\.com/i);
+  assert.doesNotMatch(`${code}\n${frontend}`, /[A-Z0-9._%+-]+@gmail\.com/i);
   assert.match(code, /OPS_SPREADSHEET_ID/);
   assert.match(code, /REPLACE_WITH_SCRIPT_PROPERTY/);
   assert.match(code, /getScriptProperties\(\)/);
