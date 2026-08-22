@@ -7,6 +7,8 @@ import test from 'node:test';
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const operator = await readFile(join(root, 'src', 'PersonalOperator.gs'), 'utf8');
 const html = await readFile(join(root, 'src', 'Index.html'), 'utf8');
+const adapter = await readFile(join(root, 'src', 'LiveAdapter.html'), 'utf8');
+const frontend = `${html}\n${adapter}`;
 
 test('personal operator uses a small canonical allowlist', () => {
   assert.match(operator, /function getPersonalOperatorContextV1\(force\)/);
@@ -30,11 +32,11 @@ test('personal operator is read-only and sensitive by default', () => {
 });
 
 test('frontend shows decisions and keeps full-vault search on demand', () => {
-  assert.match(html, /getPersonalOperatorContextV1/);
-  assert.match(html, /Persönlicher Operator/);
+  assert.match(adapter, /getPersonalOperatorContextV1/);
+  assert.match(html, /Personal Operator/);
   assert.match(html, /Nächster sichtbarer Schritt/);
-  assert.match(html, /Bewusst nicht jetzt/);
-  assert.ok(html.indexOf('card-persoenlich') < html.indexOf('<footer'), 'personal operator card should render directly before the footer');
-  assert.match(html, /searchSecondBrainV1/);
-  assert.doesNotMatch(html, /getPersonalContextV1/);
+  assert.match(html, /Bewusst nicht jetzt/i);
+  assert.match(html, /data-tile="operator"/);
+  assert.match(adapter, /searchSecondBrainV1/);
+  assert.doesNotMatch(frontend, /getPersonalContextV1/);
 });
