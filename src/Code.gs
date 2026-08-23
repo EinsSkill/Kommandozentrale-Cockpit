@@ -46,8 +46,9 @@ const WELLBEING_INFLUENCES = [
   'unklar'
 ];
 
-function doGet() {
-  return HtmlService.createTemplateFromFile('Index').evaluate()
+function doGet(e) {
+  const view = e && e.parameter && e.parameter.view === 'mobile' ? 'MobileIndex' : 'Index';
+  return HtmlService.createTemplateFromFile(view).evaluate()
     .setTitle('Lukes Kommandozentrale')
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }

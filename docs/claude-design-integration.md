@@ -11,6 +11,17 @@ Zur Nachvollziehbarkeit sind die gelieferten Quellen festgehalten:
 
 `tests/claude-design-live.test.mjs` schützt diese Herkunft und prüft außerdem, dass bekannte Demo-Einträge nicht mehr im Live-Cockpit vorkommen.
 
+## Mobile-Version
+
+Die mobile Claude-Datei bleibt als eigener Apps-Script-Template-View erhalten:
+
+- Mobile-Design-HTML, SHA-256: `94f45fae22b676d57a4904b6f8330a2ff9789184e88ef89fb283927751b0b3a0`
+- Datei im Repository: `src/MobileIndex.html`
+- Auf kleinen Bildschirmen führt der normale `/exec`-Aufruf automatisch zu `?view=mobile`.
+- `?view=mobile` erzwingt die mobile Ansicht; `?view=desktop` erzwingt die Desktop-Ansicht.
+
+Die mobile Oberfläche verwendet dieselben Live-Endpunkte, Schreibpfade, Script Properties, Claude-Runtime und den Live-Adapter wie die Desktop-Oberfläche. Das Layout wird nicht neu nachgebaut; nur die Daten- und Aktionsbindungen sind an die vorhandenen Contracts angeschlossen.
+
 ## Was technisch angebunden ist
 
 | Bereich | Bestehender Endpunkt / Vertrag |
@@ -39,9 +50,10 @@ Im bestehenden Apps-Script-Projekt **Kommandozentrale**:
 
 1. `src/Code.gs` vollständig in die vorhandene Datei `Code.gs` kopieren.
 2. `src/Index.html` vollständig in die vorhandene Datei `Index.html` kopieren.
-3. Eine neue HTML-Datei `ClaudeRuntime` anlegen und den vollständigen Inhalt von `src/ClaudeRuntime.html` hineinkopieren.
-4. Eine neue HTML-Datei `LiveAdapter` anlegen und den vollständigen Inhalt von `src/LiveAdapter.html` hineinkopieren.
-5. Die vorhandenen Dateien `HealthSync.gs`, `PersonalOperator.gs`, `SecondBrain.gs` und `Weather.gs` unverändert im Projekt belassen.
+3. Eine neue HTML-Datei `MobileIndex` anlegen und den vollständigen Inhalt von `src/MobileIndex.html` hineinkopieren.
+4. Eine neue HTML-Datei `ClaudeRuntime` anlegen bzw. die vorhandene Datei aus dem Desktop-Merge unverändert beibehalten; Inhalt von `src/ClaudeRuntime.html` verwenden.
+5. Eine neue HTML-Datei `LiveAdapter` anlegen bzw. die vorhandene Datei aus dem Desktop-Merge unverändert beibehalten; Inhalt von `src/LiveAdapter.html` verwenden.
+6. Die vorhandenen Dateien `HealthSync.gs`, `PersonalOperator.gs`, `SecondBrain.gs` und `Weather.gs` unverändert im Projekt belassen.
 
 `support.js` muss nicht als eigene Datei angelegt werden. Sein unveränderter Inhalt steckt bereits in `ClaudeRuntime.html`.
 
@@ -66,11 +78,12 @@ Falls die zugehörigen Bereiche noch nicht eingerichtet sind, einmal manuell in 
 
 1. Vor dem Kopieren im Repository `npm test` ausführen.
 2. In Apps Script eine neue Version der bestehenden Web-App-Bereitstellung veröffentlichen. Der vorhandene Web-App-Link bleibt bei einer aktualisierten Bereitstellung gleich.
-3. Web-App neu laden und die Bootsequenz abwarten oder überspringen.
-4. Prüfen, dass der Quellen-Chip den echten Ladezustand zeigt und Fehler nicht als erfolgreiche Daten erscheinen.
-5. Je einen Leseweg prüfen: Aufgabe, Kalendertermin, `OPS.EMAIL_REFS`, Finanzwert, Health-Wert und Wellbeing-Verlauf.
-6. Die Second-Brain-Suche im Detail **Personal Operator** testen; sie muss `read-only` melden.
-7. Nur mit einem bewusst gewählten Testeintrag je einen Schreibweg prüfen und danach den zugehörigen OPS-/Audit-Eintrag kontrollieren.
+3. Den `/exec`-Link auf dem Desktop und auf dem Smartphone öffnen; zusätzlich `?view=desktop` und `?view=mobile` testen.
+4. Web-App neu laden und die Bootsequenz abwarten oder überspringen.
+5. Prüfen, dass der Quellen-Chip den echten Ladezustand zeigt und Fehler nicht als erfolgreiche Daten erscheinen.
+6. Je einen Leseweg prüfen: Aufgabe, Kalendertermin, `OPS.EMAIL_REFS`, Finanzwert, Health-Wert und Wellbeing-Verlauf.
+7. Die Second-Brain-Suche im Detail **Personal Operator** bzw. im mobilen Tab **Mehr** testen; sie muss `read-only` melden.
+8. Nur mit einem bewusst gewählten Testeintrag je einen Schreibweg prüfen und danach den zugehörigen OPS-/Audit-Eintrag kontrollieren.
 
 Merge und Live-Bereitstellung bleiben getrennte, ausdrücklich freizugebende Schritte.
 

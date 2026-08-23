@@ -3,6 +3,16 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<script>
+(function () {
+  if (new URLSearchParams(window.location.search).has('view')) return;
+  if (window.matchMedia && window.matchMedia('(max-width: 720px)').matches) {
+    var mobileUrl = new URL(window.location.href);
+    mobileUrl.searchParams.set('view', 'mobile');
+    window.location.replace(mobileUrl.toString());
+  }
+})();
+</script>
 <!-- Claude Design source SHA-256: 01b102d2f95fef3b037030d946e4a9ab98a819eb3926ca3d35250c8c1bbf117b. Visual structure is design-locked. -->
 <?!= includeHtml_('ClaudeRuntime'); ?>
 <?!= includeHtml_('LiveAdapter'); ?>
