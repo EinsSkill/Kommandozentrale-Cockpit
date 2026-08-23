@@ -25,7 +25,8 @@ test('Claude Design source and runtime remain traceable and design-locked', () =
 });
 
 test('Apps Script evaluates the design template and includes both repository-owned fragments', () => {
-  assert.match(code, /createTemplateFromFile\('Index'\)\.evaluate\(\)/);
+  assert.match(code, /const view = e && e\.parameter && e\.parameter\.view === 'mobile' \? 'MobileIndex' : 'Index';/);
+  assert.match(code, /createTemplateFromFile\(view\)\.evaluate\(\)/);
   assert.match(code, /function includeHtml_\(fileName\)/);
   assert.match(index, /includeHtml_\('ClaudeRuntime'\)/);
   assert.match(index, /includeHtml_\('LiveAdapter'\)/);

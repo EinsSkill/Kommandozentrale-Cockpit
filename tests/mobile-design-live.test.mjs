@@ -1,0 +1,137 @@
+import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
+import { readFile } from 'node:fs/promises';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import test from 'node:test';
+
+const root = join(dirname(fileURLToPath(import.meta.url)), '..');
+const mobile = await readFile(join(root, 'src', 'MobileIndex.html'), 'utf8');
+const index = await readFile(join(root, 'src', 'Index.html'), 'utf8');
+const code = await readFile(join(root, 'src', 'Code.gs'), 'utf8');
+const adapterFile = await readFile(join(root, 'src', 'LiveAdapter.html'), 'utf8');
+const adapterScript = adapterFile.replace(/^\s*<script>\s*/i, '').replace(/\s*<\/script>\s*$/i, '');
+const logic = mobile.match(/<script type="text\/x-dc"[\s\S]*?>([\s\S]*?)<\/script>\s*<\/body>/i)?.[1];
+assert.ok(logic, 'mobile x-dc logic missing');
+
+test('mobile Claude source is retained and routed without external support.js', () => {
+  assert.match(mobile, /Claude Mobile Design source SHA-256: 94f45fae22b676d57a4904b6f8330a2ff9789184e88ef89fb283927751b0b3a0/);
+  assert.match(mobile, /includeHtml_\('ClaudeRuntime'\)/);
+  assert.match(mobile, /includeHtml_\('LiveAdapter'\)/);
+  assert.doesNotMatch(mobile, /<script[^>]+src=["'][^"']*support\.js/i);
+  const style = mobile.match(/<style>([\s\S]*?)<\/style>/)?.[1];
+  assert.ok(style, 'mobile Claude stylesheet missing');
+  assert.equal(createHash('sha256').update(style).digest('hex'), '3104df4cc942f1bbe621506a0be9f8f8f7b72dba75aeaeafc687a25544534734');
+  assert.match(code, /e\.parameter\.view === 'mobile' \? 'MobileIndex' : 'Index'/);
+  assert.match(index, /searchParams\.set\('view', 'mobile'\)/);
+});
+
+test('mobile live surface exposes the existing read and write contracts', () => {
+  for (const endpoint of [
+    'getDashboardBaseV31', 'getPersonalOperatorContextV1', 'getFinanceV33',
+    'getHealthV31', 'getWellbeingV1', 'getCalendarWeekV3', 'getMailV3',
+    'setTaskDone', 'acknowledgeAlert', 'reviewAiInbox', 'saveWellbeingEntryV1',
+    'searchSecondBrainV1'
+  ]) assert.match(mobile + adapterFile, new RegExp(endpoint));
+  for (const action of ['completeTask', 'acknowledgeAlert', 'reviewInbox', 'saveWellbeing', 'searchSecondBrain']) {
+    assert.match(mobile, new RegExp(action));
+  }
+  assert.match(mobile, /read-only/);
+  for (const demo of [
+    'Angebot Weber', 'Nordlicht anstoßen', 'Frau Sander', 'Website-Relaunch',
+    'Inbox auf Null', 'Token expired', 'Woche vor der Woche', 'Lüneburg'
+  ]) assert.doesNotMatch(mobile, new RegExp(demo, 'i'));
+});
+
+function harness() {
+  const window = {};
+  new Function('window', adapterScript)(window);
+  class DCLogic {}
+  const Component = new Function('DCLogic', 'window', `${logic}\nreturn Component;`)(DCLogic, window);
+  const component = new Component();
+  component.props = { bootSequence: false, bootSpeed: 1, customCursor: false, timeOfDay: 'morgen', accentGold: '#B8912F' };
+  component.setState = update => {
+    const next = typeof update === 'function' ? update(component.state) : update;
+    Object.assign(component.state, next || {});
+  };
+  window.KZLive.component = component;
+  return { window, component, adapter: window.KZLive };
+}
+
+test('mobile live values render safely before any source has loaded', () => {
+  const { component } = harness();
+  component.state.p = 1;
+  component.state.dp = 1;
+  const values = component.renderVals();
+  assert.equal(values.tasks.length, 0);
+  assert.equal(values.projects.length, 0);
+  assert.equal(values.mails.length, 0);
+  assert.equal(values.finLedger[0].val, '–');
+  assert.equal(values.heaRings[0].pctLabel, '–');
+  assert.equal(values.weather.temp, '–');
+  assert.match(values.sourceState?.label || values.boot.readyLabel, /warten|bereit/i);
+});
+
+test('mobile live values receive real endpoint-shaped data and keep details callable', () => {
+  const { component, adapter } = harness();
+  component.state.p = 1;
+  component.state.dp = 1;
+  Object.keys(adapter.loads).forEach(key => { adapter.loads[key] = { state: 'ok', ms: 12, error: '' }; });
+
+  adapter.applyBase({
+    tasks: [{ id: 'TASK_1', title: 'Live-Aufgabe', status: 'OPEN', aiPriority: 88, deadline: '2026-08-22', dueLabel: 'Heute', nextAction: 'Live-Schritt', estimatedMinutes: 45 }],
+    projects: [{ id: 'PROJECT_1', title: 'Live-Projekt', progress: 42, health: 'YELLOW', blocker: 'Live-Blocker' }],
+    aiInbox: [{ id: 'INBOX_1', information: 'Live-Erkenntnis', confidence: 73, sourceType: 'OPS' }],
+    alerts: [{ id: 'ALERT_1', title: 'Live-Alert', severity: 'IMPORTANT', status: 'OPEN' }],
+    goals: [
+      { id: 'GOAL_1', title: 'Schritte', metric: 'steps', currentValue: 7000, targetValue: 10000, unit: '' },
+      { id: 'GOAL_2', title: 'Schlaf', metric: 'sleep', currentValue: 7, targetValue: 8, unit: 'h' },
+      { id: 'GOAL_3', title: 'Aktivminuten', metric: 'active minutes', currentValue: 30, targetValue: 60, unit: 'Min' }
+    ],
+    briefing: { type: 'MORNING', createdAt: '2026-08-22 06:40', summary: 'Live-Briefing', recommendation: 'Live-Empfehlung' },
+    weather: { available: true, location: 'Live-Ort', current: { temperatureC: 20, feelsLikeC: 19, text: 'klar' }, hours: [{ time: '2026-08-22T12:00:00Z', temperatureC: 21, precipitationProbability: 10, text: 'klar' }] },
+    syncState: [], errors: {}
+  });
+  adapter.applyFinance({
+    monthSeries: [{ key: '2026-08', label: 'Aug', income: 2000, expense: 1200 }],
+    current: { income: 2000, expense: 1200 },
+    budgets: [{ id: 'B_1', category: 'Betrieb', actual: 300, planned: 500, remaining: 200 }],
+    categorySpend: [{ category: 'Betrieb', amount: 300 }],
+    recent: [{ date: '2026-08-21', merchant: 'Live-Händler', category: 'Betrieb', amount: 30, direction: 'EXPENSE' }],
+    transactionCount: 1
+  });
+  adapter.applyHealth({
+    latestSteps: 7000, latestWeight: 78.4,
+    last7: [{ date: '2026-08-22', day: 'SA', steps: 7000, activeMinutes: 30, sleepMinutes: 420 }],
+    last14: [{ date: '2026-08-22', day: 'SA', steps: 7000, activeMinutes: 30, sleepMinutes: 420 }],
+    sleepSeries: [{ date: '2026-08-22', day: 'SA', minutes: 420, deep: 90 }],
+    weightSeries: [{ date: '2026-08-22', weight: 78.4 }],
+    workouts: [{ date: '2026-08-21', type: 'Laufen', duration: 35 }], sync: {}
+  });
+  adapter.applyWellbeing({
+    available: true,
+    history: [{ date: '2026-08-21', mood: 7, energy: 6, innerPressure: 4, sleepQuality: 7, motivation: 6, recovery: 7, feeling: 'ruhig / ausgeglichen', influenceFactor: 'Freizeit / Erholung' }],
+    summary: { latest: { mood: 7, energy: 6, innerPressure: 4, sleepQuality: 7, motivation: 6, recovery: 7, feeling: 'ruhig / ausgeglichen', influenceFactor: 'Freizeit / Erholung' }, averages: {} },
+    pattern: { candidate: false, status: 'INSUFFICIENT_DATA', days: 1 }, morningGuidance: { active: false },
+    options: { feelings: ['ruhig / ausgeglichen'], influences: ['Freizeit / Erholung'] }
+  });
+  adapter.applyCalendar({ weekStart: '2026-08-17T00:00:00Z', events: [{ id: 'EVENT_1', title: 'Live-Termin', start: '2026-08-22T10:00:00Z', end: '2026-08-22T11:00:00Z' }] });
+  adapter.applyMail({ messages: [{ refId: 'MAIL_1', from: 'person@example.invalid', subject: 'Live-Mail', reason: 'Live-Grund' }] });
+  adapter.applyPersonal({ ok: true, personal: { focusRules: ['Live-Fokusregel'] } });
+  adapter.refreshSystem();
+
+  const values = component.renderVals();
+  assert.equal(values.tasks[0].title, 'Live-Aufgabe');
+  assert.equal(values.projects[0].title, 'Live-Projekt');
+  assert.equal(values.mails[0].subject, 'Live-Mail');
+  assert.equal(values.brief.core, 'Live-Briefing');
+  assert.equal(values.weather.place, 'Live-Ort · gefühlt 19 °C');
+  assert.equal(values.heaRings[0].pctLabel, '70%');
+  assert.equal(values.finLedger[0].val, '800 €');
+  assert.equal(values.wbFeeling, 'ruhig / ausgeglichen');
+
+  for (const tab of ['heute', 'finanzen', 'gesundheit', 'wellbeing', 'mehr']) {
+    component.state.tab = tab;
+    assert.doesNotThrow(() => component.renderVals(), `mobile tab must render: ${tab}`);
+  }
+});
