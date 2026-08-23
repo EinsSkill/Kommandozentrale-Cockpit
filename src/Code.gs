@@ -48,7 +48,9 @@ const WELLBEING_INFLUENCES = [
 
 function doGet(e) {
   const view = e && e.parameter && e.parameter.view === 'mobile' ? 'MobileIndex' : 'Index';
-  return HtmlService.createTemplateFromFile(view).evaluate()
+  const template = HtmlService.createTemplateFromFile(view);
+  template.webAppUrl = ScriptApp.getService().getUrl() || '';
+  return template.evaluate()
     .setTitle('Lukes Kommandozentrale')
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }

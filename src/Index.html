@@ -12,9 +12,11 @@
   var viewportWidth = document.documentElement.clientWidth || window.innerWidth || 9999;
   var narrowViewport = (window.matchMedia && window.matchMedia('(max-width: 720px)').matches) || viewportWidth <= 720 || screenWidth <= 720;
   if (mobileAgent || narrowViewport) {
-    var mobileUrl = new URL(window.location.href);
+    var publishedUrl = '<?= webAppUrl ?>';
+    var mobileUrl = new URL(publishedUrl || window.location.href);
     mobileUrl.searchParams.set('view', 'mobile');
-    window.location.replace(mobileUrl.toString());
+    if (window.top && window.top !== window) window.top.location.replace(mobileUrl.toString());
+    else window.location.replace(mobileUrl.toString());
   }
 })();
 </script>
