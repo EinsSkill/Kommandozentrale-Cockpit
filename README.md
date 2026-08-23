@@ -1,23 +1,53 @@
 # Kommandozentrale Cockpit
 
-Technische Quellbasis für das HTML-Cockpit der persönlichen Kommandozentrale.
+> Eine technische Quellbasis für ein persönliches Dashboard, das wichtige Alltagssysteme an einem Ort zusammenführt.
 
-Dieses Repository enthält ausschließlich die Software-Schicht:
+Das Kommandozentrale Cockpit verbindet Darstellung, Datenverträge und Bedienlogik für ein persönliches HTML-Dashboard. Die eigentlichen Gmail-, Kalender-, Drive-, OPS- und Second-Brain-Daten bleiben in ihren jeweiligen autoritativen Quellen.
 
-- Google-Apps-Script-Backend (`src/Code.gs`)
-- unverändert importierte Claude-Design-Laufzeit (`src/ClaudeRuntime.html`)
-- Claude-Design-Oberfläche (`src/Index.html`) mit Live-Datenbindungen
-- schmaler Apps-Script-Adapter (`src/LiveAdapter.html`)
+[![Projekt öffnen](https://img.shields.io/badge/GitHub-Projekt_öffnen-173f35?style=for-the-badge&logo=github&logoColor=white)](https://github.com/EinsSkill/Kommandozentrale-Cockpit)
+
+## Was zeigt dieses Repository?
+
+- Claude-Design-Oberfläche und Runtime
+- Google-Apps-Script-Backend und schmalen Adapter
+- Live-Datenbindungen für die persönliche Kommandozentrale
+- Wetter- und Gesundheitsdaten-Anbindung
+- Personal-Operator-Layer und Wohlbefinden
 - anonymisierte Fixtures und statische Vertragstests
-- technische Regeln für Claude Code, Reviews und Releases
-
-Echte Gmail-Inhalte, Kalenderdaten, Finanzdaten, OPS-Exporte, Second-Brain-Dateien, Passwörter und Tokens gehören nicht in dieses Repository.
 
 ## Architektur
 
-ChatGPT bleibt der persönliche Operator. Das OPS Sheet bleibt die operative Source of Truth. Gmail, Google Calendar und Google Drive bleiben ihre jeweiligen autoritativen Quellen. Das Cockpit liest und bedient diese Daten, ist aber keine eigene Wissensdatenbank und keine autonome KI.
+Die Kommandozentrale ist bewusst kein neuer Datenspeicher:
 
-Der Mailbereich verwendet `OPS.EMAIL_REFS` für die operative Relevanzliste. Gmail bleibt die Source of Truth für die Originalnachrichten.
+| Bereich | Autoritative Quelle |
+| --- | --- |
+| Mails | Gmail |
+| Termine | Google Calendar |
+| Dateien und Wissen | Google Drive / Second Brain |
+| Operative Daten | OPS Sheet |
+| Darstellung und Bedienung | Kommandozentrale Cockpit |
+
+Das Cockpit liest und bedient diese Quellen. Es speichert keine vollständige Kopie des persönlichen Wissensbestands.
+
+## Öffentliche Sicherheitsgrenze
+
+Dieses Repository enthält ausschließlich die Software-Schicht und anonymisierte Testdaten.
+
+Nicht im Repository enthalten:
+
+- echte Gmail-Inhalte
+- echte Kalenderdaten
+- Finanzdaten und OPS-Exporte
+- persönliche Second-Brain-Dateien
+- Passwörter, Tokens oder persönliche IDs
+
+Live-Bereitstellung, Freigaben und Änderungen an verbundenen Systemen bleiben separate Schritte.
+
+## Aktueller Stand
+
+**Aktiv in Entwicklung**
+
+Das Cockpit wird schrittweise erweitert und nach jeder größeren Phase lokal geprüft, reviewed und anschließend separat bereitgestellt. Die öffentliche Version dient als technische Dokumentation und als Showcase für Architektur, Datenfluss und Interface.
 
 ## Lokale Prüfung
 
@@ -27,46 +57,45 @@ Voraussetzung: Node.js 20 oder neuer.
 npm test
 ```
 
-Die Tests prüfen den Datenpfad statisch und verwenden ausschließlich anonymisierte Fixture-Daten. Sie verbinden sich nicht mit Google und verändern keine echten Daten.
+Die Tests verwenden ausschließlich anonymisierte Fixture-Daten. Sie verbinden sich nicht mit Google und verändern keine echten Daten.
 
 ## Apps-Script-Konfiguration
 
-Die echte OPS-ID wird nicht aus dem Repository geladen. Für eine spätere Apps-Script-Bereitstellung muss in den Script Properties ein Eintrag gesetzt werden:
+Für eine spätere Apps-Script-Bereitstellung wird die persönliche OPS-ID ausschließlich als Script Property gesetzt:
 
 ```text
 OPS_SPREADSHEET_ID=<persönliche OPS-ID>
 ```
 
-Live-Deployment, Freigaben und Änderungen an verbundenen Systemen bleiben separate, ausdrücklich freizugebende Schritte.
+Sie wird nicht aus dem Repository geladen.
 
 ## Arbeitsablauf
 
 ```text
-IDEe/Spezifikation → Claude-Code-Branch → Tests → unabhängiger Review
-→ Nutzerfreigabe → Merge → Live-Deployment → Smoke-Test → Audit-Log
+Idee / Spezifikation
+        ↓
+Entwicklung und Tests
+        ↓
+Review
+        ↓
+Merge
+        ↓
+Live-Deployment
+        ↓
+Smoke-Test und Audit
 ```
 
-Die Repositorybasis ist bewusst klein gehalten. Neue Abstraktionen oder zusätzliche Dienste werden erst aufgenommen, wenn sie ein konkretes Problem lösen.
+Die Repositorybasis bleibt bewusst klein. Neue Abstraktionen oder Dienste kommen nur hinzu, wenn sie ein konkretes Problem lösen.
 
-## Claude-Design-Cockpit
+## Technologie
 
-Das neue Cockpit verwendet Claudes gelieferte `x-dc`-Oberfläche und deren Runtime direkt; es wurde nicht als neues Layout nachgebaut. Ausschließlich Demo-Daten und lokale Demo-Aktionen wurden an die bestehenden Kommandozentralen-Verträge angebunden.
+- HTML, CSS und JavaScript
+- Google Apps Script
+- Node.js
+- statische Vertragstests
+- anonymisierte Fixture-Daten
+- GitHub für Versionierung und Reviews
 
-Die genaue Dateiliste zum Kopieren in Apps Script, die unveränderten Script Properties und der Smoke-Test stehen in [docs/claude-design-integration.md](docs/claude-design-integration.md).
+---
 
-## Phase 4 – personalisierter Second-Brain-Kontext
-
-`src/SecondBrain.gs` bleibt die read-only Grundlage für die geschützte Volltextsuche. Der vollständige Markdown-Bestand bleibt außerhalb von GitHub.
-
-## Phase 4B – Personal Operator Layer
-
-`src/PersonalOperator.gs` lädt beim Dashboard-Start nur fünf kanonische, nicht-sensitive Systemseiten. Zusammen mit aktuellen OPS-Daten erzeugt das Cockpit daraus eine handlungsorientierte Personal Lens: nächster sichtbarer Schritt, Begründung, bewusster Nicht-Fokus und passende Arbeitsregel. Die Volltextsuche bleibt ausdrücklich on-demand.
-
-Einrichtung, Datenschutzgrenzen und Live-Smoke-Test stehen in [docs/phase4b-personal-operator.md](docs/phase4b-personal-operator.md).
-
-## Phase 5 – Wohlbefinden
-
-Die unterste Karte **Dein Wohlbefinden** bietet einen freiwilligen Abendcheck mit sechs 1–10-Werten, einem Hauptgefühl, Einflussfaktor und optionalem Reflexionssatz. Der Verlauf bleibt im OPS-Tab `WELLBEING_LOG`; die Detailansicht zeigt 7- und 30-Tage-Verläufe. Bestätigte langfristige Muster werden nicht automatisch ins Second Brain geschrieben.
-
-Die Einrichtung und die persönliche Entscheidungslogik stehen in [docs/phase5-wellbeing.md](docs/phase5-wellbeing.md). Die Funktion `ensureWellbeingLogV1` legt den leeren OPS-Tab mit Kopfzeile an.
-
+Ein persönliches Operator-Cockpit als nachvollziehbares Softwareprojekt – mit klarer Trennung zwischen öffentlichem Code und privaten Datenquellen.
