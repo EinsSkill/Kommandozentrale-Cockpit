@@ -19,6 +19,9 @@ test('mobile Claude source is retained and routed without external support.js', 
   assert.match(mobile, /includeHtml_\('ClaudeRuntime'\)/);
   assert.match(mobile, /includeHtml_\('LiveAdapter'\)/);
   assert.doesNotMatch(mobile, /<script[^>]+src=["'][^"']*support\.js/i);
+  assert.match(mobile, /data-screen-label="Kommandozentrale Mobil" style="[^"]*width:100%;max-width:100%/);
+  assert.match(mobile, /position:fixed;left:0;right:0;bottom:0;width:100%/);
+  assert.match(mobile, /viewport-fit=cover/);
   const style = mobile.match(/<style>([\s\S]*?)<\/style>/)?.[1];
   assert.ok(style, 'mobile Claude stylesheet missing');
   assert.equal(createHash('sha256').update(style).digest('hex'), '3104df4cc942f1bbe621506a0be9f8f8f7b72dba75aeaeafc687a25544534734');
