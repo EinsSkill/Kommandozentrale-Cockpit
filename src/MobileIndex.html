@@ -10,7 +10,7 @@
 <body>
 <x-dc>
 <helmet>
-<meta name="viewport" content="width=428">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400&family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -36,7 +36,7 @@
 </style>
 </helmet>
 
-<div data-screen-label="Kommandozentrale Mobil" style="position:relative;max-width:480px;margin:0 auto;min-height:100vh;overflow-x:hidden;background:linear-gradient(180deg,#E9E1D0 0%,#E1D8C5 100%);box-shadow:0 0 60px rgba(10,20,14,.22)">
+<div data-screen-label="Kommandozentrale Mobil" style="position:relative;width:100%;max-width:100%;margin:0 auto;min-height:100vh;overflow-x:hidden;background:linear-gradient(180deg,#E9E1D0 0%,#E1D8C5 100%);box-shadow:0 0 60px rgba(10,20,14,.22)">
 
   <div style="position:absolute;inset:0;pointer-events:none;z-index:1;opacity:.9;background:{{ ambient }}"></div>
   <div style="position:absolute;inset:0;pointer-events:none;z-index:2;mix-blend-mode:multiply;opacity:.45;background-image:url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E&quot;)"></div>
@@ -66,7 +66,7 @@
       </div>
     </div>
 
-    <div ref="{{ contentRef }}" onTouchStart="{{ onTabTouchStart }}" onTouchEnd="{{ onTabTouchEnd }}" style="flex:1;padding:16px 16px 28px;display:flex;flex-direction:column;gap:14px">
+    <div ref="{{ contentRef }}" onTouchStart="{{ onTabTouchStart }}" onTouchEnd="{{ onTabTouchEnd }}" style="flex:1;padding:16px 16px calc(28px + 74px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:14px">
 
       <sc-if value="{{ tabOn.heute }}" hint-placeholder-val="{{ true }}">
         <div style="animation:kRise 420ms cubic-bezier(.16,1,.3,1) both">
@@ -669,7 +669,7 @@
       </sc-if>
     </div>
 
-    <div style="position:sticky;bottom:0;z-index:40;display:flex;background:linear-gradient(180deg,#102C1E 0%,#0A1F15 100%);border-top:1px solid rgba(184,145,47,.4);padding:4px 4px calc(4px + env(safe-area-inset-bottom,0px))">
+    <div style="position:fixed;left:0;right:0;bottom:0;width:100%;z-index:40;display:flex;background:linear-gradient(180deg,#102C1E 0%,#0A1F15 100%);border-top:1px solid rgba(184,145,47,.4);padding:4px 4px calc(4px + env(safe-area-inset-bottom,0px));box-sizing:border-box">
       <div onClick="{{ goHeute }}" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:8px 2px 7px;min-height:54px;color:{{ tabColor.heute }}" style-active="transform:scale(.93)">
         <svg viewBox="0 0 24 24" width="20" height="20" fill="none"><circle cx="12" cy="12" r="8.4" stroke="currentColor" stroke-width="1.6"></circle><path d="M14.4 9.6 L12.9 13.4 L9.6 14.4 L11.1 10.6 Z" fill="currentColor"></path></svg>
         <span style="font-size:9.5px">Heute</span>
@@ -700,7 +700,7 @@
   </sc-if>
 
   <sc-if value="{{ sheet.open }}" hint-placeholder-val="{{ false }}">
-    <div style="position:fixed;inset:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;z-index:70">
+    <div style="position:fixed;inset:0;left:0;width:100%;z-index:70">
       <div onClick="{{ sheet.close }}" style="position:absolute;inset:0;background:rgba(8,18,12,.5);opacity:{{ sheet.backdropOp }};transition:opacity 320ms ease-out"></div>
       <div ref="{{ sheetPanelRef }}" onTouchStart="{{ onSheetTouchStart }}" onTouchMove="{{ onSheetTouchMove }}" onTouchEnd="{{ onSheetTouchEnd }}" style="{{ sheet.style }}">
         <div style="width:36px;height:4px;border-radius:2px;background:rgba(20,45,32,.2);margin:10px auto 4px"></div>
@@ -835,7 +835,7 @@
   </sc-if>
 
   <sc-if value="{{ egg.seal }}" hint-placeholder-val="{{ false }}">
-    <div style="position:fixed;inset:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;z-index:80;pointer-events:none;display:grid;place-items:center">
+    <div style="position:fixed;inset:0;left:0;width:100%;z-index:80;pointer-events:none;display:grid;place-items:center">
       <div style="position:absolute;inset:0;background:radial-gradient(360px circle at 50% 46%,rgba(221,182,92,.3),transparent 66%);animation:kBurst 2200ms cubic-bezier(.16,1,.3,1) both"></div>
       <div style="text-align:center;animation:kRise 800ms cubic-bezier(.16,1,.3,1) both;padding:0 24px">
         <svg viewBox="0 0 100 100" width="100" height="100" style="animation:kSpin 6s linear infinite">
@@ -849,7 +849,7 @@
   </sc-if>
 
   <sc-if value="{{ egg.rain }}" hint-placeholder-val="{{ false }}">
-    <div style="position:fixed;inset:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;z-index:78;pointer-events:none;overflow:hidden">
+    <div style="position:fixed;inset:0;left:0;width:100%;z-index:78;pointer-events:none;overflow:hidden">
       <sc-for list="{{ egg.drops }}" as="d" hint-placeholder-count="16">
         <i style="position:absolute;top:0;width:3px;height:11px;border-radius:2px;background:linear-gradient(180deg,#F2DFA8,#B8912F);left:{{ d.left }}%;animation:kFall {{ d.dur }}ms cubic-bezier(.4,0,.7,1) both;animation-delay:{{ d.delay }}ms;opacity:.85"></i>
       </sc-for>
@@ -857,7 +857,7 @@
   </sc-if>
 
   <sc-if value="{{ egg.mono }}" hint-placeholder-val="{{ false }}">
-    <div style="position:fixed;inset:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;z-index:6;pointer-events:none;display:grid;place-items:center;animation:kFade 900ms ease-out both">
+    <div style="position:fixed;inset:0;left:0;width:100%;z-index:6;pointer-events:none;display:grid;place-items:center;animation:kFade 900ms ease-out both">
       <svg viewBox="0 0 200 200" width="300" height="300" style="opacity:.1">
         <circle cx="100" cy="100" r="92" fill="none" stroke="#0C2418" stroke-width="1.5"></circle>
         <path d="M100 34 L152 55 L152 108 Q152 148 100 172 Q48 148 48 108 L48 55 Z" fill="none" stroke="#0C2418" stroke-width="2"></path>
@@ -1537,7 +1537,7 @@ class Component extends DCLogic {
         readyLabel:sourceState.errors?'TEILWEISE BEREIT':sourceState.loading?'DATENPFADE WERDEN GELADEN':'ALLE DATENPFADE BEREIT',
         canvasRef:this.cvRef,
         log:bootLog.slice(0,Math.max(1,S.bootStep)).map(l=>({text:l[0],code:l[1]})),
-        style:{position:'fixed',inset:0,left:'50%',transform:'translateX(-50%)',width:'100%',maxWidth:'480px',
+        style:{position:'fixed',inset:0,left:0,transform:'none',width:'100%',maxWidth:'none',
           zIndex:90,display:'grid',placeItems:'center',overflow:'hidden',
           background:'radial-gradient(700px 900px at 50% 42%,#123522 0%,#0A1F14 46%,#050F0A 100%)',
           transition:'opacity 700ms ease-out, clip-path 900ms cubic-bezier(.16,1,.3,1)',
