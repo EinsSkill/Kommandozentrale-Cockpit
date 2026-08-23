@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<!-- Claude Mobile Design source SHA-256: 94f45fae22b676d57a4904b6f8330a2ff9789184e88ef89fb283927751b0b3a0. Visual structure is design-locked. -->
+<!-- Claude Mobile Design source SHA-256: be6acce773c2b8be4706c25a66a9ef44686e182909be360612852c8d0c9171cc. Visual structure is design-locked. -->
 <?!= includeHtml_('ClaudeRuntime'); ?>
 <?!= includeHtml_('LiveAdapter'); ?>
 </head>
@@ -16,7 +16,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400&family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <style>
-  body{margin:0;font-family:Archivo,system-ui,sans-serif;color:#142219;background:#CFC6B0;-webkit-font-smoothing:antialiased;overscroll-behavior-y:none}
+  html,body{margin:0;padding:0;width:100%;max-width:100%;overflow-x:hidden}
+  body{font-family:Archivo,system-ui,sans-serif;font-size:20.5px;line-height:1.5;color:#142219;background:#CFC6B0;-webkit-font-smoothing:antialiased;-webkit-text-size-adjust:100%;text-size-adjust:100%;overscroll-behavior-y:none;box-sizing:border-box}
+  *,*::before,*::after{box-sizing:border-box}
   a{color:#1B4632;text-decoration:none;border-bottom:1px solid rgba(184,145,47,.5)}
   a:hover{color:#8C6B18;border-bottom-color:#B8912F}
   ::selection{background:rgba(184,145,47,.28)}
@@ -31,23 +33,23 @@
   @keyframes kFall{from{transform:translateY(-8vh) rotate(0deg);opacity:0}12%{opacity:1}to{transform:translateY(104vh) rotate(220deg);opacity:0}}
   @keyframes kSealIn{from{opacity:0;transform:scale(.92) rotate(-6deg)}to{opacity:1;transform:none}}
   @media (prefers-reduced-motion: reduce){
-    *,*::before,*::after{animation-duration:.001ms !important;animation-delay:0ms !important;transition-duration:.001ms !important}
+    *,*::before,*::after{animation-duration:.001ms !important;animation-delay:0ms !important;animation-iteration-count:1 !important;transition-duration:.001ms !important;scroll-behavior:auto !important}
   }
 </style>
 </helmet>
 
-<div data-screen-label="Kommandozentrale Mobil" style="position:relative;width:100%;max-width:100%;margin:0 auto;min-height:100vh;overflow-x:hidden;background:linear-gradient(180deg,#E9E1D0 0%,#E1D8C5 100%);box-shadow:0 0 60px rgba(10,20,14,.22)">
+<div data-screen-label="Kommandozentrale Mobil" style="position:relative;width:100%;max-width:100%;box-sizing:border-box;min-height:100dvh;overflow-x:hidden;background:linear-gradient(180deg,#E9E1D0 0%,#E1D8C5 100%)">
 
   <div style="position:absolute;inset:0;pointer-events:none;z-index:1;opacity:.9;background:{{ ambient }}"></div>
   <div style="position:absolute;inset:0;pointer-events:none;z-index:2;mix-blend-mode:multiply;opacity:.45;background-image:url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E&quot;)"></div>
 
   <sc-if value="{{ showApp }}" hint-placeholder-val="{{ true }}">
-  <div style="position:relative;z-index:5;display:flex;flex-direction:column;min-height:100vh">
+  <div style="position:relative;z-index:5;display:flex;flex-direction:column;width:100%;max-width:100%;box-sizing:border-box;min-height:100dvh">
 
     <div style="position:sticky;top:0;z-index:40;background:linear-gradient(180deg,#0A1F15 0%,#102C1E 100%);border-bottom:1px solid rgba(184,145,47,.45);box-shadow:0 8px 22px -16px rgba(10,31,21,.7)">
-      <div style="padding:12px 16px;display:flex;align-items:center;gap:12px">
-        <div onClick="{{ crestClick }}" style="width:34px;height:34px;flex:0 0 auto;display:grid;place-items:center">
-          <svg viewBox="0 0 100 100" width="32" height="32" aria-hidden="true">
+      <div style="padding:calc(12px + env(safe-area-inset-top,0px)) 16px 12px;display:flex;align-items:center;gap:12px">
+        <div onClick="{{ crestClick }}" style="width:44px;height:44px;flex:0 0 auto;display:grid;place-items:center;margin-left:-4px">
+          <svg viewBox="0 0 100 100" width="36" height="36" aria-hidden="true">
             <circle cx="50" cy="50" r="45" fill="none" stroke="#B8912F" stroke-width="1.4" opacity=".55"></circle>
             <circle cx="50" cy="50" r="45" fill="none" stroke="#DDB65C" stroke-width="1.4" stroke-dasharray="6 10" opacity=".9" style="transform-origin:50% 50%;animation:kSpin 34s linear infinite"></circle>
             <path d="M50 16 L76 27 L76 55 Q76 76 50 88 Q24 76 24 55 L24 27 Z" fill="rgba(184,145,47,.14)" stroke="#DDB65C" stroke-width="1.6"></path>
@@ -55,156 +57,156 @@
           </svg>
         </div>
         <div style="display:flex;flex-direction:column;gap:1px;min-width:0">
-          <div style="font-family:'Bodoni Moda',serif;font-size:16.5px;font-weight:500;color:#F4EDDC">Kommandozentrale</div>
-          <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#C9AE6C;letter-spacing:.08em;white-space:nowrap">{{ ui.todLine }}</div>
+          <div style="font-family:'Bodoni Moda',serif;font-size:21.1px;font-weight:500;color:#F4EDDC">Kommandozentrale</div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:12.2px;color:#C9AE6C;letter-spacing:.06em;overflow-wrap:anywhere">{{ ui.todLine }}</div>
         </div>
         <div style="flex:1"></div>
         <span style="width:6px;height:6px;border-radius:50%;background:#5FBF8A;box-shadow:0 0 8px #5FBF8A;animation:kBreathe 2.6s ease-in-out infinite;flex:0 0 auto"></span>
-        <div onClick="{{ replayBoot }}" style="width:32px;height:32px;flex:0 0 auto;display:grid;place-items:center;border-radius:50%;border:1px solid rgba(184,145,47,.35);color:#C9AE6C" style-active="transform:scale(.9);background:rgba(184,145,47,.16)">
-          <svg viewBox="0 0 24 24" width="15" height="15" fill="none"><path d="M4 12a8 8 0 0 1 13.3-5.9M20 12a8 8 0 0 1-13.3 5.9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"></path><path d="M17 3v4h-4M7 21v-4h4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+        <div onClick="{{ replayBoot }}" style="width:44px;height:44px;flex:0 0 auto;display:grid;place-items:center;border-radius:50%;border:1px solid rgba(184,145,47,.35);color:#C9AE6C;transition:transform 140ms ease-out,background 160ms ease-out" style-active="transform:scale(.9);background:rgba(184,145,47,.16)">
+          <svg viewBox="0 0 24 24" width="19" height="19" fill="none"><path d="M4 12a8 8 0 0 1 13.3-5.9M20 12a8 8 0 0 1-13.3 5.9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"></path><path d="M17 3v4h-4M7 21v-4h4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path></svg>
         </div>
       </div>
     </div>
 
-    <div ref="{{ contentRef }}" onTouchStart="{{ onTabTouchStart }}" onTouchEnd="{{ onTabTouchEnd }}" style="flex:1;padding:16px 16px calc(28px + 74px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:14px">
+    <div ref="{{ contentRef }}" onTouchStart="{{ onTabTouchStart }}" onTouchEnd="{{ onTabTouchEnd }}" style="flex:1;width:100%;max-width:100%;box-sizing:border-box;padding:18px 16px calc(28px + 74px + env(safe-area-inset-bottom, 0px));display:flex;flex-direction:column;gap:16px">
 
       <sc-if value="{{ tabOn.heute }}" hint-placeholder-val="{{ true }}">
         <div style="animation:kRise 420ms cubic-bezier(.16,1,.3,1) both">
-          <div style="font-family:'Bodoni Moda',serif;font-size:24px;line-height:1.15;color:#132A1D;letter-spacing:-.01em">{{ ui.greeting }}</div>
-          <div style="margin-top:5px;font-size:12.5px;color:#4C5A4E;text-wrap:pretty">{{ ui.subline }}</div>
+          <div style="font-family:'Bodoni Moda',serif;font-size:30.7px;line-height:1.15;color:#132A1D;letter-spacing:-.01em">{{ ui.greeting }}</div>
+          <div style="margin-top:5px;font-size:16px;color:#4C5A4E;text-wrap:pretty">{{ ui.subline }}</div>
         </div>
         <div style="display:flex;gap:8px;animation:kRise 420ms cubic-bezier(.16,1,.3,1) 40ms both">
-          <div style="flex:1;padding:10px 6px;text-align:center;border-radius:8px;background:rgba(255,255,255,.4);border:1px solid rgba(20,45,32,.1)">
-            <div style="font-family:'IBM Plex Mono',monospace;font-size:8.5px;letter-spacing:.1em;color:#7A8A7C">OFFEN</div>
-            <div style="font-family:'Bodoni Moda',serif;font-size:19px;color:#1B4632;font-variant-numeric:tabular-nums">{{ ui.openCount }}</div>
+          <div style="flex:1;padding:13px 8px;text-align:center;border-radius:10px;background:rgba(255,255,255,.4);border:1px solid rgba(20,45,32,.1)">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.1em;color:#7A8A7C">OFFEN</div>
+            <div style="font-family:'Bodoni Moda',serif;font-size:24.3px;color:#1B4632;font-variant-numeric:tabular-nums">{{ ui.openCount }}</div>
           </div>
-          <div style="flex:1;padding:10px 6px;text-align:center;border-radius:8px;background:rgba(255,255,255,.4);border:1px solid rgba(20,45,32,.1)">
-            <div style="font-family:'IBM Plex Mono',monospace;font-size:8.5px;letter-spacing:.1em;color:#7A8A7C">FÄLLIG HEUTE</div>
-            <div style="font-family:'Bodoni Moda',serif;font-size:19px;color:#8C4A20;font-variant-numeric:tabular-nums">{{ ui.dueCount }}</div>
+          <div style="flex:1;padding:13px 8px;text-align:center;border-radius:10px;background:rgba(255,255,255,.4);border:1px solid rgba(20,45,32,.1)">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.1em;color:#7A8A7C">FÄLLIG HEUTE</div>
+            <div style="font-family:'Bodoni Moda',serif;font-size:24.3px;color:#8C4A20;font-variant-numeric:tabular-nums">{{ ui.dueCount }}</div>
           </div>
-          <div style="flex:1;padding:10px 6px;text-align:center;border-radius:8px;background:rgba(255,255,255,.4);border:1px solid rgba(20,45,32,.1)">
-            <div style="font-family:'IBM Plex Mono',monospace;font-size:8.5px;letter-spacing:.1em;color:#7A8A7C">FOKUSZEIT</div>
-            <div style="font-family:'Bodoni Moda',serif;font-size:19px;color:#1B4632;font-variant-numeric:tabular-nums">{{ ui.focus }}</div>
+          <div style="flex:1;padding:13px 8px;text-align:center;border-radius:10px;background:rgba(255,255,255,.4);border:1px solid rgba(20,45,32,.1)">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.1em;color:#7A8A7C">FOKUSZEIT</div>
+            <div style="font-family:'Bodoni Moda',serif;font-size:24.3px;color:#1B4632;font-variant-numeric:tabular-nums">{{ ui.focus }}</div>
           </div>
         </div>
 
-        <div onClick="{{ opOpen }}" style="position:relative;overflow:hidden;border-radius:12px;padding:18px;background:linear-gradient(158deg,#0C2418 0%,#153520 58%,#0E2A1B 100%);border:1px solid rgba(184,145,47,.4);box-shadow:0 14px 30px -20px rgba(10,31,21,.85);animation:kRise 460ms cubic-bezier(.16,1,.3,1) 80ms both" style-active="transform:scale(.985)">
+        <div onClick="{{ opOpen }}" style="position:relative;overflow:hidden;border-radius:14px;padding:20px;background:linear-gradient(158deg,#0C2418 0%,#153520 58%,#0E2A1B 100%);border:1px solid rgba(184,145,47,.4);box-shadow:0 14px 30px -20px rgba(10,31,21,.85);animation:kRise 460ms cubic-bezier(.16,1,.3,1) 80ms both;transition:transform 180ms ease-out" style-active="transform:scale(.985)">
           <div style="display:flex;align-items:center;justify-content:space-between">
-            <div style="font-family:'Bodoni Moda',serif;font-size:15px;color:#F3EBD9">Personal Operator</div>
+            <div style="font-family:'Bodoni Moda',serif;font-size:19.2px;color:#F3EBD9">Personal Operator</div>
             <div style="display:flex;align-items:center;gap:6px;padding:4px 9px;border-radius:999px;background:rgba(221,182,92,.14);border:1px solid rgba(221,182,92,.34)">
               <span style="width:5px;height:5px;border-radius:50%;background:#DDB65C;animation:kBreathe 2.2s ease-in-out infinite"></span>
-              <span style="font-size:9.5px;letter-spacing:.05em;color:#E4CE95">Lens</span>
+              <span style="font-size:12.2px;letter-spacing:.05em;color:#E4CE95">Lens</span>
             </div>
           </div>
-          <div style="margin-top:13px;font-family:'Bodoni Moda',serif;font-size:21px;line-height:1.25;color:#F7F1E2;text-wrap:pretty">{{ op.step }}</div>
-          <div style="margin-top:11px;font-size:11.5px;line-height:1.4;color:#D8DFD5;padding-top:11px;border-top:1px solid rgba(221,182,92,.2)">{{ op.why }}</div>
+          <div style="margin-top:13px;font-family:'Bodoni Moda',serif;font-size:26.9px;line-height:1.25;color:#F7F1E2;text-wrap:pretty">{{ op.step }}</div>
+          <div style="margin-top:11px;font-size:14.7px;line-height:1.4;color:#D8DFD5;padding-top:11px;border-top:1px solid rgba(221,182,92,.2)">{{ op.why }}</div>
           <div style="margin-top:10px;display:flex;flex-wrap:wrap;gap:6px">
             <sc-for list="{{ op.notNow }}" as="n" hint-placeholder-count="3">
-              <span style="font-size:10px;color:#A9B7A8;padding:3px 8px;border-radius:3px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);text-decoration:line-through;text-decoration-color:rgba(221,182,92,.55)">{{ n }}</span>
+              <span style="font-size:12.8px;color:#A9B7A8;padding:3px 8px;border-radius:3px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);text-decoration:line-through;text-decoration-color:rgba(221,182,92,.55)">{{ n }}</span>
             </sc-for>
           </div>
           <div style="display:flex;align-items:center;justify-content:space-between;margin-top:14px">
-            <span style="font-size:11px;color:#EBD9AC;font-weight:500">{{ op.mode }}</span>
-            <span onClick="{{ startFocus }}" style="font-size:11.5px;color:#0C2418;background:linear-gradient(180deg,#E2C271,#C09B36);padding:9px 15px;border-radius:6px;font-weight:600" style-active="transform:scale(.94)">{{ op.cta }}</span>
+            <span style="font-size:14.1px;color:#EBD9AC;font-weight:500">{{ op.mode }}</span>
+            <span onClick="{{ startFocus }}" style="font-size:14.7px;color:#0C2418;background:linear-gradient(180deg,#E2C271,#C09B36);padding:0 20px;min-height:46px;display:inline-flex;align-items:center;border-radius:8px;font-weight:600;transition:transform 140ms ease-out" style-active="transform:scale(.95)">{{ op.cta }}</span>
           </div>
         </div>
 
-        <div style="position:relative;overflow:hidden;border-radius:12px;padding:14px 16px;background:linear-gradient(180deg,#F5EFE2 0%,#EFE8D8 100%);border:1px solid rgba(20,45,32,.14);box-shadow:0 10px 22px -18px rgba(20,45,32,.5);animation:kRise 460ms cubic-bezier(.16,1,.3,1) 130ms both">
+        <div style="position:relative;overflow:hidden;border-radius:14px;padding:18px;background:linear-gradient(180deg,#F5EFE2 0%,#EFE8D8 100%);border:1px solid rgba(20,45,32,.14);box-shadow:0 10px 22px -18px rgba(20,45,32,.5);animation:kRise 460ms cubic-bezier(.16,1,.3,1) 130ms both">
           <div style="display:flex;align-items:baseline;justify-content:space-between">
-            <div style="font-family:'Bodoni Moda',serif;font-size:15px;color:#132A1D">Alerts</div>
-            <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#8C4A20;letter-spacing:.05em">{{ alertsMeta }}</div>
+            <div style="font-family:'Bodoni Moda',serif;font-size:19.2px;color:#132A1D">Alerts</div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:12.2px;color:#8C4A20;letter-spacing:.05em">{{ alertsMeta }}</div>
           </div>
           <div style="margin-top:9px;display:flex;flex-direction:column;gap:2px">
             <sc-for list="{{ alerts }}" as="a" hint-placeholder-count="3">
-              <div onClick="{{ a.open }}" style="display:flex;align-items:center;gap:9px;opacity:{{ a.op }};padding:8px 0;border-bottom:1px solid rgba(20,45,32,.07);min-height:44px">
-                <span style="display:flex;gap:2px;flex:0 0 auto">
-                  <i style="width:3px;height:13px;border-radius:1px;background:{{ a.c1 }}"></i>
-                  <i style="width:3px;height:13px;border-radius:1px;background:{{ a.c2 }}"></i>
-                  <i style="width:3px;height:13px;border-radius:1px;background:{{ a.c3 }}"></i>
+              <div onClick="{{ a.open }}" style="display:flex;align-items:flex-start;gap:11px;opacity:{{ a.op }};padding:11px 0;border-bottom:1px solid rgba(20,45,32,.07);min-height:52px">
+                <span style="display:flex;gap:2px;flex:0 0 auto;padding-top:3px">
+                  <i style="width:3px;height:17px;border-radius:1px;background:{{ a.c1 }}"></i>
+                  <i style="width:3px;height:17px;border-radius:1px;background:{{ a.c2 }}"></i>
+                  <i style="width:3px;height:17px;border-radius:1px;background:{{ a.c3 }}"></i>
                 </span>
                 <div style="min-width:0;flex:1">
-                  <div style="font-size:12px;font-weight:500;color:#1B2A1E;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-decoration:{{ a.strike }}">{{ a.title }}</div>
-                  <div style="font-size:10px;color:#6C7B6E">{{ a.meta }}</div>
+                  <div style="font-size:15.4px;font-weight:500;color:#1B2A1E;overflow-wrap:anywhere;text-decoration:{{ a.strike }}">{{ a.title }}</div>
+                  <div style="font-size:12.8px;color:#6C7B6E">{{ a.meta }}</div>
                 </div>
-                <span onClick="{{ a.ack }}" style="font-size:10px;padding:6px 9px;border-radius:5px;border:1px solid rgba(27,70,50,.28);color:#1B4632;flex:0 0 auto" style-active="background:rgba(27,70,50,.12)">{{ a.ackLabel }}</span>
+                <span onClick="{{ a.ack }}" style="font-size:12.8px;padding:11px 13px;min-height:44px;display:inline-flex;align-items:center;border-radius:7px;border:1px solid rgba(27,70,50,.28);color:#1B4632;flex:0 0 auto;transition:background 160ms ease-out" style-active="background:rgba(27,70,50,.12)">{{ a.ackLabel }}</span>
               </div>
             </sc-for>
           </div>
         </div>
 
-        <div style="position:relative;overflow:hidden;border-radius:12px;padding:14px 16px;background:linear-gradient(180deg,#F5EFE2 0%,#EFE8D8 100%);border:1px solid rgba(20,45,32,.14);box-shadow:0 10px 22px -18px rgba(20,45,32,.5);animation:kRise 460ms cubic-bezier(.16,1,.3,1) 180ms both">
+        <div style="position:relative;overflow:hidden;border-radius:14px;padding:18px;background:linear-gradient(180deg,#F5EFE2 0%,#EFE8D8 100%);border:1px solid rgba(20,45,32,.14);box-shadow:0 10px 22px -18px rgba(20,45,32,.5);animation:kRise 460ms cubic-bezier(.16,1,.3,1) 180ms both">
           <div style="display:flex;align-items:baseline;justify-content:space-between">
-            <div style="font-family:'Bodoni Moda',serif;font-size:15px;color:#132A1D">Aufgaben</div>
-            <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6C7B6E;letter-spacing:.05em">{{ tasksMeta }}</div>
+            <div style="font-family:'Bodoni Moda',serif;font-size:19.2px;color:#132A1D">Aufgaben</div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:12.2px;color:#6C7B6E;letter-spacing:.05em">{{ tasksMeta }}</div>
           </div>
           <div style="margin-top:8px;display:flex;flex-direction:column">
             <sc-for list="{{ tasks }}" as="t" hint-placeholder-count="4">
-              <div onClick="{{ t.open }}" style="display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;padding:9px 0;border-bottom:1px solid rgba(20,45,32,.08);min-height:44px">
-                <span onClick="{{ t.complete }}" style="width:15px;height:15px;border-radius:2px;border:1.5px solid rgba(27,70,50,.45);display:grid;place-items:center;font-size:8.5px;color:#1B4632">{{ t.tick }}</span>
+              <div onClick="{{ t.open }}" style="display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid rgba(20,45,32,.08);min-height:52px;transition:opacity 160ms ease-out" style-active="opacity:.7">
+                <span onClick="{{ t.complete }}" style="width:22px;height:22px;border-radius:3px;border:1.5px solid rgba(27,70,50,.45);display:grid;place-items:center;font-size:12.8px;color:#1B4632;flex:0 0 auto">{{ t.tick }}</span>
                 <div style="min-width:0">
-                  <div style="font-size:12.5px;font-weight:500;color:#17251B;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ t.title }}</div>
-                  <div style="font-size:10.5px;color:#61705F;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ t.next }}</div>
+                  <div style="font-size:16px;font-weight:500;color:#17251B;overflow-wrap:anywhere">{{ t.title }}</div>
+                  <div style="font-size:13.4px;color:#61705F;margin-top:1px;overflow-wrap:anywhere">{{ t.next }}</div>
                 </div>
                 <div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px">
-                  <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:{{ t.dueColor }};font-variant-numeric:tabular-nums">{{ t.due }}</span>
-                  <span style="font-size:8.5px;letter-spacing:.05em;padding:2px 6px;border-radius:2px;background:{{ t.prioBg }};color:{{ t.prioFg }};font-weight:600">{{ t.prio }}</span>
+                  <span style="font-family:'IBM Plex Mono',monospace;font-size:12.8px;color:{{ t.dueColor }};font-variant-numeric:tabular-nums">{{ t.due }}</span>
+                  <span style="font-size:11px;letter-spacing:.05em;padding:2px 6px;border-radius:2px;background:{{ t.prioBg }};color:{{ t.prioFg }};font-weight:600">{{ t.prio }}</span>
                 </div>
               </div>
             </sc-for>
           </div>
         </div>
 
-        <div onClick="{{ briefingOpen }}" style="position:relative;overflow:hidden;border-radius:12px;padding:15px 16px;background:linear-gradient(140deg,#153520 0%,#0D2517 100%);border:1px solid rgba(184,145,47,.32);box-shadow:0 12px 26px -20px rgba(10,31,21,.8);animation:kRise 460ms cubic-bezier(.16,1,.3,1) 230ms both" style-active="transform:scale(.985)">
+        <div onClick="{{ briefingOpen }}" style="position:relative;overflow:hidden;border-radius:14px;padding:18px;background:linear-gradient(140deg,#153520 0%,#0D2517 100%);border:1px solid rgba(184,145,47,.32);box-shadow:0 12px 26px -20px rgba(10,31,21,.8);animation:kRise 460ms cubic-bezier(.16,1,.3,1) 230ms both" style-active="transform:scale(.985)">
           <div style="display:flex;align-items:baseline;justify-content:space-between">
-            <div style="font-family:'Bodoni Moda',serif;font-size:15px;color:#F3EBD9">Briefing</div>
-            <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#C9AE6C;letter-spacing:.05em">{{ brief.meta }}</div>
+            <div style="font-family:'Bodoni Moda',serif;font-size:19.2px;color:#F3EBD9">Briefing</div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:12.2px;color:#C9AE6C;letter-spacing:.05em">{{ brief.meta }}</div>
           </div>
-          <div style="margin-top:10px;font-family:'Bodoni Moda',serif;font-size:15.5px;line-height:1.35;color:#F0E8D6;font-style:italic;text-wrap:pretty">„{{ brief.core }}“</div>
+          <div style="margin-top:10px;font-family:'Bodoni Moda',serif;font-size:19.8px;line-height:1.35;color:#F0E8D6;font-style:italic;text-wrap:pretty">„{{ brief.core }}“</div>
           <div style="margin-top:10px;display:flex;flex-direction:column;gap:3px;padding-top:9px;border-top:1px solid rgba(221,182,92,.2)">
-            <span style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.1em;color:#9AAE9C">EMPFEHLUNG</span>
-            <span style="font-size:11.5px;color:#DFD5BE">{{ brief.rec }}</span>
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.1em;color:#9AAE9C">EMPFEHLUNG</span>
+            <span style="font-size:14.7px;color:#DFD5BE">{{ brief.rec }}</span>
           </div>
         </div>
 
-        <div style="position:relative;overflow:hidden;border-radius:12px;padding:14px 16px;background:{{ weather.bg }};border:1px solid rgba(20,45,32,.14);box-shadow:0 10px 22px -18px rgba(20,45,32,.5);animation:kRise 460ms cubic-bezier(.16,1,.3,1) 280ms both">
+        <div style="position:relative;overflow:hidden;border-radius:14px;padding:18px;background:{{ weather.bg }};border:1px solid rgba(20,45,32,.14);box-shadow:0 10px 22px -18px rgba(20,45,32,.5);animation:kRise 460ms cubic-bezier(.16,1,.3,1) 280ms both">
           <div style="display:flex;align-items:flex-start;justify-content:space-between">
             <div>
-              <div style="font-family:'Bodoni Moda',serif;font-size:15px;color:#132A1D">Wetter</div>
-              <div style="font-size:10.5px;color:#61705F;margin-top:2px">{{ weather.place }}</div>
+              <div style="font-family:'Bodoni Moda',serif;font-size:19.2px;color:#132A1D">Wetter</div>
+              <div style="font-size:13.4px;color:#61705F;margin-top:2px">{{ weather.place }}</div>
             </div>
             <div onClick="{{ weatherEgg }}" style="display:flex;align-items:baseline;gap:5px">
-              <span style="font-family:'Bodoni Moda',serif;font-size:28px;color:#1B4632;font-variant-numeric:tabular-nums;line-height:1">{{ weather.temp }}</span>
-              <span style="font-size:11px;color:#6C7B6E">{{ weather.cond }}</span>
+              <span style="font-family:'Bodoni Moda',serif;font-size:35.8px;color:#1B4632;font-variant-numeric:tabular-nums;line-height:1">{{ weather.temp }}</span>
+              <span style="font-size:14.1px;color:#6C7B6E">{{ weather.cond }}</span>
             </div>
           </div>
           <div style="margin-top:11px;display:flex;align-items:flex-end;gap:5px;height:46px">
             <sc-for list="{{ weather.hours }}" as="h" hint-placeholder-count="8">
               <div onClick="{{ h.open }}" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;min-height:44px;justify-content:flex-end">
-                <span style="font-family:'IBM Plex Mono',monospace;font-size:8.5px;color:#6C7B6E">{{ h.t }}</span>
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#6C7B6E">{{ h.t }}</span>
                 <i style="width:100%;border-radius:2px 2px 0 0;background:{{ h.fill }};height:{{ h.h }}px;transform-origin:bottom;animation:kRiseUp 560ms cubic-bezier(.16,1,.3,1) both;animation-delay:{{ h.delay }}ms"></i>
               </div>
             </sc-for>
           </div>
         </div>
 
-        <div style="position:relative;overflow:hidden;border-radius:12px;padding:14px 16px;background:linear-gradient(180deg,#F5EFE2 0%,#EEE6D5 100%);border:1px solid rgba(20,45,32,.14);box-shadow:0 10px 22px -18px rgba(20,45,32,.5);animation:kRise 460ms cubic-bezier(.16,1,.3,1) 330ms both">
+        <div style="position:relative;overflow:hidden;border-radius:14px;padding:18px;background:linear-gradient(180deg,#F5EFE2 0%,#EEE6D5 100%);border:1px solid rgba(20,45,32,.14);box-shadow:0 10px 22px -18px rgba(20,45,32,.5);animation:kRise 460ms cubic-bezier(.16,1,.3,1) 330ms both">
           <div style="display:flex;align-items:baseline;justify-content:space-between">
-            <div style="font-family:'Bodoni Moda',serif;font-size:15px;color:#132A1D">Heute im Kalender</div>
-            <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6C7B6E;letter-spacing:.05em">{{ cal.meta }}</div>
+            <div style="font-family:'Bodoni Moda',serif;font-size:19.2px;color:#132A1D">Heute im Kalender</div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:12.2px;color:#6C7B6E;letter-spacing:.05em">{{ cal.meta }}</div>
           </div>
           <div style="margin-top:10px;display:flex;flex-direction:column;gap:6px">
             <sc-for list="{{ calToday }}" as="e" hint-placeholder-count="2">
-              <div style="display:flex;align-items:center;gap:10px;padding:7px 9px;border-radius:6px;background:{{ e.bg }};border-left:3px solid {{ e.accent }};min-height:40px">
-                <span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:{{ e.timeColor }};font-variant-numeric:tabular-nums">{{ e.t }}</span>
-                <span style="font-size:12px;color:{{ e.fg }}">{{ e.l }}</span>
+              <div style="display:grid;grid-template-columns:auto minmax(0,1fr);gap:11px;align-items:baseline;padding:11px 12px;border-radius:7px;background:{{ e.bg }};border-left:3px solid {{ e.accent }};min-height:48px">
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:13.4px;color:{{ e.timeColor }};font-variant-numeric:tabular-nums">{{ e.t }}</span>
+                <span style="font-size:15.4px;line-height:1.4;color:{{ e.fg }};overflow-wrap:anywhere;text-wrap:pretty">{{ e.l }}</span>
               </div>
             </sc-for>
           </div>
           <div style="margin-top:12px;display:flex;gap:6px;padding-top:12px;border-top:1px solid rgba(20,45,32,.1)">
             <sc-for list="{{ calStrip }}" as="d" hint-placeholder-count="7">
-              <div onClick="{{ d.open }}" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 2px;border-radius:6px;background:{{ d.bg }};border:1px solid {{ d.border }};min-height:44px;justify-content:center">
-                <span style="font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:.05em;color:{{ d.color }}">{{ d.wd }}</span>
-                <span style="font-family:'Bodoni Moda',serif;font-size:12.5px;color:{{ d.color }}">{{ d.n }}</span>
+              <div onClick="{{ d.open }}" style="flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:4px;padding:9px 2px;border-radius:8px;background:{{ d.bg }};border:1px solid {{ d.border }};min-height:56px;justify-content:center;transition:transform 150ms ease-out" style-active="transform:scale(.95)">
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.05em;color:{{ d.color }}">{{ d.wd }}</span>
+                <span style="font-family:'Bodoni Moda',serif;font-size:16px;color:{{ d.color }}">{{ d.n }}</span>
                 <i style="width:3px;height:3px;border-radius:50%;background:{{ d.color }};opacity:{{ d.dotOp }}"></i>
               </div>
             </sc-for>
@@ -215,12 +217,12 @@
       <sc-if value="{{ tabOn.finanzen }}" hint-placeholder-val="{{ false }}">
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;animation:kRise 420ms cubic-bezier(.16,1,.3,1) both">
           <sc-for list="{{ finLedger }}" as="l" hint-placeholder-count="4">
-            <div style="padding:12px;border-radius:10px;background:rgba(255,255,255,.42);border:1px solid rgba(20,45,32,.1)">
-              <div style="font-family:'IBM Plex Mono',monospace;font-size:8.5px;letter-spacing:.08em;color:#7A8A7C">{{ l.label }}</div>
-              <div style="font-family:'Bodoni Moda',serif;font-size:19px;color:#17251B;margin-top:4px;font-variant-numeric:tabular-nums">{{ l.val }}</div>
+            <div style="padding:15px;border-radius:12px;background:rgba(255,255,255,.42);border:1px solid rgba(20,45,32,.1)">
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.08em;color:#7A8A7C">{{ l.label }}</div>
+              <div style="font-family:'Bodoni Moda',serif;font-size:24.3px;color:#17251B;margin-top:4px;font-variant-numeric:tabular-nums">{{ l.val }}</div>
               <div style="display:flex;justify-content:space-between;margin-top:2px">
-                <span style="font-size:10px;color:{{ l.tc }}">{{ l.delta }}</span>
-                <span style="font-size:9.5px;color:#7A8A7C">{{ l.note }}</span>
+                <span style="font-size:12.8px;color:{{ l.tc }}">{{ l.delta }}</span>
+                <span style="font-size:12.2px;color:#7A8A7C">{{ l.note }}</span>
               </div>
             </div>
           </sc-for>
@@ -228,17 +230,17 @@
 
         <div style="display:flex;gap:7px;animation:kRise 420ms cubic-bezier(.16,1,.3,1) 40ms both">
           <sc-for list="{{ ranges }}" as="r" hint-placeholder-count="3">
-            <span onClick="{{ r.pick }}" style="flex:1;text-align:center;font-size:11.5px;padding:9px 6px;border-radius:7px;border:1px solid {{ r.border }};background:{{ r.bg }};color:{{ r.fg }}" style-active="transform:scale(.96)">{{ r.label }}</span>
+            <span onClick="{{ r.pick }}" style="flex:1;min-width:0;text-align:center;font-size:14.7px;padding:0 6px;min-height:46px;display:inline-flex;align-items:center;justify-content:center;border-radius:9px;border:1px solid {{ r.border }};background:{{ r.bg }};color:{{ r.fg }};transition:background 200ms ease-out,transform 140ms ease-out" style-active="transform:scale(.96)">{{ r.label }}</span>
           </sc-for>
         </div>
 
-        <div style="padding:16px;border-radius:12px;background:linear-gradient(180deg,#F5EFE2,#EFE7D5);border:1px solid rgba(20,45,32,.13);box-shadow:0 10px 22px -18px rgba(20,45,32,.5);animation:kRise 420ms cubic-bezier(.16,1,.3,1) 80ms both">
+        <div style="padding:18px;border-radius:14px;background:linear-gradient(180deg,#F5EFE2,#EFE7D5);border:1px solid rgba(20,45,32,.13);box-shadow:0 10px 22px -18px rgba(20,45,32,.5);animation:kRise 420ms cubic-bezier(.16,1,.3,1) 80ms both">
           <div style="display:flex;align-items:baseline;justify-content:space-between">
-            <div style="font-family:'Bodoni Moda',serif;font-size:15px;color:#132A1D">{{ chartInc.title }}</div>
-            <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#6C7B6E;font-variant-numeric:tabular-nums">{{ chartInc.sum }}</div>
+            <div style="font-family:'Bodoni Moda',serif;font-size:19.2px;color:#132A1D">{{ chartInc.title }}</div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:12.8px;color:#6C7B6E;font-variant-numeric:tabular-nums">{{ chartInc.sum }}</div>
           </div>
           <div style="position:relative;margin-top:10px" onTouchMove="{{ chartInc.move }}" onTouchEnd="{{ chartInc.leave }}" onMouseMove="{{ chartInc.move }}" onMouseLeave="{{ chartInc.leave }}">
-            <svg viewBox="0 0 320 150" preserveAspectRatio="none" style="width:100%;height:150px;display:block">
+            <svg viewBox="0 0 320 150" preserveAspectRatio="none" style="width:100%;height:168px;display:block">
               <defs><linearGradient id="incFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#2F6B4C" stop-opacity=".28"></stop><stop offset="100%" stop-color="#2F6B4C" stop-opacity="0"></stop></linearGradient></defs>
               <sc-for list="{{ chartInc.grid }}" as="g" hint-placeholder-count="4"><line x1="0" y1="{{ g.y }}" x2="320" y2="{{ g.y }}" stroke="rgba(20,45,32,.09)" stroke-width="1"></line></sc-for>
               <path d="{{ chartInc.area }}" fill="url(#incFill)"></path>
@@ -249,20 +251,20 @@
             </svg>
             <sc-if value="{{ chartInc.tip.show }}" hint-placeholder-val="{{ false }}">
               <div style="{{ chartInc.tip.style }}">
-                <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.08em;color:#C9AE6C">{{ chartInc.tip.label }}</div>
-                <div style="font-size:12px;font-variant-numeric:tabular-nums">{{ chartInc.tip.val }}</div>
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.08em;color:#C9AE6C">{{ chartInc.tip.label }}</div>
+                <div style="font-size:15.4px;font-variant-numeric:tabular-nums">{{ chartInc.tip.val }}</div>
               </div>
             </sc-if>
           </div>
         </div>
 
-        <div style="padding:16px;border-radius:12px;background:linear-gradient(180deg,#F5EFE2,#EFE7D5);border:1px solid rgba(20,45,32,.13);box-shadow:0 10px 22px -18px rgba(20,45,32,.5);animation:kRise 420ms cubic-bezier(.16,1,.3,1) 120ms both">
+        <div style="padding:18px;border-radius:14px;background:linear-gradient(180deg,#F5EFE2,#EFE7D5);border:1px solid rgba(20,45,32,.13);box-shadow:0 10px 22px -18px rgba(20,45,32,.5);animation:kRise 420ms cubic-bezier(.16,1,.3,1) 120ms both">
           <div style="display:flex;align-items:baseline;justify-content:space-between">
-            <div style="font-family:'Bodoni Moda',serif;font-size:15px;color:#132A1D">{{ chartExp.title }}</div>
-            <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#6C7B6E;font-variant-numeric:tabular-nums">{{ chartExp.sum }}</div>
+            <div style="font-family:'Bodoni Moda',serif;font-size:19.2px;color:#132A1D">{{ chartExp.title }}</div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:12.8px;color:#6C7B6E;font-variant-numeric:tabular-nums">{{ chartExp.sum }}</div>
           </div>
           <div style="position:relative;margin-top:10px" onTouchMove="{{ chartExp.move }}" onTouchEnd="{{ chartExp.leave }}" onMouseMove="{{ chartExp.move }}" onMouseLeave="{{ chartExp.leave }}">
-            <svg viewBox="0 0 320 150" preserveAspectRatio="none" style="width:100%;height:150px;display:block">
+            <svg viewBox="0 0 320 150" preserveAspectRatio="none" style="width:100%;height:168px;display:block">
               <defs><linearGradient id="expFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#8C4A20" stop-opacity=".26"></stop><stop offset="100%" stop-color="#8C4A20" stop-opacity="0"></stop></linearGradient></defs>
               <sc-for list="{{ chartExp.grid }}" as="g" hint-placeholder-count="4"><line x1="0" y1="{{ g.y }}" x2="320" y2="{{ g.y }}" stroke="rgba(20,45,32,.09)" stroke-width="1"></line></sc-for>
               <path d="{{ chartExp.area }}" fill="url(#expFill)"></path>
@@ -273,70 +275,72 @@
             </svg>
             <sc-if value="{{ chartExp.tip.show }}" hint-placeholder-val="{{ false }}">
               <div style="{{ chartExp.tip.style }}">
-                <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.08em;color:#C9AE6C">{{ chartExp.tip.label }}</div>
-                <div style="font-size:12px;font-variant-numeric:tabular-nums">{{ chartExp.tip.val }}</div>
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.08em;color:#C9AE6C">{{ chartExp.tip.label }}</div>
+                <div style="font-size:15.4px;font-variant-numeric:tabular-nums">{{ chartExp.tip.val }}</div>
               </div>
             </sc-if>
           </div>
         </div>
 
-        <div style="padding:16px;border-radius:12px;background:linear-gradient(180deg,#F5EFE2,#EFE7D5);border:1px solid rgba(20,45,32,.13);box-shadow:0 10px 22px -18px rgba(20,45,32,.5);animation:kRise 420ms cubic-bezier(.16,1,.3,1) 160ms both">
-          <div style="font-family:'Bodoni Moda',serif;font-size:15px;color:#132A1D">Budgets</div>
+        <div style="padding:18px;border-radius:14px;background:linear-gradient(180deg,#F5EFE2,#EFE7D5);border:1px solid rgba(20,45,32,.13);box-shadow:0 10px 22px -18px rgba(20,45,32,.5);animation:kRise 420ms cubic-bezier(.16,1,.3,1) 160ms both">
+          <div style="font-family:'Bodoni Moda',serif;font-size:19.2px;color:#132A1D">Budgets</div>
           <div style="margin-top:11px;display:flex;flex-direction:column;gap:10px">
             <sc-for list="{{ budgets }}" as="b" hint-placeholder-count="4">
-              <div onClick="{{ b.open }}" style="display:grid;grid-template-columns:80px 1fr auto;gap:9px;align-items:center;min-height:32px">
-                <span style="font-size:11.5px;color:#39473B;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ b.label }}</span>
-                <span style="height:7px;border-radius:4px;background:rgba(20,45,32,.1);overflow:hidden">
-                  <i style="display:block;height:100%;border-radius:4px;background:{{ b.fill }};width:{{ b.pct }}%;transition:width 700ms cubic-bezier(.16,1,.3,1)"></i>
+              <div onClick="{{ b.open }}" style="display:flex;flex-direction:column;gap:8px;padding:7px 0;min-height:44px;justify-content:center;transition:opacity 160ms ease-out" style-active="opacity:.72">
+                <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px">
+                  <span style="font-size:14.7px;color:#39473B;overflow-wrap:anywhere">{{ b.label }}</span>
+                  <span style="font-family:'IBM Plex Mono',monospace;font-size:12.8px;color:#4C5A4E;flex:0 0 auto;font-variant-numeric:tabular-nums">{{ b.val }}</span>
+                </div>
+                <span style="display:block;width:100%;height:9px;border-radius:5px;background:rgba(20,45,32,.1);overflow:hidden">
+                  <i style="display:block;height:100%;border-radius:5px;background:{{ b.fill }};width:{{ b.pct }}%;transition:width 900ms cubic-bezier(.16,1,.3,1)"></i>
                 </span>
-                <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#4C5A4E">{{ b.val }}</span>
               </div>
             </sc-for>
           </div>
         </div>
 
-        <div style="padding:16px;border-radius:12px;background:linear-gradient(180deg,#F5EFE2,#EFE7D5);border:1px solid rgba(20,45,32,.13);box-shadow:0 10px 22px -18px rgba(20,45,32,.5);animation:kRise 420ms cubic-bezier(.16,1,.3,1) 200ms both">
-          <div style="font-family:'Bodoni Moda',serif;font-size:15px;color:#132A1D">Ausgaben nach Kategorie</div>
-          <div style="margin-top:12px;display:flex;align-items:center;gap:16px">
-            <div style="position:relative;width:112px;height:112px;flex:0 0 auto">
-              <svg viewBox="0 0 100 100" style="width:112px;height:112px;transform:rotate(-90deg)">
+        <div style="padding:18px;border-radius:14px;background:linear-gradient(180deg,#F5EFE2,#EFE7D5);border:1px solid rgba(20,45,32,.13);box-shadow:0 10px 22px -18px rgba(20,45,32,.5);animation:kRise 420ms cubic-bezier(.16,1,.3,1) 200ms both">
+          <div style="font-family:'Bodoni Moda',serif;font-size:19.2px;color:#132A1D">Ausgaben nach Kategorie</div>
+          <div style="margin-top:14px;display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+            <div style="position:relative;width:120px;height:120px;flex:0 0 auto">
+              <svg viewBox="0 0 100 100" style="width:120px;height:120px;transform:rotate(-90deg)">
                 <sc-for list="{{ donut }}" as="s" hint-placeholder-count="6">
                   <circle cx="50" cy="50" r="38" fill="none" stroke="{{ s.color }}" stroke-width="{{ s.w }}" stroke-dasharray="{{ s.dash }}" stroke-dashoffset="{{ s.off }}" onClick="{{ s.tap }}" style="transition:stroke-width 180ms ease-out"></circle>
                 </sc-for>
               </svg>
               <div style="position:absolute;inset:0;display:grid;place-items:center;text-align:center">
                 <div>
-                  <div style="font-family:'Bodoni Moda',serif;font-size:16px;color:#1B4632;font-variant-numeric:tabular-nums;line-height:1.1">{{ donutVal }}</div>
-                  <div style="font-size:9px;color:#7A8A7C">{{ donutLabel }}</div>
+                  <div style="font-family:'Bodoni Moda',serif;font-size:20.5px;color:#1B4632;font-variant-numeric:tabular-nums;line-height:1.1">{{ donutVal }}</div>
+                  <div style="font-size:11.5px;color:#7A8A7C">{{ donutLabel }}</div>
                 </div>
               </div>
             </div>
             <div style="flex:1;display:flex;flex-direction:column;gap:7px">
               <sc-for list="{{ legend }}" as="l" hint-placeholder-count="6">
-                <div onClick="{{ l.tap }}" style="display:grid;grid-template-columns:8px 1fr auto;gap:8px;align-items:center;opacity:{{ l.op }};min-height:20px">
-                  <span style="width:8px;height:8px;border-radius:2px;background:{{ l.color }}"></span>
-                  <span style="font-size:11px;color:#39473B;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ l.label }}</span>
-                  <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#4C5A4E">{{ l.val }}</span>
+                <div onClick="{{ l.tap }}" style="display:grid;grid-template-columns:10px minmax(0,1fr) auto;gap:9px;align-items:center;opacity:{{ l.op }};min-height:34px;transition:opacity 200ms ease-out">
+                  <span style="width:10px;height:10px;border-radius:3px;background:{{ l.color }}"></span>
+                  <span style="font-size:14.1px;color:#39473B;overflow-wrap:anywhere">{{ l.label }}</span>
+                  <span style="font-family:'IBM Plex Mono',monospace;font-size:12.8px;color:#4C5A4E">{{ l.val }}</span>
                 </div>
               </sc-for>
             </div>
           </div>
         </div>
 
-        <div style="padding:16px;border-radius:12px;background:linear-gradient(180deg,#F5EFE2,#EFE7D5);border:1px solid rgba(20,45,32,.13);box-shadow:0 10px 22px -18px rgba(20,45,32,.5);animation:kRise 420ms cubic-bezier(.16,1,.3,1) 240ms both">
+        <div style="padding:18px;border-radius:14px;background:linear-gradient(180deg,#F5EFE2,#EFE7D5);border:1px solid rgba(20,45,32,.13);box-shadow:0 10px 22px -18px rgba(20,45,32,.5);animation:kRise 420ms cubic-bezier(.16,1,.3,1) 240ms both">
           <div style="display:flex;align-items:baseline;justify-content:space-between">
-            <div style="font-family:'Bodoni Moda',serif;font-size:15px;color:#132A1D">Letzte Transaktionen</div>
-            <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6C7B6E">AUG 2026</div>
+            <div style="font-family:'Bodoni Moda',serif;font-size:19.2px;color:#132A1D">Letzte Transaktionen</div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:12.2px;color:#6C7B6E">AUG 2026</div>
           </div>
           <div style="margin-top:8px;display:flex;flex-direction:column">
             <sc-for list="{{ tx }}" as="t" hint-placeholder-count="7">
-              <div onClick="{{ t.open }}" style="display:grid;grid-template-columns:40px 1fr auto;gap:8px;align-items:center;padding:9px 0;border-bottom:1px solid rgba(20,45,32,.08);min-height:40px">
-                <span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#8A9A8C">{{ t.date }}</span>
+              <div onClick="{{ t.open }}" style="display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:11px;align-items:center;padding:12px 0;border-bottom:1px solid rgba(20,45,32,.08);min-height:52px;transition:opacity 160ms ease-out" style-active="opacity:.7">
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:12.2px;color:#8A9A8C">{{ t.date }}</span>
                 <span style="min-width:0">
-                  <span style="display:block;font-size:12px;color:#1B2A1E;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ t.label }}</span>
-                  <span style="display:flex;align-items:center;gap:5px;margin-top:2px"><i style="width:6px;height:6px;border-radius:2px;background:{{ t.color }}"></i><span style="font-size:9.5px;color:#7A8A7C">{{ t.cat }}</span></span>
+                  <span style="display:block;font-size:15.4px;color:#1B2A1E;overflow-wrap:anywhere">{{ t.label }}</span>
+                  <span style="display:flex;align-items:center;gap:5px;margin-top:2px"><i style="width:6px;height:6px;border-radius:2px;background:{{ t.color }}"></i><span style="font-size:12.2px;color:#7A8A7C">{{ t.cat }}</span></span>
                 </span>
-                <span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:{{ t.tc }};font-variant-numeric:tabular-nums">{{ t.amount }}</span>
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:14.7px;color:{{ t.tc }};font-variant-numeric:tabular-nums">{{ t.amount }}</span>
               </div>
             </sc-for>
           </div>
@@ -344,45 +348,45 @@
       </sc-if>
 
       <sc-if value="{{ tabOn.gesundheit }}" hint-placeholder-val="{{ false }}">
-        <div style="padding:16px;border-radius:12px;background:linear-gradient(180deg,#F5EFE2,#EFE7D5);border:1px solid rgba(20,45,32,.13);box-shadow:0 10px 22px -18px rgba(20,45,32,.5);animation:kRise 420ms cubic-bezier(.16,1,.3,1) both">
-          <div style="display:flex;justify-content:space-around">
+        <div style="padding:18px;border-radius:14px;background:linear-gradient(180deg,#F5EFE2,#EFE7D5);border:1px solid rgba(20,45,32,.13);box-shadow:0 10px 22px -18px rgba(20,45,32,.5);animation:kRise 420ms cubic-bezier(.16,1,.3,1) both">
+          <div style="display:flex;justify-content:space-around;gap:8px;flex-wrap:wrap">
             <sc-for list="{{ heaRings }}" as="r" hint-placeholder-count="3">
               <div onClick="{{ r.open }}" style="display:flex;flex-direction:column;align-items:center;gap:7px">
-                <div style="position:relative;width:82px;height:82px">
-                  <svg viewBox="0 0 100 100" style="width:82px;height:82px;transform:rotate(-90deg)">
+                <div style="position:relative;width:92px;height:92px">
+                  <svg viewBox="0 0 100 100" style="width:92px;height:92px;transform:rotate(-90deg)">
                     <circle cx="50" cy="50" r="42" fill="none" stroke="rgba(20,45,32,.1)" stroke-width="8"></circle>
                     <circle cx="50" cy="50" r="42" fill="none" stroke="{{ r.color }}" stroke-width="8" stroke-linecap="round" stroke-dasharray="{{ r.c }}" stroke-dashoffset="{{ r.off }}" style="filter:drop-shadow(0 0 5px {{ r.glow }})"></circle>
                   </svg>
-                  <div style="position:absolute;inset:0;display:grid;place-items:center;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#1B4632">{{ r.pctLabel }}</div>
+                  <div style="position:absolute;inset:0;display:grid;place-items:center;font-family:'IBM Plex Mono',monospace;font-size:14.1px;color:#1B4632">{{ r.pctLabel }}</div>
                 </div>
-                <span style="font-size:10.5px;color:#39473B">{{ r.label }}</span>
+                <span style="font-size:13.4px;color:#39473B">{{ r.label }}</span>
               </div>
             </sc-for>
           </div>
         </div>
 
-        <div style="padding:16px;border-radius:12px;background:linear-gradient(180deg,#F5EFE2,#EFE7D5);border:1px solid rgba(20,45,32,.13);box-shadow:0 10px 22px -18px rgba(20,45,32,.5);animation:kRise 420ms cubic-bezier(.16,1,.3,1) 60ms both">
+        <div style="padding:18px;border-radius:14px;background:linear-gradient(180deg,#F5EFE2,#EFE7D5);border:1px solid rgba(20,45,32,.13);box-shadow:0 10px 22px -18px rgba(20,45,32,.5);animation:kRise 420ms cubic-bezier(.16,1,.3,1) 60ms both">
           <div style="display:flex;align-items:baseline;justify-content:space-between">
-            <div style="font-family:'Bodoni Moda',serif;font-size:15px;color:#132A1D">Schritte, 7 Tage</div>
-            <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#6C7B6E">Ø {{ heaAvg }}</div>
+            <div style="font-family:'Bodoni Moda',serif;font-size:19.2px;color:#132A1D">Schritte, 7 Tage</div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:12.8px;color:#6C7B6E">Ø {{ heaAvg }}</div>
           </div>
           <div style="margin-top:12px;display:flex;align-items:flex-end;gap:6px;height:70px">
             <sc-for list="{{ heaWeek }}" as="d" hint-placeholder-count="7">
               <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px">
                 <i style="width:100%;border-radius:2px;background:{{ d.fill }};height:{{ d.h }}px;transform-origin:bottom;animation:kRiseUp 560ms cubic-bezier(.16,1,.3,1) both;animation-delay:{{ d.delay }}ms"></i>
-                <span style="font-family:'IBM Plex Mono',monospace;font-size:8.5px;color:#7A8A7C">{{ d.l }}</span>
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#7A8A7C">{{ d.l }}</span>
               </div>
             </sc-for>
           </div>
         </div>
 
-        <div style="padding:16px;border-radius:12px;background:linear-gradient(180deg,#F5EFE2,#EFE7D5);border:1px solid rgba(20,45,32,.13);box-shadow:0 10px 22px -18px rgba(20,45,32,.5);animation:kRise 420ms cubic-bezier(.16,1,.3,1) 100ms both">
+        <div style="padding:18px;border-radius:14px;background:linear-gradient(180deg,#F5EFE2,#EFE7D5);border:1px solid rgba(20,45,32,.13);box-shadow:0 10px 22px -18px rgba(20,45,32,.5);animation:kRise 420ms cubic-bezier(.16,1,.3,1) 100ms both">
           <div style="display:flex;align-items:baseline;justify-content:space-between">
-            <div style="font-family:'Bodoni Moda',serif;font-size:15px;color:#132A1D">{{ weightChart.title }}</div>
-            <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#6C7B6E">{{ weightChart.sum }}</div>
+            <div style="font-family:'Bodoni Moda',serif;font-size:19.2px;color:#132A1D">{{ weightChart.title }}</div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:12.8px;color:#6C7B6E">{{ weightChart.sum }}</div>
           </div>
           <div style="position:relative;margin-top:10px" onTouchMove="{{ weightChart.move }}" onTouchEnd="{{ weightChart.leave }}" onMouseMove="{{ weightChart.move }}" onMouseLeave="{{ weightChart.leave }}">
-            <svg viewBox="0 0 320 150" preserveAspectRatio="none" style="width:100%;height:150px;display:block">
+            <svg viewBox="0 0 320 150" preserveAspectRatio="none" style="width:100%;height:168px;display:block">
               <defs><linearGradient id="wgtFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#2F6B4C" stop-opacity=".24"></stop><stop offset="100%" stop-color="#2F6B4C" stop-opacity="0"></stop></linearGradient></defs>
               <sc-for list="{{ weightChart.grid }}" as="g" hint-placeholder-count="4"><line x1="0" y1="{{ g.y }}" x2="320" y2="{{ g.y }}" stroke="rgba(20,45,32,.09)" stroke-width="1"></line></sc-for>
               <path d="{{ weightChart.area }}" fill="url(#wgtFill)"></path>
@@ -392,46 +396,46 @@
               </sc-if>
             </svg>
             <sc-if value="{{ weightChart.tip.show }}" hint-placeholder-val="{{ false }}">
-              <div style="{{ weightChart.tip.style }}"><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#C9AE6C">{{ weightChart.tip.label }}</div><div style="font-size:12px">{{ weightChart.tip.val }}</div></div>
+              <div style="{{ weightChart.tip.style }}"><div style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:#C9AE6C">{{ weightChart.tip.label }}</div><div style="font-size:15.4px">{{ weightChart.tip.val }}</div></div>
             </sc-if>
           </div>
         </div>
 
-        <div style="padding:16px;border-radius:12px;background:linear-gradient(180deg,#F5EFE2,#EFE7D5);border:1px solid rgba(20,45,32,.13);box-shadow:0 10px 22px -18px rgba(20,45,32,.5);animation:kRise 420ms cubic-bezier(.16,1,.3,1) 140ms both">
+        <div style="padding:18px;border-radius:14px;background:linear-gradient(180deg,#F5EFE2,#EFE7D5);border:1px solid rgba(20,45,32,.13);box-shadow:0 10px 22px -18px rgba(20,45,32,.5);animation:kRise 420ms cubic-bezier(.16,1,.3,1) 140ms both">
           <div style="display:flex;align-items:baseline;justify-content:space-between">
-            <div style="font-family:'Bodoni Moda',serif;font-size:15px;color:#132A1D">Schlafphasen, 7 Nächte</div>
+            <div style="font-family:'Bodoni Moda',serif;font-size:19.2px;color:#132A1D">Schlafphasen, 7 Nächte</div>
             <div style="display:flex;gap:8px">
-              <span style="display:flex;align-items:center;gap:4px;font-size:9.5px;color:#4C5A4E"><i style="width:7px;height:7px;border-radius:2px;background:#5C8F70"></i>REM</span>
-              <span style="display:flex;align-items:center;gap:4px;font-size:9.5px;color:#4C5A4E"><i style="width:7px;height:7px;border-radius:2px;background:#123A26"></i>Tief</span>
+              <span style="display:flex;align-items:center;gap:4px;font-size:12.2px;color:#4C5A4E"><i style="width:7px;height:7px;border-radius:2px;background:#5C8F70"></i>REM</span>
+              <span style="display:flex;align-items:center;gap:4px;font-size:12.2px;color:#4C5A4E"><i style="width:7px;height:7px;border-radius:2px;background:#123A26"></i>Tief</span>
             </div>
           </div>
           <div style="margin-top:12px;display:flex;align-items:flex-end;gap:9px;height:110px">
             <sc-for list="{{ sleepBars }}" as="d" hint-placeholder-count="7">
               <div onClick="{{ d.tap }}" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;height:100%;justify-content:flex-end;position:relative">
                 <sc-if value="{{ d.hovered }}" hint-placeholder-val="{{ false }}">
-                  <div style="position:absolute;bottom:100%;margin-bottom:6px;padding:5px 8px;border-radius:3px;background:rgba(12,36,24,.95);color:#F2EBD9;white-space:nowrap;z-index:2;font-size:10px">{{ d.tip }}</div>
+                  <div style="position:absolute;bottom:100%;margin-bottom:6px;padding:5px 8px;border-radius:3px;background:rgba(12,36,24,.95);color:#F2EBD9;white-space:nowrap;z-index:2;font-size:12.8px">{{ d.tip }}</div>
                 </sc-if>
-                <span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#4C5A4E">{{ d.total }}</span>
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:#4C5A4E">{{ d.total }}</span>
                 <span style="width:100%;max-width:30px;display:flex;flex-direction:column;gap:2px;transform-origin:bottom;animation:kRiseUp 620ms cubic-bezier(.16,1,.3,1) both;animation-delay:{{ d.delay }}ms">
                   <i style="border-radius:2px 2px 0 0;background:#5C8F70;height:{{ d.rem }}px"></i>
                   <i style="background:#2F6B4C;height:{{ d.light }}px"></i>
                   <i style="border-radius:0 0 2px 2px;background:#123A26;height:{{ d.deep }}px"></i>
                 </span>
-                <span style="font-family:'IBM Plex Mono',monospace;font-size:8.5px;color:#7A8A7C">{{ d.l }}</span>
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#7A8A7C">{{ d.l }}</span>
               </div>
             </sc-for>
           </div>
         </div>
 
-        <div style="padding:16px;border-radius:12px;background:linear-gradient(180deg,#F5EFE2,#EFE7D5);border:1px solid rgba(20,45,32,.13);box-shadow:0 10px 22px -18px rgba(20,45,32,.5);animation:kRise 420ms cubic-bezier(.16,1,.3,1) 180ms both">
+        <div style="padding:18px;border-radius:14px;background:linear-gradient(180deg,#F5EFE2,#EFE7D5);border:1px solid rgba(20,45,32,.13);box-shadow:0 10px 22px -18px rgba(20,45,32,.5);animation:kRise 420ms cubic-bezier(.16,1,.3,1) 180ms both">
           <div style="display:flex;align-items:baseline;justify-content:space-between">
-            <div style="font-family:'Bodoni Moda',serif;font-size:15px;color:#132A1D">Schritte, 14 Tage</div>
+            <div style="font-family:'Bodoni Moda',serif;font-size:19.2px;color:#132A1D">Schritte, 14 Tage</div>
           </div>
           <div style="margin-top:12px;display:flex;align-items:flex-end;gap:4px;height:110px">
             <sc-for list="{{ steps14 }}" as="d" hint-placeholder-count="14">
               <div onClick="{{ d.tap }}" style="flex:1;display:flex;flex-direction:column;align-items:center;height:100%;justify-content:flex-end;position:relative">
                 <sc-if value="{{ d.hovered }}" hint-placeholder-val="{{ false }}">
-                  <div style="position:absolute;bottom:100%;margin-bottom:5px;padding:5px 7px;border-radius:3px;background:rgba(12,36,24,.95);color:#F2EBD9;white-space:nowrap;z-index:2;font-size:9.5px">{{ d.tip }}</div>
+                  <div style="position:absolute;bottom:100%;margin-bottom:5px;padding:5px 7px;border-radius:3px;background:rgba(12,36,24,.95);color:#F2EBD9;white-space:nowrap;z-index:2;font-size:12.2px">{{ d.tip }}</div>
                 </sc-if>
                 <i style="width:100%;border-radius:2px;background:{{ d.fill }};height:{{ d.h }}px;transform-origin:bottom;animation:kRiseUp 620ms cubic-bezier(.16,1,.3,1) both;animation-delay:{{ d.delay }}ms"></i>
               </div>
@@ -439,15 +443,14 @@
           </div>
         </div>
 
-        <div style="padding:16px;border-radius:12px;background:linear-gradient(180deg,#F5EFE2,#EFE7D5);border:1px solid rgba(20,45,32,.13);box-shadow:0 10px 22px -18px rgba(20,45,32,.5);animation:kRise 420ms cubic-bezier(.16,1,.3,1) 220ms both">
-          <div style="font-family:'Bodoni Moda',serif;font-size:15px;color:#132A1D">Workouts diese Woche</div>
+        <div style="padding:18px;border-radius:14px;background:linear-gradient(180deg,#F5EFE2,#EFE7D5);border:1px solid rgba(20,45,32,.13);box-shadow:0 10px 22px -18px rgba(20,45,32,.5);animation:kRise 420ms cubic-bezier(.16,1,.3,1) 220ms both">
+          <div style="font-family:'Bodoni Moda',serif;font-size:19.2px;color:#132A1D">Workouts diese Woche</div>
           <div style="margin-top:9px;display:flex;flex-direction:column;gap:2px">
             <sc-for list="{{ workouts }}" as="w" hint-placeholder-count="4">
-              <div onClick="{{ w.open }}" style="display:grid;grid-template-columns:30px 1fr auto auto;gap:9px;align-items:center;padding:8px 0;border-bottom:1px solid rgba(20,45,32,.07);min-height:40px">
-                <span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#8A9A8C">{{ w.day }}</span>
-                <span style="font-size:12px;color:#1B2A1E">{{ w.type }}</span>
-                <span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#4C5A4E">{{ w.dur }}</span>
-                <span style="font-size:9.5px;padding:3px 7px;border-radius:2px;background:{{ w.bg }};color:{{ w.fg }}">{{ w.load }}</span>
+              <div onClick="{{ w.open }}" style="display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 10px;align-items:center;padding:12px 0;border-bottom:1px solid rgba(20,45,32,.07);min-height:52px;transition:opacity 160ms ease-out" style-active="opacity:.7">
+                <span style="font-size:15.4px;line-height:1.35;color:#1B2A1E;overflow-wrap:anywhere">{{ w.type }}</span>
+                <span style="font-size:12.2px;padding:5px 9px;border-radius:3px;background:{{ w.bg }};color:{{ w.fg }};justify-self:end;white-space:nowrap">{{ w.load }}</span>
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:12.2px;color:#8A9A8C;grid-column:1 / -1">{{ w.day }} · {{ w.dur }}</span>
               </div>
             </sc-for>
           </div>
@@ -457,262 +460,262 @@
       <sc-if value="{{ tabOn.wellbeing }}" hint-placeholder-val="{{ false }}">
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;animation:kRise 420ms cubic-bezier(.16,1,.3,1) both">
           <sc-for list="{{ wbLedger }}" as="l" hint-placeholder-count="4">
-            <div style="padding:12px;border-radius:10px;background:rgba(255,255,255,.42);border:1px solid rgba(20,45,32,.1)">
-              <div style="font-family:'IBM Plex Mono',monospace;font-size:8.5px;letter-spacing:.08em;color:#7A8A7C">{{ l.label }}</div>
-              <div style="font-family:'Bodoni Moda',serif;font-size:17px;color:#17251B;margin-top:4px">{{ l.val }}</div>
-              <div style="font-size:9.5px;color:#7A8A7C;margin-top:2px">{{ l.note }}</div>
+            <div style="padding:15px;border-radius:12px;background:rgba(255,255,255,.42);border:1px solid rgba(20,45,32,.1)">
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.08em;color:#7A8A7C">{{ l.label }}</div>
+              <div style="font-family:'Bodoni Moda',serif;font-size:21.8px;color:#17251B;margin-top:4px">{{ l.val }}</div>
+              <div style="font-size:12.2px;color:#7A8A7C;margin-top:2px">{{ l.note }}</div>
             </div>
           </sc-for>
         </div>
 
-        <div style="padding:16px;border-radius:12px;background:linear-gradient(180deg,#F5EFE2,#EFE7D5);border:1px solid rgba(20,45,32,.13);box-shadow:0 10px 22px -18px rgba(20,45,32,.5);animation:kRise 420ms cubic-bezier(.16,1,.3,1) 60ms both">
+        <div style="padding:18px;border-radius:14px;background:linear-gradient(180deg,#F5EFE2,#EFE7D5);border:1px solid rgba(20,45,32,.13);box-shadow:0 10px 22px -18px rgba(20,45,32,.5);animation:kRise 420ms cubic-bezier(.16,1,.3,1) 60ms both">
           <div style="display:flex;align-items:baseline;justify-content:space-between">
-            <div style="font-family:'Bodoni Moda',serif;font-size:15px;color:#132A1D">Sechs Werte, 1 bis 10</div>
-            <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#6C7B6E">{{ wbCount }} / 6</div>
+            <div style="font-family:'Bodoni Moda',serif;font-size:19.2px;color:#132A1D">Sechs Werte, 1 bis 10</div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:12.8px;color:#6C7B6E">{{ wbCount }} / 6</div>
           </div>
           <div style="margin-top:14px;display:flex;flex-direction:column;gap:12px">
             <sc-for list="{{ wbValues }}" as="v" hint-placeholder-count="6">
               <div>
-                <div style="font-size:11.5px;color:#39473B;margin-bottom:6px">{{ v.label }}</div>
-                <div style="display:flex;gap:3px">
+                <div style="font-size:14.7px;color:#39473B;margin-bottom:8px">{{ v.label }}</div>
+                <div style="display:flex;gap:4px">
                   <sc-for list="{{ v.steps }}" as="s" hint-placeholder-count="10">
-                    <span onClick="{{ s.pick }}" style="flex:1;height:32px;display:grid;place-items:center;border-radius:4px;background:{{ s.bg }};color:{{ s.fg }};font-family:'IBM Plex Mono',monospace;font-size:10px">{{ s.n }}</span>
+                    <span onClick="{{ s.pick }}" style="flex:1;min-width:0;height:46px;display:grid;place-items:center;border-radius:7px;background:{{ s.bg }};color:{{ s.fg }};font-family:'IBM Plex Mono',monospace;font-size:12.8px;transition:background 180ms ease-out,transform 140ms ease-out" style-active="transform:scale(.92)">{{ s.n }}</span>
                   </sc-for>
                 </div>
               </div>
             </sc-for>
           </div>
           <div style="margin-top:16px;padding-top:14px;border-top:1px solid rgba(20,45,32,.1)">
-            <div style="font-size:12px;color:#39473B">Hauptgefühl</div>
+            <div style="font-size:15.4px;color:#39473B">Hauptgefühl</div>
             <div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:6px">
               <sc-for list="{{ wbMoods }}" as="m" hint-placeholder-count="6">
-                <span onClick="{{ m.pick }}" style="font-size:11.5px;padding:8px 13px;border-radius:999px;background:{{ m.bg }};border:1px solid {{ m.border }};color:{{ m.fg }}">{{ m.label }}</span>
+                <span onClick="{{ m.pick }}" style="font-size:14.7px;padding:0 16px;min-height:44px;display:inline-flex;align-items:center;border-radius:999px;background:{{ m.bg }};border:1px solid {{ m.border }};color:{{ m.fg }};transition:background 180ms ease-out,transform 140ms ease-out" style-active="transform:scale(.95)">{{ m.label }}</span>
               </sc-for>
             </div>
           </div>
           <div style="margin-top:14px">
-            <div style="font-size:12px;color:#39473B">Größter Einflussfaktor</div>
+            <div style="font-size:15.4px;color:#39473B">Größter Einflussfaktor</div>
             <div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:6px">
               <sc-for list="{{ wbFactors }}" as="m" hint-placeholder-count="6">
-                <span onClick="{{ m.pick }}" style="font-size:11.5px;padding:8px 13px;border-radius:5px;background:{{ m.bg }};border:1px solid {{ m.border }};color:{{ m.fg }}">{{ m.label }}</span>
+                <span onClick="{{ m.pick }}" style="font-size:14.7px;padding:0 16px;min-height:44px;display:inline-flex;align-items:center;border-radius:7px;background:{{ m.bg }};border:1px solid {{ m.border }};color:{{ m.fg }};transition:background 180ms ease-out,transform 140ms ease-out" style-active="transform:scale(.95)">{{ m.label }}</span>
               </sc-for>
             </div>
           </div>
           <div style="margin-top:16px;display:flex;gap:8px">
-            <span onClick="{{ wbSave }}" style="flex:1;text-align:center;font-size:12.5px;padding:12px;border-radius:7px;background:{{ wbSaveBg }};color:{{ wbSaveFg }};font-weight:500">{{ wbSaveLabel }}</span>
-            <span onClick="{{ wbReset }}" style="font-size:12px;padding:12px 14px;border-radius:7px;border:1px solid rgba(20,45,32,.18);color:#4C5A4E">Reset</span>
+            <span onClick="{{ wbSave }}" style="flex:1;text-align:center;font-size:16px;padding:0 16px;min-height:50px;display:inline-flex;align-items:center;justify-content:center;border-radius:9px;background:{{ wbSaveBg }};color:{{ wbSaveFg }};font-weight:500;transition:background 200ms ease-out,transform 140ms ease-out" style-active="transform:scale(.97)">{{ wbSaveLabel }}</span>
+            <span onClick="{{ wbReset }}" style="font-size:15.4px;padding:0 18px;min-height:50px;display:inline-flex;align-items:center;border-radius:9px;border:1px solid rgba(20,45,32,.18);color:#4C5A4E;transition:background 180ms ease-out" style-active="background:rgba(20,45,32,.08)">Reset</span>
           </div>
         </div>
 
-        <div style="padding:16px;border-radius:12px;background:linear-gradient(180deg,#F5EFE2,#EFE7D5);border:1px solid rgba(20,45,32,.13);box-shadow:0 10px 22px -18px rgba(20,45,32,.5);animation:kRise 420ms cubic-bezier(.16,1,.3,1) 100ms both">
+        <div style="padding:18px;border-radius:14px;background:linear-gradient(180deg,#F5EFE2,#EFE7D5);border:1px solid rgba(20,45,32,.13);box-shadow:0 10px 22px -18px rgba(20,45,32,.5);animation:kRise 420ms cubic-bezier(.16,1,.3,1) 100ms both">
           <div style="display:flex;align-items:baseline;justify-content:space-between">
-            <div style="font-family:'Bodoni Moda',serif;font-size:15px;color:#132A1D">7-Tage-Verlauf</div>
-            <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#6C7B6E">Ø {{ wbAvg }}</div>
+            <div style="font-family:'Bodoni Moda',serif;font-size:19.2px;color:#132A1D">7-Tage-Verlauf</div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:12.8px;color:#6C7B6E">Ø {{ wbAvg }}</div>
           </div>
           <div style="margin-top:12px;display:flex;align-items:flex-end;gap:9px;height:110px">
             <sc-for list="{{ wbHistory }}" as="d" hint-placeholder-count="7">
               <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;height:100%;justify-content:flex-end">
-                <span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#4C5A4E">{{ d.val }}</span>
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:12.2px;color:#4C5A4E">{{ d.val }}</span>
                 <i style="width:100%;max-width:28px;border-radius:2px;background:{{ d.fill }};height:{{ d.h }}px;transform-origin:bottom;animation:kRiseUp 620ms cubic-bezier(.16,1,.3,1) both;animation-delay:{{ d.delay }}ms"></i>
-                <span style="font-family:'IBM Plex Mono',monospace;font-size:8.5px;color:#7A8A7C">{{ d.l }}</span>
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#7A8A7C">{{ d.l }}</span>
               </div>
             </sc-for>
           </div>
         </div>
 
-        <div style="padding:16px;border-radius:12px;background:linear-gradient(150deg,#153520,#0C2418);border:1px solid rgba(184,145,47,.3);box-shadow:0 10px 22px -18px rgba(10,31,21,.8);animation:kRise 420ms cubic-bezier(.16,1,.3,1) 140ms both">
-          <div style="font-family:'Bodoni Moda',serif;font-size:15px;color:#F3EBD9">Was das Muster sagt</div>
-          <div style="margin-top:9px;font-size:12px;line-height:1.5;color:#C4CFC2">{{ wbPatternText }}</div>
+        <div style="padding:18px;border-radius:14px;background:linear-gradient(150deg,#153520,#0C2418);border:1px solid rgba(184,145,47,.3);box-shadow:0 10px 22px -18px rgba(10,31,21,.8);animation:kRise 420ms cubic-bezier(.16,1,.3,1) 140ms both">
+          <div style="font-family:'Bodoni Moda',serif;font-size:19.2px;color:#F3EBD9">Was das Muster sagt</div>
+          <div style="margin-top:9px;font-size:15.4px;line-height:1.5;color:#C4CFC2">{{ wbPatternText }}</div>
           <div style="margin-top:12px;display:flex;flex-direction:column;gap:7px">
-            <div style="display:flex;justify-content:space-between;font-size:11.5px;color:#DFD5BE;padding-bottom:6px;border-bottom:1px solid rgba(221,182,92,.18)"><span>Höchster Wert</span><span>{{ wbHighest }}</span></div>
-            <div style="display:flex;justify-content:space-between;font-size:11.5px;color:#DFD5BE;padding-bottom:6px;border-bottom:1px solid rgba(221,182,92,.18)"><span>Niedrigster Wert</span><span>{{ wbLowest }}</span></div>
-            <div style="display:flex;justify-content:space-between;font-size:11.5px;color:#DFD5BE"><span>Letztes Gefühl</span><span>{{ wbFeeling }}</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:14.7px;color:#DFD5BE;padding-bottom:6px;border-bottom:1px solid rgba(221,182,92,.18)"><span>Höchster Wert</span><span>{{ wbHighest }}</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:14.7px;color:#DFD5BE;padding-bottom:6px;border-bottom:1px solid rgba(221,182,92,.18)"><span>Niedrigster Wert</span><span>{{ wbLowest }}</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:14.7px;color:#DFD5BE"><span>Letztes Gefühl</span><span>{{ wbFeeling }}</span></div>
           </div>
         </div>
       </sc-if>
 
       <sc-if value="{{ tabOn.mehr }}" hint-placeholder-val="{{ false }}">
-        <div style="padding:16px;border-radius:12px;background:linear-gradient(180deg,#F5EFE2,#EFE7D5);border:1px solid rgba(20,45,32,.13);box-shadow:0 10px 22px -18px rgba(20,45,32,.5);animation:kRise 420ms cubic-bezier(.16,1,.3,1) both">
+        <div style="padding:18px;border-radius:14px;background:linear-gradient(180deg,#F5EFE2,#EFE7D5);border:1px solid rgba(20,45,32,.13);box-shadow:0 10px 22px -18px rgba(20,45,32,.5);animation:kRise 420ms cubic-bezier(.16,1,.3,1) both">
           <div style="display:flex;align-items:baseline;justify-content:space-between">
-            <div style="font-family:'Bodoni Moda',serif;font-size:15px;color:#132A1D">Projekte</div>
-            <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6C7B6E">{{ projectsMeta }}</div>
+            <div style="font-family:'Bodoni Moda',serif;font-size:19.2px;color:#132A1D">Projekte</div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:12.2px;color:#6C7B6E">{{ projectsMeta }}</div>
           </div>
           <div style="margin-top:9px;display:flex;flex-direction:column;gap:10px">
             <sc-for list="{{ projects }}" as="pr" hint-placeholder-count="4">
-              <div onClick="{{ pr.open }}" style="display:grid;grid-template-columns:1fr 60px auto;gap:9px;align-items:center;min-height:36px">
-                <div style="min-width:0">
-                  <div style="font-size:12px;font-weight:500;color:#1B2A1E;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ pr.title }}</div>
-                  <div style="font-size:9.5px;color:#7A8A7C;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ pr.blocker }}</div>
+              <div onClick="{{ pr.open }}" style="display:flex;flex-direction:column;gap:8px;padding:8px 0;min-height:44px;transition:opacity 160ms ease-out" style-active="opacity:.72">
+                <div style="display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:baseline">
+                  <div style="font-size:15.4px;font-weight:500;color:#1B2A1E;overflow-wrap:anywhere;text-wrap:pretty">{{ pr.title }}</div>
+                  <span style="display:flex;align-items:center;gap:6px;flex:0 0 auto"><span style="font-family:'IBM Plex Mono',monospace;font-size:12.8px;color:#4C5A4E;font-variant-numeric:tabular-nums">{{ pr.pctLabel }}</span><span style="width:7px;height:7px;border-radius:50%;background:{{ pr.dot }}"></span></span>
                 </div>
-                <span style="height:6px;border-radius:3px;background:rgba(20,45,32,.1);overflow:hidden"><i style="display:block;height:100%;border-radius:3px;background:{{ pr.fill }};width:{{ pr.pct }}%;transition:width 700ms cubic-bezier(.16,1,.3,1)"></i></span>
-                <span style="display:flex;align-items:center;gap:5px"><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#4C5A4E">{{ pr.pctLabel }}</span><span style="width:6px;height:6px;border-radius:50%;background:{{ pr.dot }}"></span></span>
+                <span style="display:block;width:100%;height:8px;border-radius:4px;background:rgba(20,45,32,.1);overflow:hidden"><i style="display:block;height:100%;border-radius:4px;background:{{ pr.fill }};width:{{ pr.pct }}%;transition:width 900ms cubic-bezier(.16,1,.3,1)"></i></span>
+                <div style="font-size:12.2px;color:#7A8A7C;overflow-wrap:anywhere">{{ pr.blocker }}</div>
               </div>
             </sc-for>
           </div>
         </div>
 
-        <div style="padding:16px;border-radius:12px;background:linear-gradient(180deg,#F5EFE2,#EFE7D5);border:1px solid rgba(20,45,32,.13);box-shadow:0 10px 22px -18px rgba(20,45,32,.5);animation:kRise 420ms cubic-bezier(.16,1,.3,1) 40ms both">
-          <div style="font-family:'Bodoni Moda',serif;font-size:15px;color:#132A1D">Ziele</div>
+        <div style="padding:18px;border-radius:14px;background:linear-gradient(180deg,#F5EFE2,#EFE7D5);border:1px solid rgba(20,45,32,.13);box-shadow:0 10px 22px -18px rgba(20,45,32,.5);animation:kRise 420ms cubic-bezier(.16,1,.3,1) 40ms both">
+          <div style="font-family:'Bodoni Moda',serif;font-size:19.2px;color:#132A1D">Ziele</div>
           <div style="margin-top:12px;display:flex;gap:12px">
             <sc-for list="{{ goals }}" as="g" hint-placeholder-count="3">
               <div onClick="{{ g.open }}" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px">
-                <div style="position:relative;width:56px;height:56px">
-                  <svg viewBox="0 0 100 100" style="width:56px;height:56px;transform:rotate(-90deg)">
+                <div style="position:relative;width:64px;height:64px">
+                  <svg viewBox="0 0 100 100" style="width:64px;height:64px;transform:rotate(-90deg)">
                     <circle cx="50" cy="50" r="43" fill="none" stroke="rgba(20,45,32,.1)" stroke-width="9"></circle>
                     <circle cx="50" cy="50" r="43" fill="none" stroke="{{ g.color }}" stroke-width="9" stroke-linecap="round" stroke-dasharray="{{ g.c }}" stroke-dashoffset="{{ g.off }}"></circle>
                   </svg>
-                  <div style="position:absolute;inset:0;display:grid;place-items:center;font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#1B4632">{{ g.pctLabel }}</div>
+                  <div style="position:absolute;inset:0;display:grid;place-items:center;font-family:'IBM Plex Mono',monospace;font-size:13.4px;color:#1B4632">{{ g.pctLabel }}</div>
                 </div>
-                <span style="font-size:10px;color:#39473B;text-align:center">{{ g.label }}</span>
+                <span style="font-size:12.8px;color:#39473B;text-align:center">{{ g.label }}</span>
               </div>
             </sc-for>
           </div>
         </div>
 
-        <div style="padding:16px;border-radius:12px;background:linear-gradient(180deg,#F1EADB 0%,#E9E0CD 100%);border:1px dashed rgba(184,145,47,.5);box-shadow:0 10px 22px -18px rgba(20,45,32,.45);animation:kRise 420ms cubic-bezier(.16,1,.3,1) 80ms both">
+        <div style="padding:18px;border-radius:14px;background:linear-gradient(180deg,#F1EADB 0%,#E9E0CD 100%);border:1px dashed rgba(184,145,47,.5);box-shadow:0 10px 22px -18px rgba(20,45,32,.45);animation:kRise 420ms cubic-bezier(.16,1,.3,1) 80ms both">
           <div style="display:flex;align-items:baseline;justify-content:space-between">
-            <div style="font-family:'Bodoni Moda',serif;font-size:15px;color:#132A1D">KI-Inbox</div>
-            <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#8C6B18">{{ inboxMeta }}</div>
+            <div style="font-family:'Bodoni Moda',serif;font-size:19.2px;color:#132A1D">KI-Inbox</div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:12.2px;color:#8C6B18">{{ inboxMeta }}</div>
           </div>
           <div style="margin-top:9px;display:flex;flex-direction:column;gap:10px">
             <sc-for list="{{ inbox }}" as="i" hint-placeholder-count="3">
               <div onClick="{{ i.open }}" style="padding-bottom:10px;border-bottom:1px solid rgba(20,45,32,.07);opacity:{{ i.op }}">
-                <div style="font-size:12px;color:#1B2A1E">{{ i.text }}</div>
+                <div style="font-size:15.4px;line-height:1.45;color:#1B2A1E;overflow-wrap:anywhere;text-wrap:pretty">{{ i.text }}</div>
                 <div style="display:flex;gap:7px;margin-top:5px;align-items:center">
-                  <span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#7A8A7C">{{ i.source }} · {{ i.conf }}%</span>
+                  <span style="font-family:'IBM Plex Mono',monospace;font-size:12.2px;color:#7A8A7C">{{ i.source }} · {{ i.conf }}%</span>
                 </div>
                 <div style="display:flex;gap:6px;margin-top:7px">
-                  <span onClick="{{ i.accept }}" style="font-size:10.5px;padding:6px 10px;border-radius:5px;background:#1B4632;color:#F1EADB">{{ i.a1 }}</span>
-                  <span onClick="{{ i.reject }}" style="font-size:10.5px;padding:6px 10px;border-radius:5px;border:1px solid rgba(20,45,32,.22);color:#4C5A4E">{{ i.a2 }}</span>
-                  <span onClick="{{ i.defer }}" style="font-size:10.5px;padding:6px 10px;border-radius:5px;border:1px solid rgba(20,45,32,.14);color:#7A8A7C">{{ i.a3 }}</span>
+                  <span onClick="{{ i.accept }}" style="font-size:13.4px;padding:0 14px;min-height:44px;display:inline-flex;align-items:center;border-radius:7px;background:#1B4632;color:#F1EADB;transition:transform 140ms ease-out" style-active="transform:scale(.95)">{{ i.a1 }}</span>
+                  <span onClick="{{ i.reject }}" style="font-size:13.4px;padding:0 14px;min-height:44px;display:inline-flex;align-items:center;border-radius:7px;border:1px solid rgba(20,45,32,.22);color:#4C5A4E;transition:transform 140ms ease-out" style-active="transform:scale(.95)">{{ i.a2 }}</span>
+                  <span onClick="{{ i.defer }}" style="font-size:13.4px;padding:0 14px;min-height:44px;display:inline-flex;align-items:center;border-radius:7px;border:1px solid rgba(20,45,32,.14);color:#7A8A7C;transition:transform 140ms ease-out" style-active="transform:scale(.95)">{{ i.a3 }}</span>
                 </div>
               </div>
             </sc-for>
           </div>
         </div>
 
-        <div style="padding:16px;border-radius:12px;background:linear-gradient(180deg,#F5EFE2,#EEE6D5);border:1px solid rgba(20,45,32,.14);box-shadow:0 10px 22px -18px rgba(20,45,32,.45);animation:kRise 420ms cubic-bezier(.16,1,.3,1) 120ms both">
+        <div style="padding:18px;border-radius:14px;background:linear-gradient(180deg,#F5EFE2,#EEE6D5);border:1px solid rgba(20,45,32,.14);box-shadow:0 10px 22px -18px rgba(20,45,32,.45);animation:kRise 420ms cubic-bezier(.16,1,.3,1) 120ms both">
           <div style="display:flex;align-items:baseline;justify-content:space-between">
-            <div style="font-family:'Bodoni Moda',serif;font-size:15px;color:#132A1D">Mail</div>
-            <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6C7B6E">{{ mailsMeta }}</div>
+            <div style="font-family:'Bodoni Moda',serif;font-size:19.2px;color:#132A1D">Mail</div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:12.2px;color:#6C7B6E">{{ mailsMeta }}</div>
           </div>
           <div style="margin-top:9px;display:flex;flex-direction:column">
             <sc-for list="{{ mails }}" as="m" hint-placeholder-count="3">
-              <div onClick="{{ m.open }}" style="padding:8px 0;border-bottom:1px solid rgba(20,45,32,.07);min-height:44px">
-                <div style="font-size:11.5px;font-weight:600;color:#1B4632">{{ m.from }}</div>
-                <div style="font-size:12px;color:#1B2A1E;margin-top:1px">{{ m.subject }}</div>
-                <div style="font-size:10px;color:#7A8A7C;margin-top:1px">{{ m.reason }}</div>
+              <div onClick="{{ m.open }}" style="display:flex;flex-direction:column;gap:3px;padding:13px 0;border-bottom:1px solid rgba(20,45,32,.07);min-height:52px;transition:opacity 160ms ease-out" style-active="opacity:.7">
+                <div style="font-size:14.7px;font-weight:600;color:#1B4632;overflow-wrap:anywhere">{{ m.from }}</div>
+                <div style="font-size:15.4px;line-height:1.4;color:#1B2A1E;overflow-wrap:anywhere;text-wrap:pretty">{{ m.subject }}</div>
+                <div style="font-size:12.8px;line-height:1.4;color:#7A8A7C;overflow-wrap:anywhere;text-wrap:pretty">{{ m.reason }}</div>
               </div>
             </sc-for>
           </div>
         </div>
 
-        <div style="padding:16px;border-radius:12px;background:linear-gradient(180deg,#F5EFE2,#EEE6D5);border:1px solid rgba(20,45,32,.14);box-shadow:0 10px 22px -18px rgba(20,45,32,.45);animation:kRise 420ms cubic-bezier(.16,1,.3,1) 160ms both">
+        <div style="padding:18px;border-radius:14px;background:linear-gradient(180deg,#F5EFE2,#EEE6D5);border:1px solid rgba(20,45,32,.14);box-shadow:0 10px 22px -18px rgba(20,45,32,.45);animation:kRise 420ms cubic-bezier(.16,1,.3,1) 160ms both">
           <div style="display:flex;align-items:baseline;justify-content:space-between">
-            <div style="font-family:'Bodoni Moda',serif;font-size:15px;color:#132A1D">Kalenderwoche</div>
-            <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6C7B6E">{{ cal.meta }}</div>
+            <div style="font-family:'Bodoni Moda',serif;font-size:19.2px;color:#132A1D">Kalenderwoche</div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:12.2px;color:#6C7B6E">{{ cal.meta }}</div>
           </div>
           <div style="margin-top:9px;display:flex;flex-direction:column;gap:2px">
             <sc-for list="{{ weekFull }}" as="d" hint-placeholder-count="7">
-              <div onClick="{{ d.open }}" style="display:grid;grid-template-columns:34px 1fr auto;gap:9px;align-items:center;padding:9px 0;border-bottom:1px solid rgba(20,45,32,.07);min-height:44px">
-                <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:{{ d.color }}">{{ d.wd }} {{ d.n }}</span>
-                <span style="font-size:11.5px;color:#39473B;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ d.summary }}</span>
-                <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#7A8A7C">{{ d.count }}</span>
+              <div onClick="{{ d.open }}" style="display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:12px;align-items:baseline;padding:12px 0;border-bottom:1px solid rgba(20,45,32,.07);min-height:52px">
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:12.8px;color:{{ d.color }}">{{ d.wd }} {{ d.n }}</span>
+                <span style="font-size:14.7px;line-height:1.4;color:#39473B;overflow-wrap:anywhere;text-wrap:pretty">{{ d.summary }}</span>
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:12.8px;color:#7A8A7C">{{ d.count }}</span>
               </div>
             </sc-for>
           </div>
         </div>
 
-        <div style="padding:16px;border-radius:12px;background:linear-gradient(180deg,#F1EADB 0%,#E8DFCC 100%);border:1px solid rgba(20,45,32,.14);box-shadow:0 10px 22px -18px rgba(20,45,32,.45);animation:kRise 420ms cubic-bezier(.16,1,.3,1) 200ms both">
+        <div style="padding:18px;border-radius:14px;background:linear-gradient(180deg,#F1EADB 0%,#E8DFCC 100%);border:1px solid rgba(20,45,32,.14);box-shadow:0 10px 22px -18px rgba(20,45,32,.45);animation:kRise 420ms cubic-bezier(.16,1,.3,1) 200ms both">
           <div style="display:flex;align-items:baseline;justify-content:space-between">
-            <div style="font-family:'Bodoni Moda',serif;font-size:15px;color:#132A1D">System &amp; Sync</div>
-            <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6C7B6E">{{ systemMeta }}</div>
+            <div style="font-family:'Bodoni Moda',serif;font-size:19.2px;color:#132A1D">System &amp; Sync</div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:12.2px;color:#6C7B6E">{{ systemMeta }}</div>
           </div>
           <div style="margin-top:9px;display:flex;flex-direction:column;gap:2px">
             <sc-for list="{{ system }}" as="s" hint-placeholder-count="5">
-              <div onClick="{{ s.open }}" style="display:grid;grid-template-columns:12px 1fr auto;gap:9px;align-items:center;padding:8px 0;min-height:36px">
-                <span style="width:7px;height:7px;border-radius:50%;background:{{ s.dot }};box-shadow:0 0 6px {{ s.dot }}"></span>
-                <span style="font-size:11.5px;color:#39473B">{{ s.name }}</span>
-                <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:{{ s.tc }}">{{ s.last }}</span>
+              <div onClick="{{ s.open }}" style="display:grid;grid-template-columns:14px minmax(0,1fr) auto;gap:11px;align-items:center;padding:12px 0;border-bottom:1px solid rgba(20,45,32,.07);min-height:48px;transition:opacity 160ms ease-out" style-active="opacity:.7">
+                <span style="width:9px;height:9px;border-radius:50%;background:{{ s.dot }};box-shadow:0 0 7px {{ s.dot }}"></span>
+                <span style="font-size:14.7px;line-height:1.35;color:#39473B;overflow-wrap:anywhere">{{ s.name }}</span>
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:12.8px;color:{{ s.tc }};flex:0 0 auto;text-align:right">{{ s.last }}</span>
               </div>
             </sc-for>
           </div>
         </div>
 
-        <div style="padding:16px;border-radius:12px;background:linear-gradient(180deg,#F5EFE2 0%,#EEE6D5 100%);border:1px solid rgba(20,45,32,.14);box-shadow:0 10px 22px -18px rgba(20,45,32,.45);animation:kRise 420ms cubic-bezier(.16,1,.3,1) 220ms both">
-          <div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px">
+        <div style="padding:18px;border-radius:14px;background:linear-gradient(180deg,#F5EFE2,#EFE7D5);border:1px solid rgba(20,45,32,.13);box-shadow:0 10px 22px -18px rgba(20,45,32,.5);animation:kRise 420ms cubic-bezier(.16,1,.3,1) 220ms both">
+          <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px">
             <div>
-              <div style="font-family:'Bodoni Moda',serif;font-size:15px;color:#132A1D">Second Brain</div>
-              <div style="font-size:10px;color:#7A8A7C;margin-top:3px">Read-only · sensible Dateien bleiben ausgeblendet</div>
+              <div style="font-family:'Bodoni Moda',serif;font-size:19.2px;color:#132A1D">Second Brain</div>
+              <div style="font-size:12.2px;color:#7A8A7C;margin-top:3px">Read-only · sensible Dateien bleiben ausgeblendet</div>
             </div>
-            <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#6C7B6E">ON-DEMAND</div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#6C7B6E;flex:0 0 auto">ON-DEMAND</div>
           </div>
-          <div style="margin-top:10px;display:grid;grid-template-columns:1fr auto;gap:7px">
-            <input value="{{ sbQuery }}" onInput="{{ searchInput }}" onKeyDown="{{ searchKey }}" placeholder="Begriff oder Thema …" style="min-width:0;padding:10px 11px;border-radius:5px;border:1px solid rgba(20,45,32,.18);background:rgba(255,255,255,.5);color:#17251B;font:11.5px Archivo,system-ui,sans-serif;outline:none"/>
-            <span onClick="{{ searchSecondBrain }}" style="display:grid;place-items:center;padding:9px 12px;border-radius:5px;background:linear-gradient(180deg,#22553A,#173C28);color:#F1EADB;font-size:11px;font-weight:500">Suchen</span>
+          <div style="display:flex;gap:8px;margin-top:12px">
+            <input value="{{ sbQuery }}" onInput="{{ searchInput }}" onKeyDown="{{ searchKey }}" placeholder="Begriff oder Thema …" style="flex:1;min-width:0;border:1px solid rgba(20,45,32,.14);border-radius:7px;background:rgba(255,255,255,.62);padding:12px 13px;color:#17251B;font:inherit;outline:none">
+            <span onClick="{{ searchSecondBrain }}" style="display:inline-flex;align-items:center;justify-content:center;padding:0 16px;min-height:46px;border-radius:7px;background:linear-gradient(180deg,#22553A,#173C28);color:#F1EADB;font-size:13.4px;font-weight:500">Suchen</span>
           </div>
-          <div style="margin-top:8px;font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6C7B6E">{{ sbStatus }}</div>
-          <div style="margin-top:6px;display:flex;flex-direction:column">
+          <div style="margin-top:8px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#6C7B6E">{{ sbStatus }}</div>
+          <div style="margin-top:8px;display:flex;flex-direction:column;gap:6px">
             <sc-for list="{{ sbResults }}" as="r" hint-placeholder-count="2">
-              <a href="{{ r.url }}" target="_blank" rel="noopener noreferrer" style="display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid rgba(20,45,32,.08);text-decoration:none">
-                <span style="font-size:11px;color:#17251B;font-weight:500">{{ r.title }}</span>
-                <span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#7A8A7C">Öffnen ↗</span>
+              <a href="{{ r.url }}" target="_blank" rel="noopener noreferrer" style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid rgba(20,45,32,.08)">
+                <span style="font-size:13.4px;color:#17251B;font-weight:500;overflow-wrap:anywhere">{{ r.title }}</span>
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#7A8A7C;flex:0 0 auto">Öffnen ↗</span>
               </a>
             </sc-for>
           </div>
         </div>
 
         <div style="text-align:center;padding:10px 0 4px;animation:kRise 420ms cubic-bezier(.16,1,.3,1) 240ms both">
-          <div onClick="{{ replayBoot }}" style="display:inline-block;font-size:11.5px;color:#8C6B18;padding:10px 18px;border-radius:999px;border:1px solid rgba(184,145,47,.35)">Boot-Sequenz erneut abspielen</div>
-          <div style="margin-top:12px;font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.08em;color:#8A9A8C">LUKES KOMMANDOZENTRALE · MOBIL · V1</div>
+          <div onClick="{{ replayBoot }}" style="display:inline-block;font-size:14.7px;color:#8C6B18;padding:10px 18px;border-radius:999px;border:1px solid rgba(184,145,47,.35)">Boot-Sequenz erneut abspielen</div>
+          <div style="margin-top:12px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.08em;color:#8A9A8C">LUKES KOMMANDOZENTRALE · MOBIL · V1</div>
         </div>
       </sc-if>
     </div>
 
-    <div style="position:fixed;left:0;right:0;bottom:0;width:100%;z-index:40;display:flex;background:linear-gradient(180deg,#102C1E 0%,#0A1F15 100%);border-top:1px solid rgba(184,145,47,.4);padding:4px 4px calc(4px + env(safe-area-inset-bottom,0px));box-sizing:border-box">
-      <div onClick="{{ goHeute }}" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:8px 2px 7px;min-height:54px;color:{{ tabColor.heute }}" style-active="transform:scale(.93)">
-        <svg viewBox="0 0 24 24" width="20" height="20" fill="none"><circle cx="12" cy="12" r="8.4" stroke="currentColor" stroke-width="1.6"></circle><path d="M14.4 9.6 L12.9 13.4 L9.6 14.4 L11.1 10.6 Z" fill="currentColor"></path></svg>
-        <span style="font-size:9.5px">Heute</span>
-        <i style="width:3.5px;height:3.5px;border-radius:50%;background:{{ tabColor.heute }};opacity:{{ tabDot.heute }}"></i>
+    <div style="position:fixed;left:0;right:0;bottom:0;width:100%;box-sizing:border-box;z-index:60;display:flex;background:linear-gradient(180deg,#102C1E 0%,#0A1F15 100%);border-top:1px solid rgba(184,145,47,.4);box-shadow:0 -10px 26px -18px rgba(5,15,10,.9);padding:6px 2px calc(6px + env(safe-area-inset-bottom, 0px))">
+      <div onClick="{{ goHeute }}" style="flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:8px 2px;min-height:62px;border-radius:10px;transition:transform 150ms ease-out,background 200ms ease-out;color:{{ tabColor.heute }}" style-active="transform:scale(.94);background:rgba(221,182,92,.12)">
+        <svg viewBox="0 0 24 24" width="24" height="24" fill="none"><circle cx="12" cy="12" r="8.4" stroke="currentColor" stroke-width="1.6"></circle><path d="M14.4 9.6 L12.9 13.4 L9.6 14.4 L11.1 10.6 Z" fill="currentColor"></path></svg>
+        <span style="font-size:12.2px">Heute</span>
+        <i style="width:4px;height:4px;border-radius:50%;background:{{ tabColor.heute }};opacity:{{ tabDot.heute }}"></i>
       </div>
-      <div onClick="{{ goFinanzen }}" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:8px 2px 7px;min-height:54px;color:{{ tabColor.finanzen }}" style-active="transform:scale(.93)">
-        <svg viewBox="0 0 24 24" width="20" height="20" fill="none"><ellipse cx="12" cy="8.2" rx="7" ry="2.8" stroke="currentColor" stroke-width="1.6"></ellipse><path d="M5 8.2v7.4c0 1.55 3.13 2.8 7 2.8s7-1.25 7-2.8V8.2" stroke="currentColor" stroke-width="1.6"></path><path d="M5 11.9c0 1.55 3.13 2.8 7 2.8s7-1.25 7-2.8" stroke="currentColor" stroke-width="1.6"></path></svg>
-        <span style="font-size:9.5px">Finanzen</span>
-        <i style="width:3.5px;height:3.5px;border-radius:50%;background:{{ tabColor.finanzen }};opacity:{{ tabDot.finanzen }}"></i>
+      <div onClick="{{ goFinanzen }}" style="flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:8px 2px;min-height:62px;border-radius:10px;transition:transform 150ms ease-out,background 200ms ease-out;color:{{ tabColor.finanzen }}" style-active="transform:scale(.94);background:rgba(221,182,92,.12)">
+        <svg viewBox="0 0 24 24" width="24" height="24" fill="none"><ellipse cx="12" cy="8.2" rx="7" ry="2.8" stroke="currentColor" stroke-width="1.6"></ellipse><path d="M5 8.2v7.4c0 1.55 3.13 2.8 7 2.8s7-1.25 7-2.8V8.2" stroke="currentColor" stroke-width="1.6"></path><path d="M5 11.9c0 1.55 3.13 2.8 7 2.8s7-1.25 7-2.8" stroke="currentColor" stroke-width="1.6"></path></svg>
+        <span style="font-size:12.2px">Finanzen</span>
+        <i style="width:4px;height:4px;border-radius:50%;background:{{ tabColor.finanzen }};opacity:{{ tabDot.finanzen }}"></i>
       </div>
-      <div onClick="{{ goGesundheit }}" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:8px 2px 7px;min-height:54px;color:{{ tabColor.gesundheit }}" style-active="transform:scale(.93)">
-        <svg viewBox="0 0 24 24" width="20" height="20" fill="none"><path d="M3 12.5h3.4l1.8-4.8 2.6 9.6 2.2-7.4 1.6 2.6h4.4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-        <span style="font-size:9.5px">Gesundheit</span>
-        <i style="width:3.5px;height:3.5px;border-radius:50%;background:{{ tabColor.gesundheit }};opacity:{{ tabDot.gesundheit }}"></i>
+      <div onClick="{{ goGesundheit }}" style="flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:8px 2px;min-height:62px;border-radius:10px;transition:transform 150ms ease-out,background 200ms ease-out;color:{{ tabColor.gesundheit }}" style-active="transform:scale(.94);background:rgba(221,182,92,.12)">
+        <svg viewBox="0 0 24 24" width="24" height="24" fill="none"><path d="M3 12.5h3.4l1.8-4.8 2.6 9.6 2.2-7.4 1.6 2.6h4.4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+        <span style="font-size:12.2px">Gesundheit</span>
+        <i style="width:4px;height:4px;border-radius:50%;background:{{ tabColor.gesundheit }};opacity:{{ tabDot.gesundheit }}"></i>
       </div>
-      <div onClick="{{ goWellbeing }}" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:8px 2px 7px;min-height:54px;color:{{ tabColor.wellbeing }}" style-active="transform:scale(.93)">
-        <svg viewBox="0 0 24 24" width="20" height="20" fill="none"><path d="M12 3.2C7.5 9 5.6 12.3 5.6 15.4a6.4 6.4 0 0 0 12.8 0c0-3.1-1.9-6.4-6.4-12.2Z" stroke="currentColor" stroke-width="1.6"></path></svg>
-        <span style="font-size:9.5px">Wellbeing</span>
-        <i style="width:3.5px;height:3.5px;border-radius:50%;background:{{ tabColor.wellbeing }};opacity:{{ tabDot.wellbeing }}"></i>
+      <div onClick="{{ goWellbeing }}" style="flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:8px 2px;min-height:62px;border-radius:10px;transition:transform 150ms ease-out,background 200ms ease-out;color:{{ tabColor.wellbeing }}" style-active="transform:scale(.94);background:rgba(221,182,92,.12)">
+        <svg viewBox="0 0 24 24" width="24" height="24" fill="none"><path d="M12 3.2C7.5 9 5.6 12.3 5.6 15.4a6.4 6.4 0 0 0 12.8 0c0-3.1-1.9-6.4-6.4-12.2Z" stroke="currentColor" stroke-width="1.6"></path></svg>
+        <span style="font-size:12.2px">Wellbeing</span>
+        <i style="width:4px;height:4px;border-radius:50%;background:{{ tabColor.wellbeing }};opacity:{{ tabDot.wellbeing }}"></i>
       </div>
-      <div onClick="{{ goMehr }}" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:8px 2px 7px;min-height:54px;color:{{ tabColor.mehr }}" style-active="transform:scale(.93)">
-        <svg viewBox="0 0 24 24" width="20" height="20" fill="none"><circle cx="7.2" cy="7.2" r="1.9" fill="currentColor"></circle><circle cx="16.8" cy="7.2" r="1.9" fill="currentColor"></circle><circle cx="7.2" cy="16.8" r="1.9" fill="currentColor"></circle><circle cx="16.8" cy="16.8" r="1.9" fill="currentColor"></circle></svg>
-        <span style="font-size:9.5px">Mehr</span>
-        <i style="width:3.5px;height:3.5px;border-radius:50%;background:{{ tabColor.mehr }};opacity:{{ tabDot.mehr }}"></i>
+      <div onClick="{{ goMehr }}" style="flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:8px 2px;min-height:62px;border-radius:10px;transition:transform 150ms ease-out,background 200ms ease-out;color:{{ tabColor.mehr }}" style-active="transform:scale(.94);background:rgba(221,182,92,.12)">
+        <svg viewBox="0 0 24 24" width="24" height="24" fill="none"><circle cx="7.2" cy="7.2" r="1.9" fill="currentColor"></circle><circle cx="16.8" cy="7.2" r="1.9" fill="currentColor"></circle><circle cx="7.2" cy="16.8" r="1.9" fill="currentColor"></circle><circle cx="16.8" cy="16.8" r="1.9" fill="currentColor"></circle></svg>
+        <span style="font-size:12.2px">Mehr</span>
+        <i style="width:4px;height:4px;border-radius:50%;background:{{ tabColor.mehr }};opacity:{{ tabDot.mehr }}"></i>
       </div>
     </div>
   </div>
   </sc-if>
 
   <sc-if value="{{ sheet.open }}" hint-placeholder-val="{{ false }}">
-    <div style="position:fixed;inset:0;left:0;width:100%;z-index:70">
+    <div style="position:fixed;inset:0;width:100%;max-width:100%;box-sizing:border-box;z-index:70">
       <div onClick="{{ sheet.close }}" style="position:absolute;inset:0;background:rgba(8,18,12,.5);opacity:{{ sheet.backdropOp }};transition:opacity 320ms ease-out"></div>
       <div ref="{{ sheetPanelRef }}" onTouchStart="{{ onSheetTouchStart }}" onTouchMove="{{ onSheetTouchMove }}" onTouchEnd="{{ onSheetTouchEnd }}" style="{{ sheet.style }}">
-        <div style="width:36px;height:4px;border-radius:2px;background:rgba(20,45,32,.2);margin:10px auto 4px"></div>
-        <div style="padding:8px 20px 26px;max-height:78vh;overflow-y:auto">
+        <div style="width:44px;height:5px;border-radius:3px;background:rgba(20,45,32,.2);margin:11px auto 4px"></div>
+        <div style="padding:10px 18px calc(26px + env(safe-area-inset-bottom, 0px));max-height:80dvh;overflow-y:auto;-webkit-overflow-scrolling:touch">
           <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
             <div>
-              <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.1em;color:#7A8A7C">{{ sheet.kicker }}</div>
-              <div style="font-family:'Bodoni Moda',serif;font-size:21px;line-height:1.2;color:#132A1D;margin-top:4px;text-wrap:pretty">{{ sheet.title }}</div>
-              <div style="font-size:12px;color:#4C5A4E;margin-top:5px;text-wrap:pretty">{{ sheet.sub }}</div>
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:12.2px;letter-spacing:.1em;color:#7A8A7C">{{ sheet.kicker }}</div>
+              <div style="font-family:'Bodoni Moda',serif;font-size:26.9px;line-height:1.2;color:#132A1D;margin-top:4px;text-wrap:pretty">{{ sheet.title }}</div>
+              <div style="font-size:15.4px;color:#4C5A4E;margin-top:5px;text-wrap:pretty">{{ sheet.sub }}</div>
             </div>
-            <div onClick="{{ sheet.close }}" style="flex:0 0 auto;width:30px;height:30px;display:grid;place-items:center;border-radius:50%;background:rgba(20,45,32,.07);color:#4C5A4E">
-              <svg viewBox="0 0 24 24" width="14" height="14"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path></svg>
+            <div onClick="{{ sheet.close }}" style="flex:0 0 auto;width:44px;height:44px;display:grid;place-items:center;border-radius:50%;background:rgba(20,45,32,.07);color:#4C5A4E;transition:background 160ms ease-out,transform 140ms ease-out" style-active="transform:scale(.92);background:rgba(20,45,32,.14)">
+              <svg viewBox="0 0 24 24" width="18" height="18"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path></svg>
             </div>
           </div>
 
@@ -725,8 +728,8 @@
                 </svg>
                 <div style="position:absolute;inset:0;display:grid;place-items:center;text-align:center">
                   <div>
-                    <div style="font-family:'Bodoni Moda',serif;font-size:22px;color:#1B4632">{{ sheet.ring.big }}</div>
-                    <div style="font-size:9.5px;color:#7A8A7C">{{ sheet.ring.small }}</div>
+                    <div style="font-family:'Bodoni Moda',serif;font-size:28.2px;color:#1B4632">{{ sheet.ring.big }}</div>
+                    <div style="font-size:12.2px;color:#7A8A7C">{{ sheet.ring.small }}</div>
                   </div>
                 </div>
               </div>
@@ -736,9 +739,9 @@
           <sc-if value="{{ sheet.hasRows }}" hint-placeholder-val="{{ false }}">
             <div style="margin-top:16px;display:flex;flex-direction:column">
               <sc-for list="{{ sheet.rows }}" as="r" hint-placeholder-count="3">
-                <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid rgba(20,45,32,.08);min-height:20px">
-                  <span style="font-size:12px;color:#61705F">{{ r.k }}</span>
-                  <span style="font-size:13px;color:#17251B;font-weight:500;font-variant-numeric:tabular-nums">{{ r.v }}</span>
+                <div style="display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:baseline;padding:12px 0;border-bottom:1px solid rgba(20,45,32,.08);min-height:44px">
+                  <span style="font-size:15.4px;line-height:1.4;color:#61705F;overflow-wrap:anywhere">{{ r.k }}</span>
+                  <span style="font-size:16.6px;color:#17251B;font-weight:500;font-variant-numeric:tabular-nums">{{ r.v }}</span>
                 </div>
               </sc-for>
             </div>
@@ -747,12 +750,12 @@
           <sc-if value="{{ sheet.hasItems }}" hint-placeholder-val="{{ false }}">
             <div style="margin-top:16px;display:flex;flex-direction:column">
               <sc-for list="{{ sheet.items }}" as="it" hint-placeholder-count="4">
-                <div style="display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid rgba(20,45,32,.08);min-height:40px">
+                <div style="display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid rgba(20,45,32,.08);min-height:48px">
                   <div>
-                    <div style="font-size:12.5px;color:#17251B;font-weight:500">{{ it.title }}</div>
-                    <div style="font-size:11px;color:#61705F;margin-top:1px">{{ it.sub }}</div>
+                    <div style="font-size:16px;color:#17251B;font-weight:500">{{ it.title }}</div>
+                    <div style="font-size:14.1px;color:#61705F;margin-top:1px">{{ it.sub }}</div>
                   </div>
-                  <span style="font-size:9.5px;padding:4px 8px;border-radius:2px;background:{{ it.bg }};color:{{ it.fg }};font-weight:600">{{ it.tag }}</span>
+                  <span style="font-size:12.2px;padding:4px 8px;border-radius:2px;background:{{ it.bg }};color:{{ it.fg }};font-weight:600">{{ it.tag }}</span>
                 </div>
               </sc-for>
             </div>
@@ -760,14 +763,14 @@
 
           <sc-if value="{{ sheet.hasNote }}" hint-placeholder-val="{{ false }}">
             <div style="margin-top:16px;padding:14px;border-radius:10px;background:linear-gradient(150deg,#153520,#0C2418)">
-              <div style="font-family:'Bodoni Moda',serif;font-size:13.5px;color:#F3EBD9">{{ sheet.note.title }}</div>
-              <div style="margin-top:7px;font-size:12px;line-height:1.5;color:#C4CFC2">{{ sheet.note.text }}</div>
+              <div style="font-family:'Bodoni Moda',serif;font-size:17.3px;color:#F3EBD9">{{ sheet.note.title }}</div>
+              <div style="margin-top:7px;font-size:15.4px;line-height:1.5;color:#C4CFC2">{{ sheet.note.text }}</div>
             </div>
           </sc-if>
 
           <div style="margin-top:18px;display:flex;gap:8px">
             <sc-for list="{{ sheet.actions }}" as="a" hint-placeholder-count="1">
-              <span onClick="{{ a.onClick }}" style="flex:1;text-align:center;font-size:12.5px;padding:12px;border-radius:8px;background:{{ a.bg }};color:{{ a.fg }};font-weight:500">{{ a.label }}</span>
+              <span onClick="{{ a.onClick }}" style="flex:1;text-align:center;font-size:16px;padding:0 16px;min-height:50px;display:inline-flex;align-items:center;justify-content:center;border-radius:10px;background:{{ a.bg }};color:{{ a.fg }};font-weight:500;transition:transform 140ms ease-out" style-active="transform:scale(.97)">{{ a.label }}</span>
             </sc-for>
           </div>
         </div>
@@ -799,29 +802,29 @@
         <div style="position:absolute;left:20px;bottom:20px;width:38px;height:38px;border-left:1px solid rgba(221,182,92,.4);border-bottom:1px solid rgba(221,182,92,.4);animation:kFade 900ms ease-out 350ms both"></div>
         <div style="position:absolute;right:20px;bottom:20px;width:38px;height:38px;border-right:1px solid rgba(221,182,92,.4);border-bottom:1px solid rgba(221,182,92,.4);animation:kFade 900ms ease-out 450ms both"></div>
 
-        <div style="position:absolute;left:0;right:0;top:34px;display:flex;flex-direction:column;align-items:center;gap:5px;animation:kSlide 700ms cubic-bezier(.16,1,.3,1) 200ms both">
+        <div style="position:absolute;left:0;right:0;top:calc(34px + env(safe-area-inset-top, 0px));display:flex;flex-direction:column;align-items:center;gap:5px;animation:kSlide 700ms cubic-bezier(.16,1,.3,1) 200ms both">
           <div style="display:flex;align-items:center;gap:8px">
             <i style="width:5px;height:5px;border-radius:50%;background:#DDB65C;box-shadow:0 0 10px rgba(221,182,92,.9);animation:kBreathe 1300ms ease-in-out infinite"></i>
-            <span style="font-size:9px;letter-spacing:.22em;color:rgba(221,182,92,.82)">LK-OS · KERN 4.2</span>
+            <span style="font-size:11.5px;letter-spacing:.22em;color:rgba(221,182,92,.82)">LK-OS · KERN 4.2</span>
           </div>
-          <span style="font-size:8.5px;letter-spacing:.18em;color:rgba(221,182,92,.55)">{{ boot.session }}</span>
+          <span style="font-size:11px;letter-spacing:.18em;color:rgba(221,182,92,.55)">{{ boot.session }}</span>
         </div>
 
-        <div style="position:absolute;left:0;right:0;bottom:0;display:flex;flex-direction:column;align-items:center;gap:12px;padding-bottom:64px">
+        <div style="position:absolute;left:0;right:0;bottom:0;display:flex;flex-direction:column;align-items:center;gap:12px;padding:0 20px calc(64px + env(safe-area-inset-bottom, 0px));box-sizing:border-box">
           <div style="display:flex;flex-direction:column;align-items:center;gap:5px;min-height:56px;justify-content:flex-end">
             <sc-for list="{{ boot.log }}" as="l" hint-placeholder-count="3">
-              <div style="display:flex;align-items:center;gap:10px;font-size:9.5px;letter-spacing:.1em;color:rgba(221,182,92,.65);animation:kSlide 500ms cubic-bezier(.16,1,.3,1) both">
+              <div style="display:flex;align-items:center;gap:10px;font-size:12.2px;letter-spacing:.1em;color:rgba(221,182,92,.65);animation:kSlide 500ms cubic-bezier(.16,1,.3,1) both;text-align:center">
                 <span>{{ l.text }}</span><span style="color:rgba(242,223,168,.9)">{{ l.code }}</span>
               </div>
             </sc-for>
           </div>
           <div style="text-align:center;animation:kFade 900ms ease-out 400ms both">
-            <div style="font-family:'Bodoni Moda',serif;font-size:44px;line-height:.86;color:#F5EBD4;letter-spacing:-.02em"><span>{{ boot.pct }}</span><span style="font-size:20px;color:rgba(221,182,92,.75)">%</span></div>
-            <div style="margin-top:7px;font-size:8.5px;letter-spacing:.22em;color:rgba(221,182,92,.6)">SYSTEMBEREITSCHAFT</div>
+            <div style="font-family:'Bodoni Moda',serif;font-size:56.3px;line-height:.86;color:#F5EBD4;letter-spacing:-.02em"><span>{{ boot.pct }}</span><span style="font-size:25.6px;color:rgba(221,182,92,.75)">%</span></div>
+            <div style="margin-top:7px;font-size:11px;letter-spacing:.22em;color:rgba(221,182,92,.6)">SYSTEMBEREITSCHAFT</div>
           </div>
           <div style="text-align:center;animation:kRise 1100ms cubic-bezier(.16,1,.3,1) 4400ms both">
-            <div style="font-family:'Bodoni Moda',serif;font-size:24px;color:#F6EDD7">Lukes Kommandozentrale</div>
-            <div style="margin-top:8px;font-size:8.5px;letter-spacing:.3em;color:rgba(221,182,92,.72)">{{ boot.readyLabel }}</div>
+            <div style="font-family:'Bodoni Moda',serif;font-size:30.7px;color:#F6EDD7">Lukes Kommandozentrale</div>
+            <div style="margin-top:8px;font-size:11px;letter-spacing:.3em;color:rgba(221,182,92,.72)">ALLE SYSTEME BEREIT</div>
           </div>
         </div>
 
@@ -830,26 +833,26 @@
         </div>
       </div>
 
-      <div onClick="{{ boot.skip }}" style="position:absolute;bottom:14px;right:14px;font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.14em;color:rgba(221,182,92,.65);padding:10px 13px;border:1px solid rgba(221,182,92,.24);border-radius:6px">ÜBERSPRINGEN</div>
+      <div onClick="{{ boot.skip }}" style="position:absolute;bottom:calc(14px + env(safe-area-inset-bottom, 0px));right:14px;font-family:'IBM Plex Mono',monospace;font-size:12.2px;letter-spacing:.14em;color:rgba(221,182,92,.65);padding:0 16px;min-height:44px;display:inline-flex;align-items:center;border:1px solid rgba(221,182,92,.24);border-radius:8px">ÜBERSPRINGEN</div>
     </div>
   </sc-if>
 
   <sc-if value="{{ egg.seal }}" hint-placeholder-val="{{ false }}">
-    <div style="position:fixed;inset:0;left:0;width:100%;z-index:80;pointer-events:none;display:grid;place-items:center">
+    <div style="position:fixed;inset:0;width:100%;max-width:100%;box-sizing:border-box;z-index:80;pointer-events:none;display:grid;place-items:center">
       <div style="position:absolute;inset:0;background:radial-gradient(360px circle at 50% 46%,rgba(221,182,92,.3),transparent 66%);animation:kBurst 2200ms cubic-bezier(.16,1,.3,1) both"></div>
       <div style="text-align:center;animation:kRise 800ms cubic-bezier(.16,1,.3,1) both;padding:0 24px">
         <svg viewBox="0 0 100 100" width="100" height="100" style="animation:kSpin 6s linear infinite">
           <circle cx="50" cy="50" r="46" fill="none" stroke="#B8912F" stroke-width="1" stroke-dasharray="3 7"></circle>
           <path d="M50 16 L78 27 L78 56 Q78 78 50 90 Q22 78 22 56 L22 27 Z" fill="rgba(221,182,92,.12)" stroke="#DDB65C" stroke-width="1.6"></path>
         </svg>
-        <div style="margin-top:9px;font-family:'Bodoni Moda',serif;font-size:19px;color:#14311F;font-style:italic">Orden für Beharrlichkeit</div>
-        <div style="margin-top:4px;font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.14em;color:#8C6B18">VERLIEHEN AN LUKE · {{ egg.date }}</div>
+        <div style="margin-top:9px;font-family:'Bodoni Moda',serif;font-size:24.3px;color:#14311F;font-style:italic">Orden für Beharrlichkeit</div>
+        <div style="margin-top:4px;font-family:'IBM Plex Mono',monospace;font-size:12.2px;letter-spacing:.14em;color:#8C6B18">VERLIEHEN AN LUKE · {{ egg.date }}</div>
       </div>
     </div>
   </sc-if>
 
   <sc-if value="{{ egg.rain }}" hint-placeholder-val="{{ false }}">
-    <div style="position:fixed;inset:0;left:0;width:100%;z-index:78;pointer-events:none;overflow:hidden">
+    <div style="position:fixed;inset:0;width:100%;max-width:100%;box-sizing:border-box;z-index:78;pointer-events:none;overflow:hidden">
       <sc-for list="{{ egg.drops }}" as="d" hint-placeholder-count="16">
         <i style="position:absolute;top:0;width:3px;height:11px;border-radius:2px;background:linear-gradient(180deg,#F2DFA8,#B8912F);left:{{ d.left }}%;animation:kFall {{ d.dur }}ms cubic-bezier(.4,0,.7,1) both;animation-delay:{{ d.delay }}ms;opacity:.85"></i>
       </sc-for>
@@ -857,13 +860,13 @@
   </sc-if>
 
   <sc-if value="{{ egg.mono }}" hint-placeholder-val="{{ false }}">
-    <div style="position:fixed;inset:0;left:0;width:100%;z-index:6;pointer-events:none;display:grid;place-items:center;animation:kFade 900ms ease-out both">
+    <div style="position:fixed;inset:0;width:100%;max-width:100%;box-sizing:border-box;z-index:6;pointer-events:none;display:grid;place-items:center;animation:kFade 900ms ease-out both">
       <svg viewBox="0 0 200 200" width="300" height="300" style="opacity:.1">
         <circle cx="100" cy="100" r="92" fill="none" stroke="#0C2418" stroke-width="1.5"></circle>
         <path d="M100 34 L152 55 L152 108 Q152 148 100 172 Q48 148 48 108 L48 55 Z" fill="none" stroke="#0C2418" stroke-width="2"></path>
         <text x="100" y="140" text-anchor="middle" fill="#0C2418" style="font-family:'Bodoni Moda',serif;font-size:60px">LK</text>
       </svg>
-      <div style="position:absolute;bottom:40px;padding:0 24px;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.16em;color:#8C6B18">SIGNET SICHTBAR · DIE ZENTRALE ERKENNT IHREN BETREIBER</div>
+      <div style="position:absolute;bottom:40px;padding:0 24px;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:12.2px;letter-spacing:.16em;color:#8C6B18">SIGNET SICHTBAR · DIE ZENTRALE ERKENNT IHREN BETREIBER</div>
     </div>
   </sc-if>
 

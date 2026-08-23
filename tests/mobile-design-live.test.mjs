@@ -15,16 +15,20 @@ const logic = mobile.match(/<script type="text\/x-dc"[\s\S]*?>([\s\S]*?)<\/scrip
 assert.ok(logic, 'mobile x-dc logic missing');
 
 test('mobile Claude source is retained and routed without external support.js', () => {
-  assert.match(mobile, /Claude Mobile Design source SHA-256: 94f45fae22b676d57a4904b6f8330a2ff9789184e88ef89fb283927751b0b3a0/);
+  assert.match(mobile, /Claude Mobile Design source SHA-256: be6acce773c2b8be4706c25a66a9ef44686e182909be360612852c8d0c9171cc/);
   assert.match(mobile, /includeHtml_\('ClaudeRuntime'\)/);
   assert.match(mobile, /includeHtml_\('LiveAdapter'\)/);
   assert.doesNotMatch(mobile, /<script[^>]+src=["'][^"']*support\.js/i);
   assert.match(mobile, /data-screen-label="Kommandozentrale Mobil" style="[^"]*width:100%;max-width:100%/);
   assert.match(mobile, /position:fixed;left:0;right:0;bottom:0;width:100%/);
   assert.match(mobile, /viewport-fit=cover/);
+  assert.match(mobile, /min-height:100dvh/);
+  assert.match(mobile, /min-height:62px/);
+  assert.match(mobile, /font-size:30\.7px/);
+  assert.match(mobile, /prefers-reduced-motion: reduce/);
   const style = mobile.match(/<style>([\s\S]*?)<\/style>/)?.[1];
   assert.ok(style, 'mobile Claude stylesheet missing');
-  assert.equal(createHash('sha256').update(style).digest('hex'), '3104df4cc942f1bbe621506a0be9f8f8f7b72dba75aeaeafc687a25544534734');
+  assert.equal(createHash('sha256').update(style).digest('hex'), '5adc33a567a3c3f99c247ecdbd7619a085d84a26cd23af492e03a8777fbd4f3a');
   assert.match(code, /e\.parameter\.view === 'mobile' \? 'MobileIndex' : 'Index'/);
   assert.match(index, /searchParams\.set\('view', 'mobile'\)/);
 });
@@ -42,8 +46,11 @@ test('mobile live surface exposes the existing read and write contracts', () => 
   assert.match(mobile, /read-only/);
   for (const demo of [
     'Angebot Weber', 'Nordlicht anstoßen', 'Frau Sander', 'Website-Relaunch',
-    'Inbox auf Null', 'Token expired', 'Woche vor der Woche', 'Lüneburg'
+    'Inbox auf Null', 'Token expired', 'Woche vor der Woche', 'Lüneburg',
+    'Stress liegt an Werkstatt-Tagen'
   ]) assert.doesNotMatch(mobile, new RegExp(demo, 'i'));
+  assert.match(mobile, /Second Brain/);
+  assert.match(mobile, /searchSecondBrain/);
 });
 
 function harness() {
