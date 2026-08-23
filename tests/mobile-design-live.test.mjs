@@ -31,6 +31,10 @@ test('mobile Claude source is retained and routed without external support.js', 
   assert.equal(createHash('sha256').update(style).digest('hex'), '5adc33a567a3c3f99c247ecdbd7619a085d84a26cd23af492e03a8777fbd4f3a');
   assert.match(code, /e\.parameter\.view === 'mobile' \? 'MobileIndex' : 'Index'/);
   assert.match(index, /searchParams\.set\('view', 'mobile'\)/);
+  assert.match(index, /mobileAgent/);
+  assert.match(index, /screenWidth <= 720/);
+  assert.match(index, /viewport-fit=cover/);
+  assert.doesNotMatch(index, /<meta name="viewport" content="width=1600">/);
 });
 
 test('mobile live surface exposes the existing read and write contracts', () => {

@@ -6,7 +6,12 @@
 <script>
 (function () {
   if (new URLSearchParams(window.location.search).has('view')) return;
-  if (window.matchMedia && window.matchMedia('(max-width: 720px)').matches) {
+  var ua = navigator.userAgent || '';
+  var mobileAgent = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua);
+  var screenWidth = window.screen && (window.screen.width || window.screen.availWidth) || 9999;
+  var viewportWidth = document.documentElement.clientWidth || window.innerWidth || 9999;
+  var narrowViewport = (window.matchMedia && window.matchMedia('(max-width: 720px)').matches) || viewportWidth <= 720 || screenWidth <= 720;
+  if (mobileAgent || narrowViewport) {
     var mobileUrl = new URL(window.location.href);
     mobileUrl.searchParams.set('view', 'mobile');
     window.location.replace(mobileUrl.toString());
@@ -20,7 +25,7 @@
 <body>
 <x-dc>
 <helmet>
-<meta name="viewport" content="width=1600">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400&family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
