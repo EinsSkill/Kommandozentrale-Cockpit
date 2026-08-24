@@ -1,0 +1,292 @@
+<script>
+(function () {
+  'use strict';
+
+  const GREEN = '#1B4632', GOLD = '#B8912F', RUST = '#8C4A20', CREAM = '#F7F1E4', MUTED = '#6C7B6E';
+  const PREF_KEY = 'kz.calendar.v1', WB_KEY = 'kz.wellbeing.entryDate.v1';
+  const DAY = ['SO', 'MO', 'DI', 'MI', 'DO', 'FR', 'SA'];
+  const state = {
+    view: 'week', anchorDate: todayKey(), calendarIds: null, calendars: [], events: [],
+    periodLabel: '', menuOpen: false, loading: false, error: '', wellbeingDate: todayKey()
+  };
+  let adapterPatched = false, observer = null, refreshTimer = null;
+
+  function todayKey() {
+    return new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Berlin' }).format(new Date());
+  }
+  function parseKey(value) {
+    const v = String(value || '');
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(v)) return null;
+    const d = new Date(v + 'T12:00:00');
+    return Number.isFinite(d.getTime()) ? d : null;
+  }
+  function key(date) {
+    const y = date.getFullYear(), m = String(date.getMonth() + 1).padStart(2, '0'), d = String(date.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
+  }
+  function berlinKey(date) {
+    return new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Berlin' }).format(date);
+  }
+  function loadPrefs() {
+    try {
+      const p = JSON.parse(localStorage.getItem(PREF_KEY) || 'null');
+      if (p && ['day', 'week', 'month'].includes(p.view)) state.view = p.view;
+      if (p && parseKey(p.anchorDate)) state.anchorDate = p.anchorDate;
+      if (p && Array.isArray(p.calendarIds)) state.calendarIds = p.calendarIds.map(String);
+      const wb = localStorage.getItem(WB_KEY);
+      if (wb && parseKey(wb) && wb <= todayKey()) state.wellbeingDate = wb;
+    } catch (_) {}
+  }
+  function savePrefs() {
+    try { localStorage.setItem(PREF_KEY, JSON.stringify({ view: state.view, anchorDate: state.anchorDate, calendarIds: state.calendarIds })); } catch (_) {}
+  }
+  function setWellbeingDate(value) {
+    const v = String(value || '');
+    state.wellbeingDate = parseKey(v) && v <= todayKey() ? v : todayKey();
+    try { localStorage.setItem(WB_KEY, state.wellbeingDate); } catch (_) {}
+  }
+  function call(name, ...args) {
+    return new Promise((resolve, reject) => {
+      if (!window.google || !google.script || !google.script.run) return reject(new Error('Apps-Script-Verbindung nicht verfügbar.'));
+      google.script.run.withSuccessHandler(resolve)
+        .withFailureHandler(err => reject(new Error(err && err.message ? err.message : String(err))))[name](...args);
+    });
+  }
+
+  async function loadCalendar(force) {
+    if (state.loading) return;
+    state.loading = true; state.error = ''; renderAll();
+    try {
+      const result = await call('getCalendarViewV4', {
+        view: state.view, anchorDate: state.anchorDate, calendarIds: state.calendarIds
+      }, !!force);
+      state.view = result && result.view || state.view;
+      state.anchorDate = result && result.anchorDate || state.anchorDate;
+      state.calendars = Array.isArray(result && result.calendars) ? result.calendars : [];
+      state.events = Array.isArray(result && result.events) ? result.events : [];
+      state.periodLabel = result && result.periodLabel || '';
+      if (Array.isArray(result && result.selectedCalendarIds)) state.calendarIds = result.selectedCalendarIds.map(String);
+      savePrefs(); syncAdapterCalendar(result || {});
+    } catch (err) {
+      state.error = err && err.message ? err.message : String(err);
+    } finally {
+      state.loading = false; renderAll();
+    }
+  }
+
+  function syncAdapterCalendar(result) {
+    const component = window.KZLive && window.KZLive.component;
+    if (!component || !component.D) return;
+    const start = new Date(result.rangeStart || result.weekStart || state.anchorDate + 'T00:00:00');
+    const count = Math.max(1, Math.min(42, Number(result.dayCount) || (state.view === 'day' ? 1 : state.view === 'month' ? 42 : 7)));
+    const events = Array.isArray(result.events) ? result.events : [];
+    component.D.week = Array.from({ length: count }, (_, i) => {
+      const current = new Date(start); current.setDate(start.getDate() + i);
+      const rows = events.filter(ev => { const d = new Date(ev.start); return Number.isFinite(d.getTime()) && berlinKey(d) === berlinKey(current); });
+      return {
+        wd: DAY[current.getDay()], n: String(current.getDate()).padStart(2, '0'), today: berlinKey(current) === todayKey(),
+        ev: rows.map((ev, j) => ({
+          id: String(ev.id || ''), t: ev.allDay ? 'GANZTAG' : new Intl.DateTimeFormat('de-DE', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Berlin' }).format(new Date(ev.start)),
+          l: String(ev.title || '(ohne Titel)'), k: collisionKind(rows, ev, j), start: String(ev.start || ''), end: String(ev.end || ''),
+          calendar: String(ev.calendar || ''), calendarId: String(ev.calendarId || ''), location: String(ev.location || ''), allDay: !!ev.allDay
+        }))
+      };
+    });
+    component.D.weekMeta = [state.periodLabel, `${events.length} TERMINE`].filter(Boolean).join(' · ');
+    try { component.setState(s => ({ tick: (s.tick || 0) + 1 })); } catch (_) {}
+  }
+  function collisionKind(dayEvents, current, index) {
+    if (current.allDay) return 'n';
+    const a = new Date(current.start), b = new Date(current.end);
+    const collision = dayEvents.some((other, j) => {
+      if (j === index || other.allDay) return false;
+      const c = new Date(other.start), d = new Date(other.end); return a < d && c < b;
+    });
+    return collision ? 'r' : berlinKey(a) === todayKey() ? 'g' : 'n';
+  }
+  function shift(direction) {
+    const d = parseKey(state.anchorDate) || new Date();
+    if (state.view === 'month') d.setMonth(d.getMonth() + direction); else d.setDate(d.getDate() + direction * (state.view === 'week' ? 7 : 1));
+    state.anchorDate = key(d); savePrefs(); loadCalendar(false);
+  }
+  function setView(view) {
+    if (!['day', 'week', 'month'].includes(view) || view === state.view) return;
+    state.view = view; savePrefs(); loadCalendar(false);
+  }
+  function toggleCalendar(id) {
+    const selected = new Set(Array.isArray(state.calendarIds) ? state.calendarIds : []);
+    if (selected.has(id)) selected.delete(id); else selected.add(id);
+    state.calendarIds = Array.from(selected); savePrefs(); loadCalendar(false);
+  }
+
+  function node(tag, styles, text) {
+    const n = document.createElement(tag); if (styles) Object.assign(n.style, styles); if (text != null) n.textContent = text; return n;
+  }
+  function button(label, active, action, mobile) {
+    const b = node('button', {
+      appearance: 'none', minHeight: mobile ? '44px' : '30px', padding: mobile ? '0 14px' : '0 10px',
+      borderRadius: mobile ? '9px' : '4px', border: `1px solid ${active ? 'rgba(184,145,47,.58)' : 'rgba(20,45,32,.15)'}`,
+      background: active ? GREEN : 'rgba(255,255,255,.38)', color: active ? '#F4EDDC' : '#39473B',
+      fontFamily: 'inherit', fontSize: mobile ? '14px' : '10px', cursor: 'pointer', transition: 'background 160ms ease,color 160ms ease,transform 120ms ease'
+    }, label);
+    b.type = 'button'; b.addEventListener('click', e => { e.preventDefault(); e.stopPropagation(); action(); }); return b;
+  }
+
+  function findHosts() {
+    const hosts = [];
+    const desktop = document.querySelector('[data-tile="calendar"]'); if (desktop) hosts.push({ host: desktop, mobile: false });
+    const mobileRoot = document.querySelector('[data-screen-label="Kommandozentrale Mobil"]');
+    if (mobileRoot) {
+      const heading = Array.from(mobileRoot.querySelectorAll('div')).find(n => /^Kalender(woche|tag|monat)$/.test((n.textContent || '').trim()));
+      if (heading) {
+        let card = heading.parentElement;
+        while (card && card !== mobileRoot && !(card.style && /border-radius/.test(card.getAttribute('style') || '') && /background/.test(card.getAttribute('style') || ''))) card = card.parentElement;
+        if (card && card !== mobileRoot) hosts.push({ host: card, mobile: true, heading });
+      }
+    }
+    return hosts;
+  }
+
+  function renderAll() {
+    if (observer) observer.disconnect();
+    try {
+      findHosts().forEach(info => renderHost(info));
+      renderWellbeingPickers();
+      patchAdapter();
+    } finally { observe(); }
+  }
+  function observe() {
+    if (!observer || !document.documentElement) return;
+    observer.observe(document.documentElement, { childList: true, subtree: true });
+  }
+  function renderHost({ host, mobile, heading }) {
+    let mount = host.querySelector(':scope > [data-kz-calendar-enhanced]');
+    if (!mount) { mount = node('div', { position: 'relative', zIndex: '6' }); mount.dataset.kzCalendarEnhanced = '1'; host.appendChild(mount); }
+    mount.replaceChildren();
+    if (!mobile) host.style.overflow = 'visible';
+
+    const titleText = state.view === 'day' ? 'Kalendertag' : state.view === 'month' ? 'Kalendermonat' : 'Kalenderwoche';
+    if (mobile && heading) heading.textContent = titleText;
+    if (!mobile) {
+      const title = host.querySelector(':scope > div:first-child > div:first-child');
+      const meta = host.querySelector(':scope > div:first-child > div:last-child');
+      if (title) title.textContent = titleText;
+      if (meta) meta.textContent = [state.periodLabel, `${state.events.length} TERMINE`].filter(Boolean).join(' · ');
+    }
+
+    Array.from(host.children).forEach(child => {
+      if (child === mount) return;
+      if (!mobile && child === host.firstElementChild) return;
+      if (mobile && heading && child.contains(heading)) return;
+      if (!child.dataset.kzOriginalDisplay) child.dataset.kzOriginalDisplay = child.style.display || '__empty__';
+      child.style.display = 'none';
+    });
+
+    const toolbar = node('div', { display: 'flex', flexWrap: 'wrap', gap: mobile ? '7px' : '6px', alignItems: 'center', marginTop: mobile ? '10px' : '9px' });
+    ['day', 'week', 'month'].forEach(v => toolbar.appendChild(button(v === 'day' ? 'Tag' : v === 'week' ? 'Woche' : 'Monat', state.view === v, () => setView(v), mobile)));
+    toolbar.appendChild(button('‹', false, () => shift(-1), mobile));
+    toolbar.appendChild(button('Heute', false, () => { state.anchorDate = todayKey(); savePrefs(); loadCalendar(false); }, mobile));
+    toolbar.appendChild(button('›', false, () => shift(1), mobile));
+    toolbar.appendChild(button('Kalender ▾', state.menuOpen, () => { state.menuOpen = !state.menuOpen; renderAll(); }, mobile));
+    mount.appendChild(toolbar);
+    if (state.menuOpen) mount.appendChild(renderMenu(mobile));
+    if (state.error) mount.appendChild(node('div', { marginTop: '8px', color: RUST, fontSize: mobile ? '13px' : '10px' }, state.error));
+    mount.appendChild(renderCalendar(mobile));
+  }
+
+  function renderMenu(mobile) {
+    const box = node('div', { marginTop: '8px', padding: '8px', borderRadius: mobile ? '10px' : '5px', background: CREAM, border: '1px solid rgba(184,145,47,.35)', boxShadow: '0 16px 32px -22px rgba(10,31,21,.5)', display: 'grid', gap: '5px' });
+    if (!state.calendars.length) box.appendChild(node('div', { color: MUTED, fontSize: mobile ? '13px' : '10px' }, state.loading ? 'Kalender werden geladen …' : 'Keine Kalender verfügbar.'));
+    state.calendars.forEach(cal => {
+      const selected = Array.isArray(state.calendarIds) && state.calendarIds.includes(String(cal.id));
+      const row = button('', selected, () => toggleCalendar(String(cal.id)), mobile);
+      Object.assign(row.style, { width: '100%', display: 'flex', justifyContent: 'flex-start', alignItems: 'center', gap: '8px' });
+      row.append(node('span', { width: '9px', height: '9px', borderRadius: '50%', background: cal.color || GREEN, flex: '0 0 auto' }),
+        node('span', { overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: '1', textAlign: 'left' }, cal.name || '(ohne Namen)'),
+        node('span', { color: selected ? GOLD : 'transparent', fontWeight: '700' }, '✓'));
+      box.appendChild(row);
+    }); return box;
+  }
+
+  function rangeStart() {
+    const d = parseKey(state.anchorDate) || new Date(); d.setHours(12, 0, 0, 0);
+    if (state.view === 'day') return d;
+    if (state.view === 'month') d.setDate(1);
+    const weekday = d.getDay() || 7; d.setDate(d.getDate() - weekday + 1); return d;
+  }
+  function eventsFor(date) {
+    const k = berlinKey(date); return state.events.filter(ev => { const d = new Date(ev.start); return Number.isFinite(d.getTime()) && berlinKey(d) === k; });
+  }
+  function eventCard(ev, mobile, compact) {
+    const item = node('div', { padding: compact ? (mobile ? '3px' : '2px 3px') : (mobile ? '8px 9px' : '5px 6px'), borderRadius: mobile ? '6px' : '2px', background: 'rgba(27,70,50,.09)', borderTop: `2px solid ${ev.color || GREEN}`, marginBottom: compact ? '2px' : '5px', minWidth: '0', overflow: 'hidden' });
+    const time = ev.allDay ? 'GANZTAG' : new Intl.DateTimeFormat('de-DE', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Berlin' }).format(new Date(ev.start));
+    item.append(node('div', { fontFamily: "'IBM Plex Mono',monospace", fontSize: compact ? (mobile ? '9px' : '7.5px') : (mobile ? '11px' : '9px'), color: MUTED }, time),
+      node('div', { fontSize: compact ? (mobile ? '10px' : '8.5px') : (mobile ? '14px' : '10.5px'), color: '#1B2A1E', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }, ev.title || '(ohne Titel)'));
+    if (!compact && ev.calendar) item.appendChild(node('div', { fontSize: mobile ? '11px' : '9px', color: '#7A8A7C', marginTop: '2px' }, ev.calendar));
+    return item;
+  }
+  function renderCalendar(mobile) {
+    const wrap = node('div', { marginTop: '9px' });
+    if (state.loading && !state.events.length) { wrap.appendChild(node('div', { padding: '18px 0', color: MUTED, fontSize: mobile ? '14px' : '11px' }, 'Kalender wird geladen …')); return wrap; }
+    const start = rangeStart(), count = state.view === 'day' ? 1 : state.view === 'week' ? 7 : 42;
+    const days = Array.from({ length: count }, (_, i) => { const d = new Date(start); d.setDate(start.getDate() + i); return d; });
+    if (state.view === 'day') {
+      const day = days[0], events = eventsFor(day);
+      wrap.appendChild(node('div', { fontFamily: "'Bodoni Moda',serif", fontSize: mobile ? '18px' : '14px', color: GREEN, marginBottom: '7px' }, new Intl.DateTimeFormat('de-DE', { weekday: 'long', day: '2-digit', month: 'long' }).format(day)));
+      if (!events.length) wrap.appendChild(node('div', { color: MUTED, fontSize: mobile ? '14px' : '11px', padding: '8px 0' }, 'Keine Termine.'));
+      events.forEach(ev => wrap.appendChild(eventCard(ev, mobile, false))); return wrap;
+    }
+    const grid = node('div', { display: 'grid', gridTemplateColumns: 'repeat(7,minmax(0,1fr))', gap: state.view === 'month' ? (mobile ? '4px' : '3px') : '6px' });
+    days.forEach(day => {
+      const current = berlinKey(day) === todayKey(), events = eventsFor(day), limit = state.view === 'month' ? 1 : 2;
+      const cell = node('div', { minWidth: '0', minHeight: state.view === 'month' ? (mobile ? '68px' : '42px') : (mobile ? '96px' : '105px'), padding: state.view === 'month' ? (mobile ? '5px 3px' : '3px 2px') : '7px 5px', borderRadius: mobile ? '8px' : '3px', background: current ? 'rgba(27,70,50,.11)' : 'rgba(255,255,255,.34)', border: `1px solid ${current ? 'rgba(184,145,47,.55)' : 'rgba(20,45,32,.08)'}`, overflow: 'hidden' });
+      const head = node('div', { textAlign: 'center', marginBottom: '4px' });
+      head.append(node('div', { fontFamily: "'IBM Plex Mono',monospace", fontSize: mobile ? '10px' : '8px', color: current ? '#8C6B18' : '#7A8A7C' }, DAY[day.getDay()]), node('div', { fontFamily: "'Bodoni Moda',serif", fontSize: mobile ? '15px' : '13px', color: current ? GREEN : '#39473B' }, String(day.getDate()))); cell.appendChild(head);
+      events.slice(0, limit).forEach(ev => cell.appendChild(eventCard(ev, mobile, true)));
+      if (events.length > limit) cell.appendChild(node('div', { fontSize: mobile ? '10px' : '8px', color: MUTED, textAlign: 'center' }, `+${events.length - limit}`));
+      grid.appendChild(cell);
+    }); wrap.appendChild(grid); return wrap;
+  }
+
+  function renderWellbeingPickers() {
+    const mobileRoot = document.querySelector('[data-screen-label="Kommandozentrale Mobil"]');
+    const scopes = [document, mobileRoot].filter(Boolean);
+    const seen = new Set();
+    scopes.forEach(scope => Array.from(scope.querySelectorAll('div')).forEach(heading => {
+      if (!/^(Sechs Werte, 1 bis 10|Hauptgefühl)$/.test((heading.textContent || '').trim())) return;
+      let card = heading.parentElement;
+      while (card && card !== document.body && !(card.getAttribute && /background/.test(card.getAttribute('style') || '') && /border-radius/.test(card.getAttribute('style') || ''))) card = card.parentElement;
+      if (!card || seen.has(card) || card.querySelector('[data-kz-wellbeing-date]')) return;
+      seen.add(card);
+      const box = node('div', { marginTop: '12px', padding: '10px 11px', borderRadius: '8px', background: 'rgba(255,255,255,.36)', border: '1px solid rgba(184,145,47,.28)', display: 'flex', alignItems: 'center', gap: '9px', flexWrap: 'wrap' }); box.dataset.kzWellbeingDate = '1';
+      const label = node('label', { fontSize: '12px', color: '#4C5A4E' }, 'Eintrag für');
+      const input = document.createElement('input'); input.type = 'date'; input.value = state.wellbeingDate; input.max = todayKey();
+      Object.assign(input.style, { minHeight: '44px', padding: '0 10px', borderRadius: '7px', border: '1px solid rgba(20,45,32,.18)', background: CREAM, color: GREEN, fontFamily: "'IBM Plex Mono',monospace", fontSize: '16px', boxSizing: 'border-box' });
+      input.addEventListener('change', e => { e.stopPropagation(); setWellbeingDate(e.target.value); input.value = state.wellbeingDate; }); input.addEventListener('click', e => e.stopPropagation());
+      box.append(label, input, node('span', { fontSize: '11px', color: MUTED }, 'Vergangene Tage können nachgetragen werden.'));
+      const row = heading.parentElement; if (row && row.parentElement) row.insertAdjacentElement('afterend', box); else card.prepend(box);
+    }));
+  }
+
+  function patchAdapter() {
+    if (adapterPatched || !window.KZLive) return;
+    const adapter = window.KZLive; adapterPatched = true;
+    adapter.saveWellbeing = async function (component) {
+      if (!component || !component.D.wb.available) return;
+      const f = component.state.wbForm || {};
+      const payload = { entryDate: state.wellbeingDate, mood: f[0] == null ? null : f[0], energy: f[1] == null ? null : f[1], innerPressure: f[2] == null ? null : f[2], sleepQuality: f[3] == null ? null : f[3], motivation: f[4] == null ? null : f[4], recovery: f[5] == null ? null : f[5], feeling: component.state.wbMood || null, feelingIntensity: null, influenceFactor: component.state.wbFactor || null, reflection: '' };
+      try {
+        const result = await adapter.call('saveWellbeingEntryV2', payload);
+        if (!result || result.ok === false) throw new Error(result && result.error ? result.error : 'Abendcheck konnte nicht gespeichert werden.');
+        adapter.applyWellbeing(result.data || {}); component.setState({ wbSaved: true });
+      } catch (error) { adapter.recordActionError(error); }
+    };
+  }
+
+  function scheduleRender() { clearTimeout(refreshTimer); refreshTimer = setTimeout(renderAll, 50); }
+  loadPrefs(); patchAdapter();
+  observer = new MutationObserver(scheduleRender); observe();
+  window.addEventListener('beforeunload', () => { if (observer) observer.disconnect(); clearTimeout(refreshTimer); });
+  renderAll(); loadCalendar(false);
+})();
+</script>
