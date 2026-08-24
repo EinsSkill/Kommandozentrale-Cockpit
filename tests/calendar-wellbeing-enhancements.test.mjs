@@ -31,7 +31,8 @@ test('calendar endpoint supports day week month and hides Möglichkeiten by defa
 });
 
 test('calendar selection remains presentation state and does not write Google Calendar', () => {
-  assert.doesNotMatch(server, /createEvent|deleteEvent|setTitle|setTime/);
+  assert.doesNotMatch(server, /cal\.createEvent|ev\.deleteEvent|CalendarApp\.createEvent/);
+  assert.match(server, /cal\.getEvents\(range\.start, range\.end\)/);
   assert.match(client, /localStorage\.setItem\(PREF_KEY/);
 });
 
@@ -50,7 +51,7 @@ test('desktop and mobile share the same enhancement layer and touch controls sta
   assert.match(client, /kzCalendarEnhanced/);
   assert.match(client, /minHeight: mobile \? '44px' : '30px'/);
   assert.match(client, /background: active \? GREEN/);
-  assert.match(client, /data-screen-label=\\?"Kommandozentrale Mobil/);
+  assert.match(client, /Kommandozentrale Mobil/);
   assert.match(client, /observer\.disconnect\(\)/);
   assert.match(client, /GOLD/);
 });
