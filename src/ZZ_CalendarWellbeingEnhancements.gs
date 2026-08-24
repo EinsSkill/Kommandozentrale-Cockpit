@@ -12,7 +12,11 @@ function doGet(e) {
   template.webAppUrl = ScriptApp.getService().getUrl() || '';
   const evaluated = template.evaluate();
   const enhancement = HtmlService.createHtmlOutputFromFile('CalendarWellbeingEnhancements').getContent();
-  const content = evaluated.getContent().replace(/<\/body>\s*<\/html>\s*$/i, enhancement + '\n</body>\n</html>');
+  // The current mobile design calls this card "Heute im Kalender". Normalizing
+  // the label lets the shared enhancement layer find the same card on both
+  // desktop and mobile without editing the Claude source file itself.
+  const rendered = evaluated.getContent().replace('Heute im Kalender', 'Kalenderwoche');
+  const content = rendered.replace(/<\/body>\s*<\/html>\s*$/i, enhancement + '\n</body>\n</html>');
   return HtmlService.createHtmlOutput(content)
     .setTitle('Lukes Kommandozentrale')
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
