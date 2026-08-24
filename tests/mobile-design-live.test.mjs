@@ -34,6 +34,8 @@ test('mobile Claude source is retained and routed without external support.js', 
   assert.match(index, /searchParams\.set\('view', 'mobile'\)/);
   assert.match(index, /publishedUrl = '[^']*webAppUrl[^']*'/);
   assert.match(index, /window\.top\.location\.replace/);
+  assert.match(index, /window\.location\.replace\(target\)/);
+  assert.match(index, /setTimeout\(function \(\)/);
   assert.match(index, /mobileAgent/);
   assert.match(index, /screenWidth <= 720/);
   assert.match(index, /viewport-fit=cover/);

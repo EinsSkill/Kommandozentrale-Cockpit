@@ -15,8 +15,17 @@
     var publishedUrl = '<?= webAppUrl ?>';
     var mobileUrl = new URL(publishedUrl || window.location.href);
     mobileUrl.searchParams.set('view', 'mobile');
-    if (window.top && window.top !== window) window.top.location.replace(mobileUrl.toString());
-    else window.location.replace(mobileUrl.toString());
+    var target = mobileUrl.toString();
+    var navigated = false;
+    try {
+      if (window.top && window.top !== window) {
+        window.top.location.replace(target);
+        navigated = true;
+      }
+    } catch (err) {}
+    setTimeout(function () {
+      if (!navigated || !window.location.search.includes('view=mobile')) window.location.replace(target);
+    }, 120);
   }
 })();
 </script>
