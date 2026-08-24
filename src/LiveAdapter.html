@@ -23,6 +23,15 @@
     return Number.isFinite(parsed.getTime()) ? parsed : null;
   };
   const compact = value => text(value).replace(/\s+/g, ' ').trim();
+  const excerpt = (value, max = 180) => {
+    const cleaned = compact(value).replace(/\b(?:FACT|INFERENCE|UNCERTAIN):\s*/gi, '');
+    if (cleaned.length <= max) return cleaned;
+    const slice = cleaned.slice(0, max + 1);
+    const sentence = slice.lastIndexOf('. ');
+    const space = slice.lastIndexOf(' ');
+    const cut = sentence >= Math.floor(max * .55) ? sentence + 1 : space >= Math.floor(max * .65) ? space : max;
+    return cleaned.slice(0, cut).trim() + '…';
+  };
   const statusUpper = value => text(value).toUpperCase();
   const safeDate = value => {
     const parsed = date(value);
@@ -249,13 +258,18 @@
 
     mapWeather(weather) {
       const current = weather && weather.current;
-      const available = !!(weather && weather.available && current);
+      const backendAvailable = !!(weather && weather.available);
+      const hasSnapshot = !!(current && (current.temperatureC != null || compact(current.text)));
+      const status = statusUpper(weather && weather.status);
+      const stale = !!(weather && (weather.stale || !backendAvailable || (status && status !== 'OK')));
       return {
-        available, stale: !!(weather && weather.stale),
-        place: text(weather && weather.location) || (available ? 'Standort aus OPS' : 'Wetterquelle nicht verfügbar'),
-        temp: available && current.temperatureC != null ? number(current.temperatureC) : null,
-        feelsLike: available && current.feelsLikeC != null ? number(current.feelsLikeC) : null,
-        cond: available ? text(current.text || 'Wetter') : (weather && weather.stale ? 'veraltet' : 'nicht verfügbar'),
+        // Freshness and usability are deliberately separate: a failed refresh
+        // does not blank a still-useful last successful weather snapshot.
+        available: hasSnapshot, stale, status,
+        place: text(weather && weather.location) || (hasSnapshot ? 'Standort aus OPS' : 'Wetterquelle nicht verfügbar'),
+        temp: hasSnapshot && current.temperatureC != null ? number(current.temperatureC) : null,
+        feelsLike: hasSnapshot && current.feelsLikeC != null ? number(current.feelsLikeC) : null,
+        cond: hasSnapshot ? text(current.text || (stale ? 'letzter gültiger Stand' : 'Wetter')) : 'nicht verfügbar',
         error: text(weather && weather.lastError), lastSuccessAt: text(weather && weather.lastSuccessAt),
         hours: asArray(weather && weather.hours).map(hour => ({
           t: safeTime(hour.time) || '–', time: text(hour.time), v: number(hour.temperatureC),
@@ -432,15 +446,22 @@
       const personal = this.raw.personal && this.raw.personal.ok !== false ? (this.raw.personal.personal || {}) : {};
       const wellbeing = data.wb || {};
       const guidance = wellbeing.guidance || {};
+      const briefing = data.briefing || {};
+      const briefingCore = briefing.available ? excerpt(briefing.core, 180) : '';
+      const briefingRec = briefing.available ? excerpt(briefing.rec, 155) : '';
+      const taskStep = task ? (task.next && !/^Kein nächster Schritt/.test(task.next) ? task.next : task.title) : '';
+      const taskWhy = task
+        ? (task.reason || [task.due !== '–' ? task.due : '', task.blockedBy].filter(Boolean).join(' · ') || 'Die Aufgabe steht im OPS aktuell an erster Stelle.')
+        : '';
       data.operator = {
-        step: task ? (task.next && !/^Kein nächster Schritt/.test(task.next) ? task.next : task.title) : 'Keine offene Aufgabe im OPS.',
-        why: task
-          ? (task.reason || [task.due !== '–' ? task.due : '', task.blockedBy].filter(Boolean).join(' · ') || 'Die Aufgabe steht im OPS aktuell an erster Stelle.')
-          : 'Der aktuelle OPS-Stand enthält keine offene Aufgabe.',
+        // The generated briefing belongs above the fold. When there is a task,
+        // it provides context; without a task, it becomes the operator's main statement.
+        step: taskStep || briefingCore || 'Keine offene Aufgabe im OPS.',
+        why: task ? (briefingCore || taskWhy) : (briefingRec || (briefingCore ? 'Aktueller Briefing-Stand aus dem OPS.' : 'Der aktuelle OPS-Stand enthält keine offene Aufgabe.')),
         notNow: tasks.slice(1, 4).map(item => item.title),
         mode: guidance.active
           ? text(guidance.message)
-          : text(asArray(personal.dayStructure)[0] || asArray(personal.focusRules)[0] || 'Einen sichtbaren Schritt abschließen und Puffer lassen.')
+          : text(briefingRec || asArray(personal.dayStructure)[0] || asArray(personal.focusRules)[0] || 'Einen sichtbaren Schritt abschließen und Puffer lassen.')
       };
     },
 

@@ -8,8 +8,8 @@
  * Location values are configuration, not source code.
  */
 var WEATHER_V1_SOURCE = 'Open-Meteo';
-var WEATHER_V1_MIN_REQUEST_INTERVAL_SECONDS = 10 * 60;
-var WEATHER_V1_429_COOLDOWN_SECONDS = 30 * 60;
+var WEATHER_V1_MIN_REQUEST_INTERVAL_SECONDS = 60 * 60;
+var WEATHER_V1_429_COOLDOWN_SECONDS = 2 * 60 * 60;
 var WEATHER_V1_LAST_REQUEST_PROPERTY = 'WEATHER_V1_LAST_REQUEST_AT';
 var WEATHER_V1_NEXT_ALLOWED_PROPERTY = 'WEATHER_V1_NEXT_ALLOWED_AT';
 
@@ -131,7 +131,7 @@ function setupWeatherSyncV1() {
   weatherNormalizeTriggersV1_();
   var result = runWeatherSyncV1();
   result.triggerInstalled = true;
-  result.intervalMinutes = 30;
+  result.intervalMinutes = 60;
   result.triggerStatus = weatherTriggerStatusV1();
   return result;
 }
@@ -169,7 +169,7 @@ function weatherNormalizeTriggersV1_() {
       ScriptApp.deleteTrigger(trigger);
     }
   });
-  ScriptApp.newTrigger('runWeatherSyncV1').timeBased().everyMinutes(30).create();
+  ScriptApp.newTrigger('runWeatherSyncV1').timeBased().everyHours(1).create();
 }
 
 function weatherConfigV1_(ss) {
@@ -239,7 +239,7 @@ function weatherSetCooldownV1_(seconds) {
   var now = Date.now();
   var duration = Number(seconds);
   if (!(duration > 0)) duration = WEATHER_V1_429_COOLDOWN_SECONDS;
-  duration = Math.max(5 * 60, Math.min(60 * 60, Math.ceil(duration)));
+  duration = Math.max(15 * 60, Math.min(6 * 60 * 60, Math.ceil(duration)));
   var existing = Number(properties.getProperty(WEATHER_V1_NEXT_ALLOWED_PROPERTY) || 0);
   var retryAt = Math.max(existing, now + duration * 1000);
   properties.setProperty(WEATHER_V1_NEXT_ALLOWED_PROPERTY, String(retryAt));
@@ -258,7 +258,7 @@ function weatherRetryAfterSecondsV1_(response) {
   var raw = headers['Retry-After'] || headers['retry-after'];
   var seconds = Number(raw);
   if (!(seconds > 0)) seconds = WEATHER_V1_429_COOLDOWN_SECONDS;
-  return Math.max(5 * 60, Math.min(60 * 60, Math.ceil(seconds)));
+  return Math.max(15 * 60, Math.min(6 * 60 * 60, Math.ceil(seconds)));
 }
 
 function weatherCurrentV1_(payload) {
@@ -339,13 +339,13 @@ function weatherUpdateStateV1_(ss, cfg, payload, errorMessage) {
   var current = payload ? weatherCurrentV1_(payload) : null;
   var values = {
     system_name:'Weather',
-    status:errorMessage ? 'ERROR' : 'OK',
+    status:errorMessage ? 'DEGRADED' : 'OK',
     last_attempt_at:nowText,
     last_error:errorMessage || '',
-    data_freshness:current ? 'CURRENT ' + current.time : 'UNKNOWN',
-    connection_state:'CONNECTED_VIA_OPEN_METEO',
+    data_freshness:current ? 'CURRENT ' + current.time : (row && row.last_success_at ? 'STALE · letzter Erfolg ' + String(row.last_success_at) : 'UNKNOWN'),
+    connection_state:errorMessage ? 'DEGRADED_VIA_OPEN_METEO' : 'CONNECTED_VIA_OPEN_METEO',
     warning_level:errorMessage ? 'IMPORTANT' : 'NORMAL',
-    note:errorMessage || ('Open-Meteo · ' + (cfg ? cfg.locationLabel : 'Konfiguration') + ' · stündliche Vorschau in WEATHER_HOURLY')
+    note:errorMessage ? ('Letzter gültiger Wetterstand bleibt aktiv · ' + errorMessage) : ('Open-Meteo · ' + (cfg ? cfg.locationLabel : 'Konfiguration') + ' · stündliche Vorschau in WEATHER_HOURLY')
   };
   if (!errorMessage) values.last_success_at = nowText;
   if (!row) {
@@ -388,7 +388,9 @@ function getWeatherSnapshot_(rd) {
     };
   }
   return {
-    available:storedStatus === 'OK',
+    // A provider/sync warning must never hide a previously valid snapshot.
+    // `stale` communicates freshness separately from usability.
+    available:true,
     stale:stale,
     status:syncStatus,
     source:current.source || WEATHER_V1_SOURCE,

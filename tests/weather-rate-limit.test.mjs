@@ -59,3 +59,13 @@ test('weather fetch pauses after Open-Meteo rate limiting', () => {
   });
   assert.equal(fixture.getFetches(), 1);
 });
+
+
+test('weather sync uses hourly cadence and multi-hour 429 cooldown', () => {
+  assert.match(weatherSource, /WEATHER_V1_MIN_REQUEST_INTERVAL_SECONDS = 60 \* 60/);
+  assert.match(weatherSource, /WEATHER_V1_429_COOLDOWN_SECONDS = 2 \* 60 \* 60/);
+  assert.match(weatherSource, /everyHours\(1\)/);
+  assert.match(weatherSource, /Math\.min\(6 \* 60 \* 60/);
+  assert.match(weatherSource, /status:errorMessage \? 'DEGRADED' : 'OK'/);
+  assert.match(weatherSource, /available:true/);
+});
