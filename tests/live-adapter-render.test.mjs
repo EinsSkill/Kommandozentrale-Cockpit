@@ -56,7 +56,7 @@ test('real endpoint-shaped payloads flow through the adapter into Claude Design 
       { id: 'GOAL_3', title: 'Aktivminuten', metric: 'active minutes', currentValue: 30, targetValue: 60, unit: 'Min' }
     ],
     briefing: { type: 'MORNING', createdAt: '2026-08-22 06:40', summary: 'Live-Briefing', recommendation: 'Live-Empfehlung' },
-    weather: { available: true, location: 'Live-Ort', current: { temperatureC: 20, feelsLikeC: 19, text: 'klar' }, hours: [{ time: '2026-08-22T12:00:00Z', temperatureC: 21, precipitationProbability: 10, text: 'klar' }] },
+    weather: { available: false, stale: true, status: 'DEGRADED', location: 'Live-Ort', current: { temperatureC: 20, feelsLikeC: 19, text: 'klar' }, hours: [{ time: '2026-08-22T12:00:00Z', temperatureC: 21, precipitationProbability: 10, text: 'klar' }] },
     syncState: [], errors: {}
   });
   adapter.applyFinance({
@@ -92,6 +92,10 @@ test('real endpoint-shaped payloads flow through the adapter into Claude Design 
   assert.equal(values.projects[0].title, 'Live-Projekt');
   assert.equal(values.mails[0].subject, 'Live-Mail');
   assert.equal(values.brief.core, 'Live-Briefing');
+  assert.equal(component.D.weather.available, true);
+  assert.equal(component.D.weather.stale, true);
+  assert.match(values.op.why, /Live-Briefing/);
+  assert.match(values.op.mode, /Live-Empfehlung/);
   assert.equal(values.weather.place, 'Live-Ort · gefühlt 19 °C');
   assert.equal(values.hea.steps, '7.000');
   assert.equal(values.wb.mood, 'ruhig / ausgeglichen');
