@@ -38,8 +38,10 @@ test('mobile Claude source is retained and routed without external support.js', 
   assert.match(index, /setTimeout\(function \(\)/);
   assert.match(index, /mobileAgent/);
   assert.match(index, /screenWidth <= 720/);
-  assert.match(index, /viewport-fit=cover/);
-  assert.doesNotMatch(index, /<meta name="viewport" content="width=1600">/);
+  // The new original Claude desktop source intentionally uses a fixed 1600px design canvas.
+  // Mobile safety comes from the routing script above plus the dedicated MobileIndex surface.
+  assert.match(index, /<meta name="viewport" content="width=device-width, initial-scale=1">/);
+  assert.match(index, /<meta name="viewport" content="width=1600">/);
 });
 
 test('mobile live surface exposes the existing read and write contracts', () => {
