@@ -50,7 +50,13 @@ function doGet(e) {
   const view = e && e.parameter && e.parameter.view === 'mobile' ? 'MobileIndex' : 'Index';
   const template = HtmlService.createTemplateFromFile(view);
   template.webAppUrl = ScriptApp.getService().getUrl() || '';
-  return template.evaluate()
+  const evaluated = template.evaluate();
+  const enhancement = HtmlService.createHtmlOutputFromFile('CalendarWellbeingEnhancements').getContent();
+  // Mobile currently labels the card "Heute im Kalender"; normalize it so the
+  // shared enhancement layer can address the same calendar surface on both views.
+  const rendered = evaluated.getContent().replace('Heute im Kalender', 'Kalenderwoche');
+  const content = rendered.replace(/<\/body>\s*<\/html>\s*$/i, enhancement + '\n</body>\n</html>');
+  return HtmlService.createHtmlOutput(content)
     .setTitle('Lukes Kommandozentrale')
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }
