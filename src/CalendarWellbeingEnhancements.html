@@ -2,98 +2,63 @@
 (function () {
   'use strict';
 
-  const GREEN = '#1B4632';
-  const GOLD = '#B8912F';
-  const RUST = '#8C4A20';
-  const CREAM = '#F7F1E4';
-  const MUTED = '#6C7B6E';
-  const PREF_KEY = 'kz.calendar.v1';
-  const WB_KEY = 'kz.wellbeing.entryDate.v1';
+  const GREEN = '#1B4632', GOLD = '#B8912F', RUST = '#8C4A20', CREAM = '#F7F1E4', MUTED = '#6C7B6E';
+  const PREF_KEY = 'kz.calendar.v1', WB_KEY = 'kz.wellbeing.entryDate.v1';
   const DAY = ['SO', 'MO', 'DI', 'MI', 'DO', 'FR', 'SA'];
-
   const state = {
-    view: 'week',
-    anchorDate: todayKey(),
-    calendarIds: null,
-    calendars: [],
-    events: [],
-    periodLabel: '',
-    menuOpen: false,
-    loading: false,
-    error: '',
-    wellbeingDate: todayKey()
+    view: 'week', anchorDate: todayKey(), calendarIds: null, calendars: [], events: [],
+    periodLabel: '', menuOpen: false, loading: false, error: '', wellbeingDate: todayKey()
   };
-
-  let adapterPatched = false;
-  let observer = null;
-  let refreshTimer = null;
+  let adapterPatched = false, observer = null, refreshTimer = null;
 
   function todayKey() {
     return new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Berlin' }).format(new Date());
   }
-
-  function parseDateKey(value) {
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(String(value || ''))) return null;
-    const d = new Date(value + 'T12:00:00');
+  function parseKey(value) {
+    const v = String(value || '');
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(v)) return null;
+    const d = new Date(v + 'T12:00:00');
     return Number.isFinite(d.getTime()) ? d : null;
   }
-
-  function dateKey(date) {
-    const y = date.getFullYear();
-    const m = String(date.getMonth() + 1).padStart(2, '0');
-    const d = String(date.getDate()).padStart(2, '0');
+  function key(date) {
+    const y = date.getFullYear(), m = String(date.getMonth() + 1).padStart(2, '0'), d = String(date.getDate()).padStart(2, '0');
     return `${y}-${m}-${d}`;
   }
-
+  function berlinKey(date) {
+    return new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Berlin' }).format(date);
+  }
   function loadPrefs() {
     try {
       const p = JSON.parse(localStorage.getItem(PREF_KEY) || 'null');
       if (p && ['day', 'week', 'month'].includes(p.view)) state.view = p.view;
-      if (p && parseDateKey(p.anchorDate)) state.anchorDate = p.anchorDate;
+      if (p && parseKey(p.anchorDate)) state.anchorDate = p.anchorDate;
       if (p && Array.isArray(p.calendarIds)) state.calendarIds = p.calendarIds.map(String);
       const wb = localStorage.getItem(WB_KEY);
-      if (wb && parseDateKey(wb) && wb <= todayKey()) state.wellbeingDate = wb;
+      if (wb && parseKey(wb) && wb <= todayKey()) state.wellbeingDate = wb;
     } catch (_) {}
   }
-
   function savePrefs() {
-    try {
-      localStorage.setItem(PREF_KEY, JSON.stringify({
-        view: state.view,
-        anchorDate: state.anchorDate,
-        calendarIds: state.calendarIds
-      }));
-    } catch (_) {}
+    try { localStorage.setItem(PREF_KEY, JSON.stringify({ view: state.view, anchorDate: state.anchorDate, calendarIds: state.calendarIds })); } catch (_) {}
   }
-
-  function saveWellbeingDate(value) {
-    const next = String(value || '');
-    state.wellbeingDate = parseDateKey(next) && next <= todayKey() ? next : todayKey();
+  function setWellbeingDate(value) {
+    const v = String(value || '');
+    state.wellbeingDate = parseKey(v) && v <= todayKey() ? v : todayKey();
     try { localStorage.setItem(WB_KEY, state.wellbeingDate); } catch (_) {}
   }
-
   function call(name, ...args) {
     return new Promise((resolve, reject) => {
-      if (!window.google || !google.script || !google.script.run) {
-        reject(new Error('Apps-Script-Verbindung nicht verfügbar.'));
-        return;
-      }
-      google.script.run
-        .withSuccessHandler(resolve)
+      if (!window.google || !google.script || !google.script.run) return reject(new Error('Apps-Script-Verbindung nicht verfügbar.'));
+      google.script.run.withSuccessHandler(resolve)
         .withFailureHandler(err => reject(new Error(err && err.message ? err.message : String(err))))[name](...args);
     });
   }
 
   async function loadCalendar(force) {
     if (state.loading) return;
-    state.loading = true;
-    state.error = '';
-    renderAll();
+    state.loading = true; state.error = ''; renderAll();
     try {
       const result = await call('getCalendarViewV4', {
-        view: state.view,
-        anchorDate: state.anchorDate,
-        calendarIds: state.calendarIds
+        view: state.view, anchorDate: state.anchorDate, calendarIds: state.calendarIds
       }, !!force);
       state.view = result && result.view || state.view;
       state.anchorDate = result && result.anchorDate || state.anchorDate;
@@ -101,13 +66,11 @@
       state.events = Array.isArray(result && result.events) ? result.events : [];
       state.periodLabel = result && result.periodLabel || '';
       if (Array.isArray(result && result.selectedCalendarIds)) state.calendarIds = result.selectedCalendarIds.map(String);
-      savePrefs();
-      syncAdapterCalendar(result || {});
+      savePrefs(); syncAdapterCalendar(result || {});
     } catch (err) {
       state.error = err && err.message ? err.message : String(err);
     } finally {
-      state.loading = false;
-      renderAll();
+      state.loading = false; renderAll();
     }
   }
 
@@ -117,317 +80,213 @@
     const start = new Date(result.rangeStart || result.weekStart || state.anchorDate + 'T00:00:00');
     const count = Math.max(1, Math.min(42, Number(result.dayCount) || (state.view === 'day' ? 1 : state.view === 'month' ? 42 : 7)));
     const events = Array.isArray(result.events) ? result.events : [];
-    const days = Array.from({ length: count }, (_, index) => {
-      const current = new Date(start);
-      current.setDate(start.getDate() + index);
-      const rows = events.filter(ev => {
-        const d = new Date(ev.start);
-        return Number.isFinite(d.getTime()) && dateKey(d) === dateKey(current);
-      });
+    component.D.week = Array.from({ length: count }, (_, i) => {
+      const current = new Date(start); current.setDate(start.getDate() + i);
+      const rows = events.filter(ev => { const d = new Date(ev.start); return Number.isFinite(d.getTime()) && berlinKey(d) === berlinKey(current); });
       return {
-        wd: DAY[current.getDay()],
-        n: String(current.getDate()).padStart(2, '0'),
-        today: dateKey(current) === todayKey(),
-        ev: rows.map((ev, i) => ({
-          id: String(ev.id || ''),
-          t: ev.allDay ? 'GANZTAG' : new Intl.DateTimeFormat('de-DE', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Berlin' }).format(new Date(ev.start)),
-          l: String(ev.title || '(ohne Titel)'),
-          k: collisionKind(rows, ev, i),
-          start: String(ev.start || ''),
-          end: String(ev.end || ''),
-          calendar: String(ev.calendar || ''),
-          calendarId: String(ev.calendarId || ''),
-          location: String(ev.location || ''),
-          allDay: !!ev.allDay
+        wd: DAY[current.getDay()], n: String(current.getDate()).padStart(2, '0'), today: berlinKey(current) === todayKey(),
+        ev: rows.map((ev, j) => ({
+          id: String(ev.id || ''), t: ev.allDay ? 'GANZTAG' : new Intl.DateTimeFormat('de-DE', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Berlin' }).format(new Date(ev.start)),
+          l: String(ev.title || '(ohne Titel)'), k: collisionKind(rows, ev, j), start: String(ev.start || ''), end: String(ev.end || ''),
+          calendar: String(ev.calendar || ''), calendarId: String(ev.calendarId || ''), location: String(ev.location || ''), allDay: !!ev.allDay
         }))
       };
     });
-    component.D.week = days;
     component.D.weekMeta = [state.periodLabel, `${events.length} TERMINE`].filter(Boolean).join(' · ');
     try { component.setState(s => ({ tick: (s.tick || 0) + 1 })); } catch (_) {}
   }
-
   function collisionKind(dayEvents, current, index) {
     if (current.allDay) return 'n';
     const a = new Date(current.start), b = new Date(current.end);
-    const collide = dayEvents.some((other, j) => {
+    const collision = dayEvents.some((other, j) => {
       if (j === index || other.allDay) return false;
-      const c = new Date(other.start), d = new Date(other.end);
-      return a < d && c < b;
+      const c = new Date(other.start), d = new Date(other.end); return a < d && c < b;
     });
-    if (collide) return 'r';
-    return dateKey(a) === todayKey() ? 'g' : 'n';
+    return collision ? 'r' : berlinKey(a) === todayKey() ? 'g' : 'n';
   }
-
   function shift(direction) {
-    const base = parseDateKey(state.anchorDate) || new Date();
-    if (state.view === 'month') base.setMonth(base.getMonth() + direction);
-    else base.setDate(base.getDate() + direction * (state.view === 'week' ? 7 : 1));
-    state.anchorDate = dateKey(base);
-    savePrefs();
-    loadCalendar(false);
+    const d = parseKey(state.anchorDate) || new Date();
+    if (state.view === 'month') d.setMonth(d.getMonth() + direction); else d.setDate(d.getDate() + direction * (state.view === 'week' ? 7 : 1));
+    state.anchorDate = key(d); savePrefs(); loadCalendar(false);
   }
-
   function setView(view) {
     if (!['day', 'week', 'month'].includes(view) || view === state.view) return;
-    state.view = view;
-    savePrefs();
-    loadCalendar(false);
+    state.view = view; savePrefs(); loadCalendar(false);
   }
-
   function toggleCalendar(id) {
-    const current = new Set(Array.isArray(state.calendarIds) ? state.calendarIds : []);
-    if (current.has(id)) current.delete(id); else current.add(id);
-    state.calendarIds = Array.from(current);
-    savePrefs();
-    loadCalendar(false);
+    const selected = new Set(Array.isArray(state.calendarIds) ? state.calendarIds : []);
+    if (selected.has(id)) selected.delete(id); else selected.add(id);
+    state.calendarIds = Array.from(selected); savePrefs(); loadCalendar(false);
   }
 
-  function el(tag, styles, text) {
-    const node = document.createElement(tag);
-    if (styles) Object.assign(node.style, styles);
-    if (text != null) node.textContent = text;
-    return node;
+  function node(tag, styles, text) {
+    const n = document.createElement(tag); if (styles) Object.assign(n.style, styles); if (text != null) n.textContent = text; return n;
   }
-
-  function button(label, active, onClick, compact) {
-    const b = el('button', {
-      appearance: 'none', border: `1px solid ${active ? 'rgba(184,145,47,.58)' : 'rgba(20,45,32,.15)'}`,
-      borderRadius: compact ? '4px' : '9px', background: active ? GREEN : 'rgba(255,255,255,.38)',
-      color: active ? '#F4EDDC' : '#39473B', minHeight: compact ? '30px' : '44px',
-      padding: compact ? '0 10px' : '0 14px', fontSize: compact ? '10px' : '14px',
-      cursor: 'pointer', fontFamily: 'inherit', transition: 'background 160ms ease,color 160ms ease,transform 120ms ease'
+  function button(label, active, action, mobile) {
+    const b = node('button', {
+      appearance: 'none', minHeight: mobile ? '44px' : '30px', padding: mobile ? '0 14px' : '0 10px',
+      borderRadius: mobile ? '9px' : '4px', border: `1px solid ${active ? 'rgba(184,145,47,.58)' : 'rgba(20,45,32,.15)'}`,
+      background: active ? GREEN : 'rgba(255,255,255,.38)', color: active ? '#F4EDDC' : '#39473B',
+      fontFamily: 'inherit', fontSize: mobile ? '14px' : '10px', cursor: 'pointer', transition: 'background 160ms ease,color 160ms ease,transform 120ms ease'
     }, label);
-    b.type = 'button';
-    b.addEventListener('click', e => { e.preventDefault(); e.stopPropagation(); onClick(e); });
-    return b;
+    b.type = 'button'; b.addEventListener('click', e => { e.preventDefault(); e.stopPropagation(); action(); }); return b;
   }
 
-  function findCalendarHosts() {
-    const desktop = document.querySelector('[data-tile="calendar"]');
-    const all = Array.from(document.querySelectorAll('div'));
-    const mobile = all.find(node => !node.closest('[data-tile="calendar"]') && /^Kalender(woche|tag|monat)$/.test((node.textContent || '').trim()) && node.parentElement && node.parentElement.parentElement);
-    const mobileCard = mobile ? mobile.parentElement.parentElement : null;
-    return [desktop, mobileCard].filter((x, i, a) => x && a.indexOf(x) === i);
+  function findHosts() {
+    const hosts = [];
+    const desktop = document.querySelector('[data-tile="calendar"]'); if (desktop) hosts.push({ host: desktop, mobile: false });
+    const mobileRoot = document.querySelector('[data-screen-label="Kommandozentrale Mobil"]');
+    if (mobileRoot) {
+      const heading = Array.from(mobileRoot.querySelectorAll('div')).find(n => /^Kalender(woche|tag|monat)$/.test((n.textContent || '').trim()));
+      if (heading) {
+        let card = heading.parentElement;
+        while (card && card !== mobileRoot && !(card.style && /border-radius/.test(card.getAttribute('style') || '') && /background/.test(card.getAttribute('style') || ''))) card = card.parentElement;
+        if (card && card !== mobileRoot) hosts.push({ host: card, mobile: true, heading });
+      }
+    }
+    return hosts;
   }
 
   function renderAll() {
-    renderCalendarHosts();
-    renderWellbeingPickers();
+    if (observer) observer.disconnect();
+    try {
+      findHosts().forEach(info => renderHost(info));
+      renderWellbeingPickers();
+      patchAdapter();
+    } finally { observe(); }
   }
-
-  function renderCalendarHosts() {
-    findCalendarHosts().forEach(host => renderCalendarHost(host));
+  function observe() {
+    if (!observer || !document.documentElement) return;
+    observer.observe(document.documentElement, { childList: true, subtree: true });
   }
-
-  function renderCalendarHost(host) {
-    const mobile = !host.hasAttribute('data-tile');
+  function renderHost({ host, mobile, heading }) {
     let mount = host.querySelector(':scope > [data-kz-calendar-enhanced]');
-    if (!mount) {
-      mount = el('div', { position: 'relative', zIndex: '5' });
-      mount.dataset.kzCalendarEnhanced = '1';
-      if (mobile) host.insertBefore(mount, host.children[1] || null);
-      else host.appendChild(mount);
-    }
+    if (!mount) { mount = node('div', { position: 'relative', zIndex: '6' }); mount.dataset.kzCalendarEnhanced = '1'; host.appendChild(mount); }
     mount.replaceChildren();
+    if (!mobile) host.style.overflow = 'visible';
 
+    const titleText = state.view === 'day' ? 'Kalendertag' : state.view === 'month' ? 'Kalendermonat' : 'Kalenderwoche';
+    if (mobile && heading) heading.textContent = titleText;
     if (!mobile) {
-      Array.from(host.children).forEach(child => {
-        if (child !== mount && child !== host.firstElementChild) {
-          if (!child.dataset.kzOriginalDisplay) child.dataset.kzOriginalDisplay = child.style.display || '__empty__';
-          child.style.display = 'none';
-        }
-      });
       const title = host.querySelector(':scope > div:first-child > div:first-child');
       const meta = host.querySelector(':scope > div:first-child > div:last-child');
-      if (title) title.textContent = state.view === 'day' ? 'Kalendertag' : state.view === 'month' ? 'Kalendermonat' : 'Kalenderwoche';
+      if (title) title.textContent = titleText;
       if (meta) meta.textContent = [state.periodLabel, `${state.events.length} TERMINE`].filter(Boolean).join(' · ');
     }
 
-    const toolbar = el('div', { display: 'flex', flexWrap: 'wrap', gap: mobile ? '7px' : '6px', alignItems: 'center', marginTop: mobile ? '10px' : '9px' });
-    ['day', 'week', 'month'].forEach(v => toolbar.appendChild(button(v === 'day' ? 'Tag' : v === 'week' ? 'Woche' : 'Monat', state.view === v, () => setView(v), !mobile)));
-    toolbar.appendChild(button('‹', false, () => shift(-1), !mobile));
-    toolbar.appendChild(button('Heute', false, () => { state.anchorDate = todayKey(); savePrefs(); loadCalendar(false); }, !mobile));
-    toolbar.appendChild(button('›', false, () => shift(1), !mobile));
-    toolbar.appendChild(button('Kalender ▾', state.menuOpen, () => { state.menuOpen = !state.menuOpen; renderAll(); }, !mobile));
-    mount.appendChild(toolbar);
+    Array.from(host.children).forEach(child => {
+      if (child === mount) return;
+      if (!mobile && child === host.firstElementChild) return;
+      if (mobile && heading && child.contains(heading)) return;
+      if (!child.dataset.kzOriginalDisplay) child.dataset.kzOriginalDisplay = child.style.display || '__empty__';
+      child.style.display = 'none';
+    });
 
-    if (state.menuOpen) mount.appendChild(calendarMenu(mobile));
-    if (state.error) mount.appendChild(el('div', { marginTop: '8px', color: RUST, fontSize: mobile ? '13px' : '10px' }, state.error));
-    mount.appendChild(calendarBody(mobile));
+    const toolbar = node('div', { display: 'flex', flexWrap: 'wrap', gap: mobile ? '7px' : '6px', alignItems: 'center', marginTop: mobile ? '10px' : '9px' });
+    ['day', 'week', 'month'].forEach(v => toolbar.appendChild(button(v === 'day' ? 'Tag' : v === 'week' ? 'Woche' : 'Monat', state.view === v, () => setView(v), mobile)));
+    toolbar.appendChild(button('‹', false, () => shift(-1), mobile));
+    toolbar.appendChild(button('Heute', false, () => { state.anchorDate = todayKey(); savePrefs(); loadCalendar(false); }, mobile));
+    toolbar.appendChild(button('›', false, () => shift(1), mobile));
+    toolbar.appendChild(button('Kalender ▾', state.menuOpen, () => { state.menuOpen = !state.menuOpen; renderAll(); }, mobile));
+    mount.appendChild(toolbar);
+    if (state.menuOpen) mount.appendChild(renderMenu(mobile));
+    if (state.error) mount.appendChild(node('div', { marginTop: '8px', color: RUST, fontSize: mobile ? '13px' : '10px' }, state.error));
+    mount.appendChild(renderCalendar(mobile));
   }
 
-  function calendarMenu(mobile) {
-    const box = el('div', {
-      marginTop: '8px', padding: '8px', borderRadius: mobile ? '10px' : '5px', background: CREAM,
-      border: '1px solid rgba(184,145,47,.35)', boxShadow: '0 16px 32px -22px rgba(10,31,21,.5)',
-      display: 'grid', gap: '5px'
-    });
-    if (!state.calendars.length) box.appendChild(el('div', { color: MUTED, fontSize: mobile ? '13px' : '10px' }, state.loading ? 'Kalender werden geladen …' : 'Keine Kalender verfügbar.'));
+  function renderMenu(mobile) {
+    const box = node('div', { marginTop: '8px', padding: '8px', borderRadius: mobile ? '10px' : '5px', background: CREAM, border: '1px solid rgba(184,145,47,.35)', boxShadow: '0 16px 32px -22px rgba(10,31,21,.5)', display: 'grid', gap: '5px' });
+    if (!state.calendars.length) box.appendChild(node('div', { color: MUTED, fontSize: mobile ? '13px' : '10px' }, state.loading ? 'Kalender werden geladen …' : 'Keine Kalender verfügbar.'));
     state.calendars.forEach(cal => {
       const selected = Array.isArray(state.calendarIds) && state.calendarIds.includes(String(cal.id));
-      const row = button('', selected, () => toggleCalendar(String(cal.id)), !mobile);
-      row.style.justifyContent = 'flex-start';
-      row.style.display = 'flex';
-      row.style.alignItems = 'center';
-      row.style.gap = '8px';
-      row.style.width = '100%';
-      const dot = el('span', { width: '9px', height: '9px', borderRadius: '50%', background: cal.color || GREEN, flex: '0 0 auto' });
-      const label = el('span', { overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: '1', textAlign: 'left' }, cal.name || '(ohne Namen)');
-      const mark = el('span', { color: selected ? GOLD : 'transparent', fontWeight: '700' }, '✓');
-      row.append(dot, label, mark);
+      const row = button('', selected, () => toggleCalendar(String(cal.id)), mobile);
+      Object.assign(row.style, { width: '100%', display: 'flex', justifyContent: 'flex-start', alignItems: 'center', gap: '8px' });
+      row.append(node('span', { width: '9px', height: '9px', borderRadius: '50%', background: cal.color || GREEN, flex: '0 0 auto' }),
+        node('span', { overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: '1', textAlign: 'left' }, cal.name || '(ohne Namen)'),
+        node('span', { color: selected ? GOLD : 'transparent', fontWeight: '700' }, '✓'));
       box.appendChild(row);
-    });
-    return box;
-  }
-
-  function calendarBody(mobile) {
-    const wrap = el('div', { marginTop: '9px' });
-    if (state.loading && !state.events.length) {
-      wrap.appendChild(el('div', { padding: '18px 0', color: MUTED, fontSize: mobile ? '14px' : '11px' }, 'Kalender wird geladen …'));
-      return wrap;
-    }
-    const start = rangeStart();
-    const count = state.view === 'day' ? 1 : state.view === 'week' ? 7 : 42;
-    const days = Array.from({ length: count }, (_, i) => {
-      const d = new Date(start); d.setDate(start.getDate() + i); return d;
-    });
-
-    if (state.view === 'day') {
-      const day = days[0];
-      const events = eventsFor(day);
-      const heading = el('div', { fontFamily: "'Bodoni Moda',serif", fontSize: mobile ? '18px' : '14px', color: GREEN, marginBottom: '7px' }, new Intl.DateTimeFormat('de-DE', { weekday: 'long', day: '2-digit', month: 'long' }).format(day));
-      wrap.appendChild(heading);
-      if (!events.length) wrap.appendChild(el('div', { color: MUTED, fontSize: mobile ? '14px' : '11px', padding: '8px 0' }, 'Keine Termine.'));
-      events.forEach(ev => wrap.appendChild(eventCard(ev, mobile)));
-      return wrap;
-    }
-
-    const grid = el('div', { display: 'grid', gridTemplateColumns: 'repeat(7,minmax(0,1fr))', gap: state.view === 'month' ? (mobile ? '4px' : '3px') : (mobile ? '6px' : '6px') });
-    days.forEach(day => {
-      const current = dateKey(day) === todayKey();
-      const cell = el('div', {
-        minWidth: '0', minHeight: state.view === 'month' ? (mobile ? '68px' : '42px') : (mobile ? '96px' : '105px'),
-        padding: state.view === 'month' ? (mobile ? '5px 3px' : '3px 2px') : (mobile ? '7px 5px' : '7px 5px'),
-        borderRadius: mobile ? '8px' : '3px', background: current ? 'rgba(27,70,50,.11)' : 'rgba(255,255,255,.34)',
-        border: `1px solid ${current ? 'rgba(184,145,47,.55)' : 'rgba(20,45,32,.08)'}`, overflow: 'hidden'
-      });
-      const head = el('div', { textAlign: 'center', marginBottom: '4px' });
-      head.appendChild(el('div', { fontFamily: "'IBM Plex Mono',monospace", fontSize: mobile ? '10px' : '8px', color: current ? '#8C6B18' : '#7A8A7C' }, DAY[day.getDay()]));
-      head.appendChild(el('div', { fontFamily: "'Bodoni Moda',serif", fontSize: mobile ? '15px' : '13px', color: current ? GREEN : '#39473B' }, String(day.getDate())));
-      cell.appendChild(head);
-      const events = eventsFor(day);
-      const limit = state.view === 'month' ? 1 : 2;
-      events.slice(0, limit).forEach(ev => cell.appendChild(eventCard(ev, mobile, true)));
-      if (events.length > limit) cell.appendChild(el('div', { fontSize: mobile ? '10px' : '8px', color: MUTED, textAlign: 'center', marginTop: '2px' }, `+${events.length - limit}`));
-      grid.appendChild(cell);
-    });
-    wrap.appendChild(grid);
-    return wrap;
+    }); return box;
   }
 
   function rangeStart() {
-    const anchor = parseDateKey(state.anchorDate) || new Date();
-    anchor.setHours(12, 0, 0, 0);
-    if (state.view === 'day') return anchor;
-    if (state.view === 'month') anchor.setDate(1);
-    const weekday = anchor.getDay() || 7;
-    anchor.setDate(anchor.getDate() - weekday + 1);
-    return anchor;
+    const d = parseKey(state.anchorDate) || new Date(); d.setHours(12, 0, 0, 0);
+    if (state.view === 'day') return d;
+    if (state.view === 'month') d.setDate(1);
+    const weekday = d.getDay() || 7; d.setDate(d.getDate() - weekday + 1); return d;
   }
-
-  function eventsFor(day) {
-    const key = dateKey(day);
-    return state.events.filter(ev => {
-      const d = new Date(ev.start);
-      return Number.isFinite(d.getTime()) && dateKey(d) === key;
-    });
+  function eventsFor(date) {
+    const k = berlinKey(date); return state.events.filter(ev => { const d = new Date(ev.start); return Number.isFinite(d.getTime()) && berlinKey(d) === k; });
   }
-
   function eventCard(ev, mobile, compact) {
-    const item = el('div', {
-      padding: compact ? (mobile ? '3px' : '2px 3px') : (mobile ? '8px 9px' : '5px 6px'),
-      borderRadius: mobile ? '6px' : '2px', background: 'rgba(27,70,50,.09)',
-      borderTop: `2px solid ${ev.color || GREEN}`, marginBottom: compact ? '2px' : '5px', minWidth: '0', overflow: 'hidden'
-    });
+    const item = node('div', { padding: compact ? (mobile ? '3px' : '2px 3px') : (mobile ? '8px 9px' : '5px 6px'), borderRadius: mobile ? '6px' : '2px', background: 'rgba(27,70,50,.09)', borderTop: `2px solid ${ev.color || GREEN}`, marginBottom: compact ? '2px' : '5px', minWidth: '0', overflow: 'hidden' });
     const time = ev.allDay ? 'GANZTAG' : new Intl.DateTimeFormat('de-DE', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Berlin' }).format(new Date(ev.start));
-    item.appendChild(el('div', { fontFamily: "'IBM Plex Mono',monospace", fontSize: compact ? (mobile ? '9px' : '7.5px') : (mobile ? '11px' : '9px'), color: MUTED }, time));
-    item.appendChild(el('div', { fontSize: compact ? (mobile ? '10px' : '8.5px') : (mobile ? '14px' : '10.5px'), color: '#1B2A1E', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }, ev.title || '(ohne Titel)'));
-    if (!compact && ev.calendar) item.appendChild(el('div', { fontSize: mobile ? '11px' : '9px', color: '#7A8A7C', marginTop: '2px' }, ev.calendar));
+    item.append(node('div', { fontFamily: "'IBM Plex Mono',monospace", fontSize: compact ? (mobile ? '9px' : '7.5px') : (mobile ? '11px' : '9px'), color: MUTED }, time),
+      node('div', { fontSize: compact ? (mobile ? '10px' : '8.5px') : (mobile ? '14px' : '10.5px'), color: '#1B2A1E', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }, ev.title || '(ohne Titel)'));
+    if (!compact && ev.calendar) item.appendChild(node('div', { fontSize: mobile ? '11px' : '9px', color: '#7A8A7C', marginTop: '2px' }, ev.calendar));
     return item;
+  }
+  function renderCalendar(mobile) {
+    const wrap = node('div', { marginTop: '9px' });
+    if (state.loading && !state.events.length) { wrap.appendChild(node('div', { padding: '18px 0', color: MUTED, fontSize: mobile ? '14px' : '11px' }, 'Kalender wird geladen …')); return wrap; }
+    const start = rangeStart(), count = state.view === 'day' ? 1 : state.view === 'week' ? 7 : 42;
+    const days = Array.from({ length: count }, (_, i) => { const d = new Date(start); d.setDate(start.getDate() + i); return d; });
+    if (state.view === 'day') {
+      const day = days[0], events = eventsFor(day);
+      wrap.appendChild(node('div', { fontFamily: "'Bodoni Moda',serif", fontSize: mobile ? '18px' : '14px', color: GREEN, marginBottom: '7px' }, new Intl.DateTimeFormat('de-DE', { weekday: 'long', day: '2-digit', month: 'long' }).format(day)));
+      if (!events.length) wrap.appendChild(node('div', { color: MUTED, fontSize: mobile ? '14px' : '11px', padding: '8px 0' }, 'Keine Termine.'));
+      events.forEach(ev => wrap.appendChild(eventCard(ev, mobile, false))); return wrap;
+    }
+    const grid = node('div', { display: 'grid', gridTemplateColumns: 'repeat(7,minmax(0,1fr))', gap: state.view === 'month' ? (mobile ? '4px' : '3px') : '6px' });
+    days.forEach(day => {
+      const current = berlinKey(day) === todayKey(), events = eventsFor(day), limit = state.view === 'month' ? 1 : 2;
+      const cell = node('div', { minWidth: '0', minHeight: state.view === 'month' ? (mobile ? '68px' : '42px') : (mobile ? '96px' : '105px'), padding: state.view === 'month' ? (mobile ? '5px 3px' : '3px 2px') : '7px 5px', borderRadius: mobile ? '8px' : '3px', background: current ? 'rgba(27,70,50,.11)' : 'rgba(255,255,255,.34)', border: `1px solid ${current ? 'rgba(184,145,47,.55)' : 'rgba(20,45,32,.08)'}`, overflow: 'hidden' });
+      const head = node('div', { textAlign: 'center', marginBottom: '4px' });
+      head.append(node('div', { fontFamily: "'IBM Plex Mono',monospace", fontSize: mobile ? '10px' : '8px', color: current ? '#8C6B18' : '#7A8A7C' }, DAY[day.getDay()]), node('div', { fontFamily: "'Bodoni Moda',serif", fontSize: mobile ? '15px' : '13px', color: current ? GREEN : '#39473B' }, String(day.getDate()))); cell.appendChild(head);
+      events.slice(0, limit).forEach(ev => cell.appendChild(eventCard(ev, mobile, true)));
+      if (events.length > limit) cell.appendChild(node('div', { fontSize: mobile ? '10px' : '8px', color: MUTED, textAlign: 'center' }, `+${events.length - limit}`));
+      grid.appendChild(cell);
+    }); wrap.appendChild(grid); return wrap;
   }
 
   function renderWellbeingPickers() {
-    const headings = Array.from(document.querySelectorAll('div')).filter(node => /^(Sechs Werte, 1 bis 10|Hauptgefühl)$/.test((node.textContent || '').trim()));
-    headings.forEach(heading => {
-      const card = heading.closest('div[style*="background"]') || heading.parentElement && heading.parentElement.parentElement;
-      if (!card || card.querySelector('[data-kz-wellbeing-date]')) return;
-      const box = el('div', {
-        marginTop: '12px', padding: '10px 11px', borderRadius: '8px', background: 'rgba(255,255,255,.36)',
-        border: '1px solid rgba(184,145,47,.28)', display: 'flex', alignItems: 'center', gap: '9px', flexWrap: 'wrap'
-      });
-      box.dataset.kzWellbeingDate = '1';
-      const label = el('label', { fontSize: '12px', color: '#4C5A4E' }, 'Eintrag für');
-      const input = document.createElement('input');
-      input.type = 'date';
-      input.value = state.wellbeingDate;
-      input.max = todayKey();
-      Object.assign(input.style, { minHeight: '40px', padding: '0 10px', borderRadius: '7px', border: '1px solid rgba(20,45,32,.18)', background: CREAM, color: GREEN, fontFamily: "'IBM Plex Mono',monospace", fontSize: '14px' });
-      input.addEventListener('change', e => { e.stopPropagation(); saveWellbeingDate(e.target.value); input.value = state.wellbeingDate; });
-      input.addEventListener('click', e => e.stopPropagation());
-      const hint = el('span', { fontSize: '11px', color: MUTED }, 'Vergangene Tage können nachgetragen werden.');
-      box.append(label, input, hint);
-      const headerRow = heading.parentElement;
-      if (headerRow && headerRow.parentElement) headerRow.insertAdjacentElement('afterend', box);
-      else card.prepend(box);
-    });
+    const mobileRoot = document.querySelector('[data-screen-label="Kommandozentrale Mobil"]');
+    const scopes = [document, mobileRoot].filter(Boolean);
+    const seen = new Set();
+    scopes.forEach(scope => Array.from(scope.querySelectorAll('div')).forEach(heading => {
+      if (!/^(Sechs Werte, 1 bis 10|Hauptgefühl)$/.test((heading.textContent || '').trim())) return;
+      let card = heading.parentElement;
+      while (card && card !== document.body && !(card.getAttribute && /background/.test(card.getAttribute('style') || '') && /border-radius/.test(card.getAttribute('style') || ''))) card = card.parentElement;
+      if (!card || seen.has(card) || card.querySelector('[data-kz-wellbeing-date]')) return;
+      seen.add(card);
+      const box = node('div', { marginTop: '12px', padding: '10px 11px', borderRadius: '8px', background: 'rgba(255,255,255,.36)', border: '1px solid rgba(184,145,47,.28)', display: 'flex', alignItems: 'center', gap: '9px', flexWrap: 'wrap' }); box.dataset.kzWellbeingDate = '1';
+      const label = node('label', { fontSize: '12px', color: '#4C5A4E' }, 'Eintrag für');
+      const input = document.createElement('input'); input.type = 'date'; input.value = state.wellbeingDate; input.max = todayKey();
+      Object.assign(input.style, { minHeight: '44px', padding: '0 10px', borderRadius: '7px', border: '1px solid rgba(20,45,32,.18)', background: CREAM, color: GREEN, fontFamily: "'IBM Plex Mono',monospace", fontSize: '16px', boxSizing: 'border-box' });
+      input.addEventListener('change', e => { e.stopPropagation(); setWellbeingDate(e.target.value); input.value = state.wellbeingDate; }); input.addEventListener('click', e => e.stopPropagation());
+      box.append(label, input, node('span', { fontSize: '11px', color: MUTED }, 'Vergangene Tage können nachgetragen werden.'));
+      const row = heading.parentElement; if (row && row.parentElement) row.insertAdjacentElement('afterend', box); else card.prepend(box);
+    }));
   }
 
   function patchAdapter() {
     if (adapterPatched || !window.KZLive) return;
-    const adapter = window.KZLive;
-    adapterPatched = true;
+    const adapter = window.KZLive; adapterPatched = true;
     adapter.saveWellbeing = async function (component) {
       if (!component || !component.D.wb.available) return;
-      const form = component.state.wbForm || {};
-      const payload = {
-        entryDate: state.wellbeingDate,
-        mood: form[0] == null ? null : form[0],
-        energy: form[1] == null ? null : form[1],
-        innerPressure: form[2] == null ? null : form[2],
-        sleepQuality: form[3] == null ? null : form[3],
-        motivation: form[4] == null ? null : form[4],
-        recovery: form[5] == null ? null : form[5],
-        feeling: component.state.wbMood || null,
-        feelingIntensity: null,
-        influenceFactor: component.state.wbFactor || null,
-        reflection: ''
-      };
+      const f = component.state.wbForm || {};
+      const payload = { entryDate: state.wellbeingDate, mood: f[0] == null ? null : f[0], energy: f[1] == null ? null : f[1], innerPressure: f[2] == null ? null : f[2], sleepQuality: f[3] == null ? null : f[3], motivation: f[4] == null ? null : f[4], recovery: f[5] == null ? null : f[5], feeling: component.state.wbMood || null, feelingIntensity: null, influenceFactor: component.state.wbFactor || null, reflection: '' };
       try {
         const result = await adapter.call('saveWellbeingEntryV2', payload);
         if (!result || result.ok === false) throw new Error(result && result.error ? result.error : 'Abendcheck konnte nicht gespeichert werden.');
-        adapter.applyWellbeing(result.data || {});
-        component.setState({ wbSaved: true });
-      } catch (error) {
-        adapter.recordActionError(error);
-      }
+        adapter.applyWellbeing(result.data || {}); component.setState({ wbSaved: true });
+      } catch (error) { adapter.recordActionError(error); }
     };
   }
 
-  function scheduleRender() {
-    clearTimeout(refreshTimer);
-    refreshTimer = setTimeout(() => {
-      patchAdapter();
-      renderAll();
-    }, 40);
-  }
-
-  loadPrefs();
-  patchAdapter();
-  observer = new MutationObserver(scheduleRender);
-  observer.observe(document.documentElement, { childList: true, subtree: true });
+  function scheduleRender() { clearTimeout(refreshTimer); refreshTimer = setTimeout(renderAll, 50); }
+  loadPrefs(); patchAdapter();
+  observer = new MutationObserver(scheduleRender); observe();
   window.addEventListener('beforeunload', () => { if (observer) observer.disconnect(); clearTimeout(refreshTimer); });
-  scheduleRender();
-  loadCalendar(false);
+  renderAll(); loadCalendar(false);
 })();
 </script>
