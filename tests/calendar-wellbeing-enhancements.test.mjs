@@ -13,7 +13,8 @@ const mobile = await readFile(join(root, 'src', 'MobileIndex.html'), 'utf8');
 test('extension injects after the evaluated original templates without modifying their design sources', () => {
   assert.match(server, /createTemplateFromFile\(view\)/);
   assert.match(server, /CalendarWellbeingEnhancements/);
-  assert.match(server, /replace\(\/<\\\/body>/);
+  assert.match(server, /rendered\.replace/);
+  assert.match(server, /Heute im Kalender/);
   assert.match(desktop, /Claude Design source SHA-256/);
   assert.match(mobile, /Claude Mobile Design source SHA-256/);
 });
@@ -45,9 +46,11 @@ test('wellbeing can be backfilled while future entry dates are rejected', () => 
 });
 
 test('desktop and mobile share the same enhancement layer and touch controls stay usable', () => {
-  assert.match(client, /findCalendarHosts/);
-  assert.match(client, /data-kz-calendar-enhanced|kzCalendarEnhanced/);
-  assert.match(client, /minHeight: compact \? '30px' : '44px'/);
+  assert.match(client, /findHosts/);
+  assert.match(client, /kzCalendarEnhanced/);
+  assert.match(client, /minHeight: mobile \? '44px' : '30px'/);
   assert.match(client, /background: active \? GREEN/);
+  assert.match(client, /data-screen-label=\\?"Kommandozentrale Mobil/);
+  assert.match(client, /observer\.disconnect\(\)/);
   assert.match(client, /GOLD/);
 });
