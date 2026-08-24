@@ -26,6 +26,81 @@ test('Code.gs owns the single web entry point and injects the enhancement withou
   assert.match(code, /Heute im Kalender/);
   assert.doesNotMatch(server, /function\s+doGet\s*\(/);
   assert.match(desktop, /Claude Design source SHA-256/);
+  assert.match(desktop, /data-kz-calendar-detail-host/);
+  assert.match(desktop, /showLedger:dk!=='calendar'/);import assert from 'node:assert/strict';
+import { readFile, readdir } from 'node:fs/promises';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import test from 'node:test';
+
+const root = join(dirname(fileURLToPath(import.meta.url)), '..');
+const src = join(root, 'src');
+const code = await readFile(join(src, 'Code.gs'), 'utf8');
+const server = await readFile(join(src, 'ZZ_CalendarWellbeingEnhancements.gs'), 'utf8');
+const client = await readFile(join(src, 'CalendarWellbeingEnhancements.html'), 'utf8');
+const desktop = await readFile(join(src, 'Index.html'), 'utf8');
+const mobile = await readFile(join(src, 'MobileIndex.html'), 'utf8');
+
+test('Code.gs owns the single web entry point and injects the enhancement without modifying design sources', async () => {
+  const gsFiles = (await readdir(src)).filter(name => name.endsWith('.gs'));
+  let doGetCount = 0;
+  for (const name of gsFiles) {
+    const content = await readFile(join(src, name), 'utf8');
+    doGetCount += (content.match(/function\s+doGet\s*\(/g) || []).length;
+  }
+  assert.equal(doGetCount, 1);
+  assert.match(code, /createTemplateFromFile\(view\)/);
+  assert.match(code, /CalendarWellbeingEnhancements/);
+  assert.match(code, /rendered\.replace/);
+  assert.match(code, /Heute im Kalender/);
+  assert.doesNotMatch(server, /function\s+doGet\s*\(/);
+  assert.match(desktop, /Claude Design source SHA-256/);
+  assert.match(mobile, /Claude Mobile Design source SHA-256/);
+});
+
+test('calendar endpoint supports day week month and hides Möglichkeiten by default', () => {
+  assert.match(server, /getCalendarViewV4/);
+  assert.match(server, /\['day', 'week', 'month'\]/);
+  assert.match(server, /defaultVisible: !\/möglichkeit\/i/);
+  assert.match(server, /CalendarApp\.getAllCalendars\(\)/);
+  assert.match(client, /kz\.calendar\.v2/);
+  for (const label of ['Tag', 'Woche', 'Monat', 'Heute', 'Kalender']) {
+    assert.match(client, new RegExp(label));
+  }
+});
+
+test('calendar redesign keeps dense views inside the tile and uses purpose-built day week month layouts', () => {
+  assert.match(client, /kz-cal-desktop/);
+  assert.match(client, /kz-cal-detail/);
+  assert.match(client, /renderLargeTimeGrid/);
+  assert.match(client, /largeTimeSegmentsForDay/);import assert from 'node:assert/strict';
+import { readFile, readdir } from 'node:fs/promises';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import test from 'node:test';
+
+const root = join(dirname(fileURLToPath(import.meta.url)), '..');
+const src = join(root, 'src');
+const code = await readFile(join(src, 'Code.gs'), 'utf8');
+const server = await readFile(join(src, 'ZZ_CalendarWellbeingEnhancements.gs'), 'utf8');
+const client = await readFile(join(src, 'CalendarWellbeingEnhancements.html'), 'utf8');
+const desktop = await readFile(join(src, 'Index.html'), 'utf8');
+const mobile = await readFile(join(src, 'MobileIndex.html'), 'utf8');
+
+test('Code.gs owns the single web entry point and injects the enhancement without modifying design sources', async () => {
+  const gsFiles = (await readdir(src)).filter(name => name.endsWith('.gs'));
+  let doGetCount = 0;
+  for (const name of gsFiles) {
+    const content = await readFile(join(src, name), 'utf8');
+    doGetCount += (content.match(/function\s+doGet\s*\(/g) || []).length;
+  }
+  assert.equal(doGetCount, 1);
+  assert.match(code, /createTemplateFromFile\(view\)/);
+  assert.match(code, /CalendarWellbeingEnhancements/);
+  assert.match(code, /rendered\.replace/);
+  assert.match(code, /Heute im Kalender/);
+  assert.doesNotMatch(server, /function\s+doGet\s*\(/);
+  assert.match(desktop, /Claude Design source SHA-256/);
   assert.match(mobile, /Claude Mobile Design source SHA-256/);
 });
 
