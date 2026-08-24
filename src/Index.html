@@ -29,14 +29,14 @@
   }
 })();
 </script>
-<!-- Claude Design source SHA-256: 01b102d2f95fef3b037030d946e4a9ab98a819eb3926ca3d35250c8c1bbf117b. Visual structure is design-locked. -->
+<!-- Claude Design source SHA-256: f4f5124103eb7d6ef0afe0f78eeb170fc97f505f5de13d3cbca04ea04da53d8e. Visual structure is design-locked; live wiring is repository-owned. -->
 <?!= includeHtml_('ClaudeRuntime'); ?>
 <?!= includeHtml_('LiveAdapter'); ?>
 </head>
 <body>
 <x-dc>
 <helmet>
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=1600">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400&family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -96,8 +96,8 @@
 
         <div style="display:flex;align-items:center;gap:10px">
           <div style="display:flex;align-items:center;gap:8px;padding:7px 13px;border:1px solid rgba(184,145,47,.4);border-radius:999px;background:rgba(184,145,47,.09)">
-            <span style="width:6px;height:6px;border-radius:50%;background:{{ sourceState.color }};box-shadow:0 0 8px {{ sourceState.glow }};animation:kBreathe 2.6s ease-in-out infinite"></span>
-            <span style="font-size:11.5px;color:#DFD5BE;letter-spacing:.02em">{{ sourceState.label }}</span>
+            <span style="width:6px;height:6px;border-radius:50%;background:#5FBF8A;box-shadow:0 0 8px #5FBF8A;animation:kBreathe 2.6s ease-in-out infinite"></span>
+            <span style="font-size:11.5px;color:#DFD5BE;letter-spacing:.02em">Alle Quellen synchron</span>
           </div>
           <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#9FB0A3;letter-spacing:.06em">{{ ui.dateLine }}</div>
           <div data-magnet onClick="{{ replayBoot }}" style="font-size:11.5px;color:#C9AE6C;padding:7px 12px;border-radius:999px;border:1px solid rgba(184,145,47,.28);cursor:pointer;transform:translate(var(--tx,0px),var(--ty,0px));transition:transform 200ms cubic-bezier(.16,1,.3,1),background-color 200ms ease-out" style-hover="background:rgba(184,145,47,.16)" style-active="transform:translate(var(--tx,0px),var(--ty,0px)) scale(.96)">Sequenz erneut</div>
@@ -170,10 +170,10 @@
         </div>
         <div style="margin-top:12px;display:flex;flex-direction:column">
           <sc-for list="{{ tasks }}" as="t" hint-placeholder-count="5">
-            <div style="display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;padding:9px 0;border-bottom:1px solid rgba(20,45,32,.08)">
-              <span onClick="{{ t.complete }}" style="width:16px;height:16px;border-radius:2px;border:1.5px solid rgba(27,70,50,.45);display:grid;place-items:center;font-size:9px;color:#1B4632;cursor:pointer" style-hover="background:rgba(27,70,50,.1)">{{ t.tick }}</span>
+            <div draggable="true" onDragStart="{{ t.dragStart }}" onDragOver="{{ t.dragOver }}" onDrop="{{ t.drop }}" style="display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;padding:9px 0;border-bottom:1px solid rgba(20,45,32,.08);opacity:{{ t.op }};cursor:grab">
+              <span onClick="{{ t.toggle }}" style="width:16px;height:16px;border-radius:2px;border:1.5px solid rgba(27,70,50,.45);display:grid;place-items:center;font-size:10px;color:{{ t.checkFg }};background:{{ t.checkBg }};cursor:pointer;transition:background-color 160ms ease-out" style-hover="background:rgba(27,70,50,.1)">{{ t.tick }}</span>
               <div style="min-width:0">
-                <div style="font-size:13px;font-weight:500;color:#17251B;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ t.title }}</div>
+                <div style="font-size:13px;font-weight:500;color:#17251B;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-decoration:{{ t.strike }}">{{ t.title }}</div>
                 <div style="font-size:11px;color:#61705F;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ t.next }}</div>
               </div>
               <div style="display:flex;align-items:center;gap:7px">
@@ -232,7 +232,7 @@
       <div data-magnet data-tile="finance" onClick="{{ open.finance }}" style="grid-column:1 / span 4;grid-row:3 / span 2;position:relative;overflow:hidden;border-radius:5px;padding:18px;background:linear-gradient(180deg,#F5EFE2 0%,#EDE5D3 100%);border:1px solid rgba(20,45,32,.14);box-shadow:0 1px 1px rgba(20,45,32,.04),0 18px 38px -26px rgba(20,45,32,.5);cursor:pointer;transform:translate(var(--tx,0px),var(--ty,0px));transition:transform 260ms cubic-bezier(.16,1,.3,1),border-color 260ms ease-out;animation:kRise 700ms cubic-bezier(.16,1,.3,1) 240ms both" style-hover="border-color:rgba(184,145,47,.55)" style-active="transform:translate(var(--tx,0px),var(--ty,0px)) scale(.988)" style-after="content:'';position:absolute;inset:0;pointer-events:none;background:radial-gradient(240px circle at var(--mx,50%) var(--my,50%),rgba(184,145,47,.13),transparent 70%);opacity:0;transition:opacity 260ms ease-out">
         <div style="display:flex;align-items:baseline;justify-content:space-between">
           <div style="font-family:'Bodoni Moda',serif;font-size:16px;color:#132A1D">Finanzen</div>
-          <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#6C7B6E;letter-spacing:.08em">{{ fin.meta }} · DETAIL →</div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#6C7B6E;letter-spacing:.08em">AUG 2026 · DETAIL →</div>
         </div>
         <div style="margin-top:14px;display:flex;align-items:baseline;gap:12px">
           <div>
@@ -489,7 +489,7 @@
           </div>
           <div style="flex:0 0 240px;padding-left:22px;border-left:1px solid rgba(20,45,32,.12)">
             <div style="display:flex;align-items:baseline;justify-content:space-between">
-              <span style="font-size:11px;color:#6C7B6E">Vorhandener Verlauf</span>
+              <span style="font-size:11px;color:#6C7B6E">7-Tage-Verlauf</span>
               <span style="font-size:11px;color:#1B4632;font-weight:600">{{ wb.mood }}</span>
             </div>
             <svg viewBox="0 0 220 44" preserveAspectRatio="none" style="width:100%;height:44px;margin-top:6px;display:block">
@@ -498,7 +498,7 @@
                 <circle cx="{{ p.x }}" cy="{{ p.y }}" r="2" fill="#B8912F"/>
               </sc-for>
             </svg>
-            <div style="margin-top:5px;font-size:10.5px;color:#7A8A7C">Letzter Einflussfaktor: {{ wb.factor }}</div>
+            <div style="margin-top:5px;font-size:10.5px;color:#7A8A7C">Einflussfaktor gestern: {{ wb.factor }}</div>
           </div>
           <div style="flex:0 0 auto">
             <span onClick="{{ open.wellbeing }}" style="display:inline-block;font-size:12px;color:#F1EADB;background:linear-gradient(180deg,#22553A,#173C28);padding:11px 18px;border-radius:3px;font-weight:500;cursor:pointer;box-shadow:0 8px 18px -12px rgba(10,31,21,.9);transition:transform 180ms cubic-bezier(.16,1,.3,1),filter 180ms ease-out" style-hover="filter:brightness(1.12)" style-active="transform:scale(.96)">Check ausfüllen</span>
@@ -647,7 +647,7 @@
             <div style="padding:18px;border-radius:5px;background:linear-gradient(180deg,#F5EFE2,#EFE7D5);border:1px solid rgba(20,45,32,.13);box-shadow:0 16px 34px -28px rgba(20,45,32,.5);animation:kRise 640ms cubic-bezier(.16,1,.3,1) 240ms both">
               <div style="display:flex;align-items:baseline;justify-content:space-between">
                 <div style="font-family:'Bodoni Moda',serif;font-size:17px;color:#132A1D">Letzte Transaktionen</div>
-                <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#6C7B6E">{{ fin.meta }}</div>
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#6C7B6E">AUG 2026</div>
               </div>
               <div style="margin-top:10px;display:flex;flex-direction:column">
                 <sc-for list="{{ finD.tx }}" as="t" hint-placeholder-count="7">
@@ -834,7 +834,7 @@
 
               <div style="margin-top:18px;display:flex;align-items:center;gap:10px">
                 <span onClick="{{ wbD.save }}" style="font-size:12.5px;padding:11px 20px;border-radius:3px;background:{{ wbD.saveBg }};color:{{ wbD.saveFg }};font-weight:500;cursor:pointer;transition:transform 180ms cubic-bezier(.16,1,.3,1),filter 180ms ease-out" style-hover="filter:brightness(1.1)" style-active="transform:scale(.96)">{{ wbD.saveLabel }}</span>
-                <span onClick="{{ wbD.reset }}" style="font-size:12px;padding:11px 16px;border-radius:3px;border:1px solid rgba(20,45,32,.18);color:#4C5A4E;cursor:pointer;transition:background-color 180ms ease-out,transform 180ms ease-out" style-hover="background:rgba(20,45,32,.06)" style-active="transform:scale(.96)">Heute nicht angeben</span>
+                <span onClick="{{ wbD.reset }}" style="font-size:12px;padding:11px 16px;border-radius:3px;border:1px solid rgba(20,45,32,.18);color:#4C5A4E;cursor:pointer;transition:background-color 180ms ease-out,transform 180ms ease-out" style-hover="background:rgba(20,45,32,.06)" style-active="transform:scale(.96)">Zurücksetzen</span>
                 <span style="font-size:11.5px;color:#7A8A7C">Optionale Reflexion folgt nach dem Speichern.</span>
               </div>
             </div>
@@ -868,10 +868,419 @@
           </div>
         </sc-if>
 
-        <sc-if value="{{ detail.isGeneric }}" hint-placeholder-val="{{ false }}">
-          <div style="margin-top:22px;display:grid;grid-template-columns:1.6fr 1fr;gap:16px">
+        <sc-if value="{{ detail.isOperator }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-top:22px;padding:20px;border-radius:5px;background:linear-gradient(180deg,#F5EFE2,#EFE7D5);border:1px solid rgba(20,45,32,.13);box-shadow:0 16px 34px -28px rgba(20,45,32,.5);animation:kRise 640ms cubic-bezier(.16,1,.3,1) 40ms both">
+            <div style="display:flex;align-items:baseline;justify-content:space-between">
+              <div style="font-family:'Bodoni Moda',serif;font-size:17px;color:#132A1D">Aktuelle Entscheidungsgrundlage</div>
+              <div style="display:flex;align-items:center;gap:10px">
+                <span style="display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:999px;background:rgba(184,145,47,.14);border:1px solid rgba(184,145,47,.34)">
+                  <i style="width:5px;height:5px;border-radius:50%;background:#B8912F;animation:kBreathe 1.6s ease-in-out infinite"></i>
+                  <span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8C6B18">{{ opD.streak }}</span>
+                </span>
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#6C7B6E">{{ opD.rate }}</span>
+                <div style="display:flex;gap:4px">
+                  <sc-for list="{{ opD.rangePick }}" as="r" hint-placeholder-count="2">
+                    <span onClick="{{ r.pick }}" style="font-size:10px;padding:4px 8px;border-radius:999px;cursor:pointer;background:{{ r.bg }};color:#4C5A4E">{{ r.label }}</span>
+                  </sc-for>
+                </div>
+              </div>
+            </div>
+            <div style="margin-top:16px;display:flex;align-items:flex-end;gap:6px;height:70px">
+              <sc-for list="{{ opD.bars }}" as="b" hint-placeholder-count="14">
+                <div onClick="{{ b.pick }}" style="flex:1;height:100%;display:flex;flex-direction:column;justify-content:flex-end;position:relative;cursor:pointer">
+                  <sc-if value="{{ b.hovered }}" hint-placeholder-val="{{ false }}">
+                    <div style="position:absolute;bottom:100%;left:50%;transform:translateX(-50%);margin-bottom:6px;padding:5px 8px;border-radius:3px;background:rgba(12,36,24,.95);color:#F2EBD9;white-space:nowrap;z-index:2;font-size:10.5px">{{ b.tip }}</div>
+                  </sc-if>
+                  <i style="width:100%;border-radius:2px;background:{{ b.fill }};height:{{ b.h }}px;transform-origin:bottom;animation:kRiseUp 620ms cubic-bezier(.16,1,.3,1) both;animation-delay:{{ b.delay }}ms"></i>
+                </div>
+              </sc-for>
+            </div>
+            <div style="margin-top:14px;display:flex;flex-direction:column;max-height:172px;overflow:auto">
+              <sc-for list="{{ opD.log }}" as="l" hint-placeholder-count="6">
+                <div style="display:grid;grid-template-columns:52px 1fr auto;gap:12px;padding:7px 0;border-bottom:1px solid rgba(20,45,32,.07);animation:kSlide 420ms cubic-bezier(.16,1,.3,1) both;animation-delay:{{ l.delay }}ms">
+                  <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8A9A8C">{{ l.d }}</span>
+                  <span style="font-size:12px;color:#1B2A1E">{{ l.dec }}</span>
+                  <span style="font-size:10.5px;color:{{ l.fg }};font-weight:600">{{ l.label }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ detail.isOperator }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-top:16px;padding:20px;border-radius:5px;background:linear-gradient(180deg,#F5EFE2,#EFE7D5);border:1px solid rgba(20,45,32,.13);box-shadow:0 16px 34px -28px rgba(20,45,32,.5);animation:kRise 640ms cubic-bezier(.16,1,.3,1) 100ms both">
+            <div style="display:flex;align-items:baseline;justify-content:space-between;gap:16px">
+              <div><div style="font-family:'Bodoni Moda',serif;font-size:17px;color:#132A1D">Second Brain durchsuchen</div><div style="font-size:11.5px;color:#61705F;margin-top:3px">Read-only · sensible Dateien bleiben standardmäßig ausgeblendet</div></div>
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#6C7B6E">ON-DEMAND</div>
+            </div>
+            <div style="margin-top:14px;display:grid;grid-template-columns:1fr auto;gap:8px">
+              <input value="{{ detail.searchQuery }}" onInput="{{ detail.searchInput }}" onKeyDown="{{ detail.searchKey }}" placeholder="Begriff oder Thema …" style="min-width:0;padding:11px 13px;border-radius:3px;border:1px solid rgba(20,45,32,.18);background:rgba(255,255,255,.5);color:#17251B;font:12.5px Archivo,sans-serif;outline:none"/>
+              <span onClick="{{ detail.search }}" style="display:grid;place-items:center;padding:10px 18px;border-radius:3px;background:linear-gradient(180deg,#22553A,#173C28);color:#F1EADB;font-size:12px;font-weight:500;cursor:pointer">Suchen</span>
+            </div>
+            <div style="margin-top:9px;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#6C7B6E">{{ detail.searchStatus }}</div>
+            <div style="margin-top:8px;display:flex;flex-direction:column">
+              <sc-for list="{{ detail.searchResults }}" as="r" hint-placeholder-count="3">
+                <a href="{{ r.url }}" target="_blank" rel="noopener noreferrer" style="display:grid;grid-template-columns:1fr auto;gap:14px;padding:11px 0;border-bottom:1px solid rgba(20,45,32,.08);text-decoration:none;animation:kSlide 460ms cubic-bezier(.16,1,.3,1) both;animation-delay:{{ r.delay }}ms">
+                  <span><span style="display:block;font-size:13px;color:#17251B;font-weight:500">{{ r.title }}</span><span style="display:block;font-size:11px;color:#61705F;margin-top:2px">{{ r.excerpt }}</span></span>
+                  <span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#7A8A7C;text-align:right">{{ r.path }}</span>
+                </a>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ detail.isTasks }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-top:22px;padding:20px;border-radius:5px;background:linear-gradient(180deg,#F5EFE2,#EFE7D5);border:1px solid rgba(20,45,32,.13);box-shadow:0 16px 34px -28px rgba(20,45,32,.5);animation:kRise 640ms cubic-bezier(.16,1,.3,1) 40ms both">
+            <div style="display:flex;align-items:baseline;justify-content:space-between">
+              <div style="font-family:'Bodoni Moda',serif;font-size:17px;color:#132A1D">AI-Priorität, offene Aufgaben</div>
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#6C7B6E">{{ taskD.sum }} GESAMT</div>
+            </div>
+            <div style="margin-top:16px;display:flex;align-items:flex-end;gap:14px;height:90px">
+              <sc-for list="{{ taskD.bars }}" as="b" hint-placeholder-count="7">
+                <div onMouseEnter="{{ b.enter }}" onMouseLeave="{{ b.leave }}" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;justify-content:flex-end;position:relative;cursor:pointer">
+                  <sc-if value="{{ b.hovered }}" hint-placeholder-val="{{ false }}">
+                    <div style="position:absolute;bottom:100%;margin-bottom:6px;padding:5px 8px;border-radius:3px;background:rgba(12,36,24,.95);color:#F2EBD9;white-space:nowrap;z-index:2;font-size:10.5px">{{ b.tip }}</div>
+                  </sc-if>
+                  <span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#4C5A4E">{{ b.v }}</span>
+                  <i style="width:100%;max-width:34px;border-radius:2px;background:{{ b.fill }};height:{{ b.h }}px;transform-origin:bottom;animation:kRiseUp 620ms cubic-bezier(.16,1,.3,1) both;animation-delay:{{ b.delay }}ms"></i>
+                  <span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#7A8A7C">{{ b.l }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ detail.isAlerts }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-top:22px;padding:20px;border-radius:5px;background:linear-gradient(180deg,#F5EFE2,#EFE7D5);border:1px solid rgba(20,45,32,.13);box-shadow:0 16px 34px -28px rgba(20,45,32,.5);animation:kRise 640ms cubic-bezier(.16,1,.3,1) 40ms both">
+            <div style="display:flex;align-items:baseline;justify-content:space-between">
+              <div style="font-family:'Bodoni Moda',serif;font-size:17px;color:#132A1D">Aktuelle Alerts nach Schweregrad</div>
+              <div style="display:flex;align-items:center;gap:8px">
+                <sc-if value="{{ alertD.clean }}" hint-placeholder-val="{{ false }}">
+                  <span style="font-size:10.5px;padding:5px 10px;border-radius:999px;background:rgba(47,107,76,.14);color:#2F6B4C;font-family:'IBM Plex Mono',monospace">RUHIGE GEWÄSSER</span>
+                </sc-if>
+                <div style="display:flex;gap:4px">
+                  <sc-for list="{{ alertD.rangePick }}" as="r" hint-placeholder-count="2">
+                    <span onClick="{{ r.pick }}" style="font-size:10px;padding:4px 8px;border-radius:999px;cursor:pointer;background:{{ r.bg }};color:#4C5A4E">{{ r.label }}</span>
+                  </sc-for>
+                </div>
+              </div>
+            </div>
+            <div style="margin-top:16px;display:flex;align-items:flex-end;gap:6px;height:88px">
+              <sc-for list="{{ alertD.bars }}" as="b" hint-placeholder-count="14">
+                <div onClick="{{ b.pick }}" style="flex:1;display:flex;flex-direction:column-reverse;height:100%;position:relative;cursor:pointer">
+                  <sc-if value="{{ b.hovered }}" hint-placeholder-val="{{ false }}">
+                    <div style="position:absolute;bottom:100%;left:50%;transform:translateX(-50%);margin-bottom:6px;padding:5px 8px;border-radius:3px;background:rgba(12,36,24,.95);color:#F2EBD9;white-space:nowrap;z-index:2;font-size:10.5px">{{ b.tip }}</div>
+                  </sc-if>
+                  <i style="width:100%;background:#8C4A20;height:{{ b.crit }}px"></i>
+                  <i style="width:100%;background:#B8912F;height:{{ b.warn }}px"></i>
+                  <i style="width:100%;border-radius:2px 2px 0 0;background:rgba(27,70,50,.35);height:{{ b.norm }}px"></i>
+                </div>
+              </sc-for>
+            </div>
+            <div style="margin-top:10px;display:flex;gap:14px">
+              <span style="display:flex;align-items:center;gap:5px;font-size:10.5px;color:#4C5A4E"><i style="width:8px;height:8px;border-radius:2px;background:#8C4A20"></i>Kritisch</span>
+              <span style="display:flex;align-items:center;gap:5px;font-size:10.5px;color:#4C5A4E"><i style="width:8px;height:8px;border-radius:2px;background:#B8912F"></i>Wichtig</span>
+              <span style="display:flex;align-items:center;gap:5px;font-size:10.5px;color:#4C5A4E"><i style="width:8px;height:8px;border-radius:2px;background:rgba(27,70,50,.35)"></i>Normal</span>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ detail.isWeather }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-top:22px;padding:20px;border-radius:5px;background:linear-gradient(180deg,#F5EFE2,#EFE7D5);border:1px solid rgba(20,45,32,.13);box-shadow:0 16px 34px -28px rgba(20,45,32,.5);animation:kRise 640ms cubic-bezier(.16,1,.3,1) 40ms both">
+            <div style="font-family:'Bodoni Moda',serif;font-size:17px;color:#132A1D">Stundenaussicht</div>
+            <div style="margin-top:14px">
+              <svg viewBox="0 0 640 150" preserveAspectRatio="none" style="width:100%;height:150px;display:block">
+                <defs>
+                  <linearGradient id="wxBand" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#3E5C7E" stop-opacity=".22"/>
+                    <stop offset="100%" stop-color="#2F6B4C" stop-opacity=".08"/>
+                  </linearGradient>
+                </defs>
+                <path d="{{ weathD.band }}" fill="url(#wxBand)"/>
+                <path d="{{ weathD.hiD }}" fill="none" stroke="#8C4A20" stroke-width="2" stroke-linejoin="round"/>
+                <path d="{{ weathD.loD }}" fill="none" stroke="#2F6B4C" stroke-width="2" stroke-linejoin="round"/>
+              </svg>
+              <div style="display:grid;grid-template-columns:repeat(7,1fr);margin-top:8px">
+                <sc-for list="{{ weathD.days }}" as="d" hint-placeholder-count="7">
+                  <div style="text-align:center;animation:kFade 500ms ease-out both;animation-delay:{{ d.delay }}ms">
+                    <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#7A8A7C">{{ d.wd }}</div>
+                    <div style="font-size:11.5px;color:#39473B;margin-top:2px">{{ d.hi }}°</div>
+                    <div style="height:24px;display:flex;align-items:flex-end;justify-content:center;margin-top:4px">
+                      <i style="width:10px;border-radius:2px 2px 0 0;background:{{ d.popFill }};height:{{ d.popH }}px"></i>
+                    </div>
+                    <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#8A9A8C">{{ d.pop }}%</div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ detail.isCalendar }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-top:22px;padding:20px;border-radius:5px;background:linear-gradient(180deg,#F5EFE2,#EFE7D5);border:1px solid rgba(20,45,32,.13);box-shadow:0 16px 34px -28px rgba(20,45,32,.5);animation:kRise 640ms cubic-bezier(.16,1,.3,1) 40ms both">
+            <div style="display:flex;align-items:baseline;justify-content:space-between">
+              <div style="font-family:'Bodoni Moda',serif;font-size:17px;color:#132A1D">Kalenderwoche im Überblick</div>
+              <div style="display:flex;gap:12px">
+                <span style="display:flex;align-items:center;gap:5px;font-size:10.5px;color:#4C5A4E"><i style="width:8px;height:8px;border-radius:2px;background:#B8912F"></i>Wichtig</span>
+                <span style="display:flex;align-items:center;gap:5px;font-size:10.5px;color:#4C5A4E"><i style="width:8px;height:8px;border-radius:2px;background:#1B4632"></i>Normal</span>
+                <span style="display:flex;align-items:center;gap:5px;font-size:10.5px;color:#4C5A4E"><i style="width:8px;height:8px;border-radius:2px;background:#8C4A20"></i>Kollision</span>
+              </div>
+            </div>
+            <div style="margin-top:16px;display:grid;grid-template-columns:44px repeat(7,1fr);gap:0">
+              <div></div>
+              <sc-for list="{{ calD.grid }}" as="d" hint-placeholder-count="7">
+                <div style="text-align:center;padding-bottom:8px;border-bottom:2px solid {{ d.headBorder }}">
+                  <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:{{ d.labelColor }};letter-spacing:.08em">{{ d.wd }}</div>
+                  <div style="font-family:'Bodoni Moda',serif;font-size:16px;color:{{ d.numColor }}">{{ d.n }}</div>
+                </div>
+              </sc-for>
+              <div style="position:relative;height:{{ calD.gridH }}px">
+                <sc-for list="{{ calD.hourLabels }}" as="h" hint-placeholder-count="11">
+                  <div style="position:absolute;left:0;right:4px;top:{{ h.top }}px;font-family:'IBM Plex Mono',monospace;font-size:9px;color:#8A9A8C;transform:translateY(-50%);text-align:right">{{ h.label }}</div>
+                </sc-for>
+              </div>
+              <sc-for list="{{ calD.grid }}" as="d" hint-placeholder-count="7">
+                <div style="position:relative;height:{{ calD.gridH }}px;border-left:1px solid rgba(20,45,32,.08);background:{{ d.colBg }}">
+                  <sc-for list="{{ calD.hourLabels }}" as="h" hint-placeholder-count="11">
+                    <div style="position:absolute;left:0;right:0;top:{{ h.top }}px;border-top:1px solid rgba(20,45,32,.06)"></div>
+                  </sc-for>
+                  <sc-for list="{{ d.events }}" as="e" hint-placeholder-count="2">
+                    <div style="position:absolute;left:3px;right:3px;top:{{ e.top }}px;height:{{ e.h }}px;border-radius:3px;background:{{ e.bg }};border-left:2.5px solid {{ e.border }};padding:3px 5px;overflow:hidden;animation:kFade 460ms ease-out both;animation-delay:{{ e.delay }}ms">
+                      <div style="font-family:'IBM Plex Mono',monospace;font-size:8.5px;color:#4C5A4E">{{ e.t }}</div>
+                      <div style="font-size:10px;color:#1B2A1E;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ e.l }}</div>
+                    </div>
+                  </sc-for>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ detail.isInbox }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-top:22px;display:grid;grid-template-columns:1.4fr 1fr;gap:16px">
+            <div style="padding:20px;border-radius:5px;background:linear-gradient(180deg,#F5EFE2,#EFE7D5);border:1px solid rgba(20,45,32,.13);box-shadow:0 16px 34px -28px rgba(20,45,32,.5);animation:kRise 640ms cubic-bezier(.16,1,.3,1) 40ms both">
+              <div style="font-family:'Bodoni Moda',serif;font-size:17px;color:#132A1D">Aktuelle Warteschlange nach Konfidenz</div>
+              <div style="margin-top:18px;display:flex;align-items:flex-end;gap:20px;height:100px">
+                <sc-for list="{{ inboxD.bars }}" as="b" hint-placeholder-count="4">
+                  <div onClick="{{ b.pick }}" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;justify-content:flex-end;position:relative;cursor:pointer">
+                    <sc-if value="{{ b.hovered }}" hint-placeholder-val="{{ false }}">
+                      <div style="position:absolute;bottom:100%;margin-bottom:6px;padding:5px 8px;border-radius:3px;background:rgba(12,36,24,.95);color:#F2EBD9;white-space:nowrap;z-index:2;font-size:10.5px">{{ b.tip }}</div>
+                    </sc-if>
+                    <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#4C5A4E">{{ b.v }}</span>
+                    <i style="width:100%;max-width:46px;border-radius:2px;background:{{ b.fill }};height:{{ b.h }}px;transform-origin:bottom;animation:kRiseUp 620ms cubic-bezier(.16,1,.3,1) both;animation-delay:{{ b.delay }}ms"></i>
+                    <span style="font-size:10.5px;color:#7A8A7C">{{ b.l }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+            <div style="padding:20px;border-radius:5px;background:linear-gradient(180deg,#F5EFE2,#EFE7D5);border:1px solid rgba(20,45,32,.13);box-shadow:0 16px 34px -28px rgba(20,45,32,.5);animation:kRise 640ms cubic-bezier(.16,1,.3,1) 90ms both">
+              <div style="font-family:'Bodoni Moda',serif;font-size:17px;color:#132A1D">Entscheidungshistorie · noch nicht angebunden</div>
+              <div style="margin-top:16px;display:flex;flex-direction:column;gap:9px">
+                <div style="display:flex;justify-content:space-between;font-size:12.5px;color:#39473B"><span>Angenommen</span><span style="font-family:'IBM Plex Mono',monospace">{{ inboxD.out.accepted }}</span></div>
+                <span style="height:8px;border-radius:4px;background:rgba(20,45,32,.09);overflow:hidden"><i style="display:block;height:100%;background:#2F6B4C;width:{{ inboxD.acceptedPct }}%"></i></span>
+                <div style="display:flex;justify-content:space-between;font-size:12.5px;color:#39473B;margin-top:5px"><span>Abgelehnt</span><span style="font-family:'IBM Plex Mono',monospace">{{ inboxD.out.rejected }}</span></div>
+                <span style="height:8px;border-radius:4px;background:rgba(20,45,32,.09);overflow:hidden"><i style="display:block;height:100%;background:#8C4A20;width:{{ inboxD.rejectedPct }}%"></i></span>
+                <div style="display:flex;justify-content:space-between;font-size:12.5px;color:#39473B;margin-top:5px"><span>Zurückgestellt</span><span style="font-family:'IBM Plex Mono',monospace">{{ inboxD.out.deferred }}</span></div>
+                <span style="height:8px;border-radius:4px;background:rgba(20,45,32,.09);overflow:hidden"><i style="display:block;height:100%;background:#B8912F;width:{{ inboxD.deferredPct }}%"></i></span>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ detail.isMail }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-top:22px;display:grid;grid-template-columns:1.3fr 1fr;gap:16px">
+            <div style="position:relative;padding:20px;border-radius:5px;background:linear-gradient(180deg,#F5EFE2,#EFE7D5);border:1px solid rgba(20,45,32,.13);box-shadow:0 16px 34px -28px rgba(20,45,32,.5);animation:kRise 640ms cubic-bezier(.16,1,.3,1) 40ms both">
+              <div style="display:flex;align-items:baseline;justify-content:space-between">
+                <div style="font-family:'Bodoni Moda',serif;font-size:17px;color:#132A1D">{{ mailD.vol.title }}</div>
+                <div style="display:flex;align-items:center;gap:8px">
+                  <span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#6C7B6E">{{ mailD.vol.sum }}</span>
+                  <div style="display:flex;gap:4px">
+                    <sc-for list="{{ mailD.rangePick }}" as="r" hint-placeholder-count="2">
+                      <span onClick="{{ r.pick }}" style="font-size:10px;padding:4px 8px;border-radius:999px;cursor:pointer;background:{{ r.bg }};color:#4C5A4E">{{ r.label }}</span>
+                    </sc-for>
+                  </div>
+                </div>
+              </div>
+              <div style="position:relative;margin-top:14px" onMouseMove="{{ mailD.vol.move }}" onMouseLeave="{{ mailD.vol.leave }}">
+                <svg viewBox="0 0 640 150" preserveAspectRatio="none" style="width:100%;height:150px;display:block">
+                  <defs><linearGradient id="mvFill" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#2F6B4C" stop-opacity=".28"/><stop offset="100%" stop-color="#2F6B4C" stop-opacity="0"/>
+                  </linearGradient></defs>
+                  <path d="{{ mailD.vol.area }}" fill="url(#mvFill)"/>
+                  <path d="{{ mailD.vol.d }}" fill="none" stroke="#2F6B4C" stroke-width="2" stroke-linejoin="round" style="filter:drop-shadow(0 0 6px rgba(47,107,76,.4))"/>
+                  <sc-if value="{{ mailD.vol.tip.show }}" hint-placeholder-val="{{ false }}">
+                    <g><line x1="{{ mailD.vol.tip.x }}" y1="0" x2="{{ mailD.vol.tip.x }}" y2="150" stroke="rgba(20,45,32,.3)" stroke-width="1" stroke-dasharray="3 3"/>
+                      <circle cx="{{ mailD.vol.tip.x }}" cy="{{ mailD.vol.tip.y }}" r="4.5" fill="#2F6B4C" stroke="#F5EFE2" stroke-width="2"/></g>
+                  </sc-if>
+                </svg>
+                <sc-if value="{{ mailD.vol.tip.show }}" hint-placeholder-val="{{ false }}">
+                  <div style="{{ mailD.vol.tip.style }}">
+                    <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.1em;color:#C9AE6C">{{ mailD.vol.tip.label }}</div>
+                    <div style="font-size:13px;margin-top:2px">{{ mailD.vol.tip.val }}</div>
+                  </div>
+                </sc-if>
+              </div>
+            </div>
+            <div style="padding:20px;border-radius:5px;background:linear-gradient(180deg,#F5EFE2,#EFE7D5);border:1px solid rgba(20,45,32,.13);box-shadow:0 16px 34px -28px rgba(20,45,32,.5);animation:kRise 640ms cubic-bezier(.16,1,.3,1) 90ms both">
+              <div style="font-family:'Bodoni Moda',serif;font-size:17px;color:#132A1D">Aktuelle Relevanzgründe</div>
+              <div style="margin-top:14px;display:flex;flex-direction:column;gap:10px">
+                <sc-for list="{{ mailD.cats }}" as="c" hint-placeholder-count="4">
+                  <div style="display:grid;grid-template-columns:10px 1fr auto;gap:8px;align-items:center">
+                    <span style="width:8px;height:8px;border-radius:2px;background:{{ c.color }}"></span>
+                    <span style="font-size:12px;color:#39473B">{{ c.l }}</span>
+                    <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#4C5A4E">{{ c.v }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ detail.isProjects }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-top:22px;padding:20px;border-radius:5px;background:linear-gradient(180deg,#F5EFE2,#EFE7D5);border:1px solid rgba(20,45,32,.13);box-shadow:0 16px 34px -28px rgba(20,45,32,.5);animation:kRise 640ms cubic-bezier(.16,1,.3,1) 40ms both">
+            <div style="display:flex;align-items:baseline;justify-content:space-between">
+              <div style="font-family:'Bodoni Moda',serif;font-size:17px;color:#132A1D">Projektfortschritt & Stichtage</div>
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#6C7B6E">{{ projD.nowLabel }}</div>
+            </div>
+            <div style="margin-top:18px;display:flex;flex-direction:column;gap:16px;position:relative">
+              <div style="position:absolute;top:0;bottom:0;left:{{ projD.nowLeft }}%;width:1px;background:rgba(184,145,47,.55)"></div>
+              <sc-for list="{{ projD.spans }}" as="p" hint-placeholder-count="4">
+                <div style="animation:kSlide 460ms cubic-bezier(.16,1,.3,1) both;animation-delay:{{ p.delay }}ms">
+                  <div style="display:flex;justify-content:space-between;font-size:12px;color:#1B2A1E;margin-bottom:5px">
+                    <span>{{ p.title }}</span><span style="font-family:'IBM Plex Mono',monospace;color:#6C7B6E">{{ p.startLabel }} – {{ p.endLabel }}</span>
+                  </div>
+                  <div style="position:relative;height:14px;background:rgba(20,45,32,.08);border-radius:3px">
+                    <div style="position:absolute;top:0;bottom:0;left:{{ p.left }}%;width:{{ p.width }}%;border-radius:3px;background:rgba(20,45,32,.14);overflow:hidden">
+                      <div style="height:100%;background:{{ p.fill }};width:{{ p.pct }}%;transition:width 700ms cubic-bezier(.16,1,.3,1)"></div>
+                    </div>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ detail.isBriefing }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-top:22px;display:grid;grid-template-columns:1.5fr 1fr;gap:16px">
+            <div style="padding:20px;border-radius:5px;background:linear-gradient(180deg,#F5EFE2,#EFE7D5);border:1px solid rgba(20,45,32,.13);box-shadow:0 16px 34px -28px rgba(20,45,32,.5);animation:kRise 640ms cubic-bezier(.16,1,.3,1) 40ms both">
+              <div style="font-family:'Bodoni Moda',serif;font-size:17px;color:#132A1D">Aktueller Briefing-Stand</div>
+              <div style="margin-top:14px;display:flex;flex-direction:column">
+                <sc-for list="{{ briefD.history }}" as="b" hint-placeholder-count="7">
+                  <div style="display:grid;grid-template-columns:52px 60px 1fr;gap:12px;padding:9px 0;border-bottom:1px solid rgba(20,45,32,.08);animation:kSlide 420ms cubic-bezier(.16,1,.3,1) both;animation-delay:{{ b.delay }}ms">
+                    <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8A9A8C">{{ b.d }}</span>
+                    <span style="font-size:10.5px;color:{{ b.fg }};font-weight:600">{{ b.t }}</span>
+                    <span style="font-size:12px;color:#1B2A1E">{{ b.core }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+            <div style="padding:20px;border-radius:5px;background:linear-gradient(180deg,#F5EFE2,#EFE7D5);border:1px solid rgba(20,45,32,.13);box-shadow:0 16px 34px -28px rgba(20,45,32,.5);animation:kRise 640ms cubic-bezier(.16,1,.3,1) 90ms both;display:flex;flex-direction:column;align-items:center;justify-content:center">
+              <div style="position:relative;width:120px;height:120px">
+                <svg viewBox="0 0 100 100" style="width:120px;height:120px;transform:rotate(-90deg)">
+                  <circle cx="50" cy="50" r="40" fill="none" stroke="rgba(20,45,32,.1)" stroke-width="8"/>
+                  <circle cx="50" cy="50" r="40" fill="none" stroke="#B8912F" stroke-width="8" stroke-linecap="round" stroke-dasharray="{{ briefD.hitC }}" stroke-dashoffset="{{ briefD.hitOff }}"/>
+                </svg>
+                <div style="position:absolute;inset:0;display:grid;place-items:center;text-align:center">
+                  <div>
+                    <div style="font-family:'Bodoni Moda',serif;font-size:22px;color:#1B4632">{{ briefD.hit }}</div>
+                    <div style="font-size:9px;color:#7A8A7C">TREFFERQUOTE</div>
+                  </div>
+                </div>
+              </div>
+              <div style="margin-top:12px;font-size:11.5px;color:#4C5A4E;text-align:center">Trefferquote-Historie noch nicht angebunden</div>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ detail.isGoals }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-top:22px;position:relative;padding:20px;border-radius:5px;background:linear-gradient(180deg,#F5EFE2,#EFE7D5);border:1px solid rgba(20,45,32,.13);box-shadow:0 16px 34px -28px rgba(20,45,32,.5);animation:kRise 640ms cubic-bezier(.16,1,.3,1) 40ms both">
+            <div style="display:flex;align-items:baseline;justify-content:space-between">
+              <div style="display:flex;gap:8px;align-items:center">
+                <sc-for list="{{ goalD.picks }}" as="g" hint-placeholder-count="3">
+                  <span onClick="{{ g.pick }}" style="font-size:11.5px;padding:6px 12px;border-radius:999px;cursor:pointer;background:{{ g.bg }};color:{{ g.fg }};border:1px solid {{ g.border }};transition:background-color 180ms ease-out">{{ g.label }}</span>
+                </sc-for>
+                <sc-if value="{{ goalD.reached }}" hint-placeholder-val="{{ false }}">
+                  <span style="font-size:10.5px;padding:5px 10px;border-radius:999px;background:rgba(184,145,47,.18);color:#8C6B18;font-family:'IBM Plex Mono',monospace">🏆 ZIEL ERREICHT</span>
+                </sc-if>
+              </div>
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#6C7B6E">{{ goalD.traj.sum }}</div>
+            </div>
+            <div style="position:relative;margin-top:14px" onMouseMove="{{ goalD.traj.move }}" onMouseLeave="{{ goalD.traj.leave }}">
+              <svg viewBox="0 0 640 150" preserveAspectRatio="none" style="width:100%;height:150px;display:block">
+                <defs><linearGradient id="gtFill" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="{{ goalD.traj.color }}" stop-opacity=".26"/><stop offset="100%" stop-color="{{ goalD.traj.color }}" stop-opacity="0"/>
+                </linearGradient></defs>
+                <path d="{{ goalD.traj.area }}" fill="url(#gtFill)"/>
+                <path d="{{ goalD.traj.d }}" fill="none" stroke="{{ goalD.traj.color }}" stroke-width="2" stroke-linejoin="round"/>
+                <sc-if value="{{ goalD.traj.tip.show }}" hint-placeholder-val="{{ false }}">
+                  <g><line x1="{{ goalD.traj.tip.x }}" y1="0" x2="{{ goalD.traj.tip.x }}" y2="150" stroke="rgba(20,45,32,.3)" stroke-width="1" stroke-dasharray="3 3"/>
+                    <circle cx="{{ goalD.traj.tip.x }}" cy="{{ goalD.traj.tip.y }}" r="4.5" fill="{{ goalD.traj.color }}" stroke="#F5EFE2" stroke-width="2"/></g>
+                </sc-if>
+              </svg>
+              <sc-if value="{{ goalD.traj.tip.show }}" hint-placeholder-val="{{ false }}">
+                <div style="{{ goalD.traj.tip.style }}">
+                  <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.1em;color:#C9AE6C">{{ goalD.traj.tip.label }}</div>
+                  <div style="font-size:13px;margin-top:2px">{{ goalD.traj.tip.val }}</div>
+                </div>
+              </sc-if>
+            </div>
+            <div style="margin-top:8px;font-size:11.5px;color:#61705F">{{ goalD.milestoneNote }}</div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ detail.isSystem }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-top:22px;display:grid;grid-template-columns:1.5fr 1fr;gap:16px">
+            <div style="padding:20px;border-radius:5px;background:linear-gradient(180deg,#F5EFE2,#EFE7D5);border:1px solid rgba(20,45,32,.13);box-shadow:0 16px 34px -28px rgba(20,45,32,.5);animation:kRise 640ms cubic-bezier(.16,1,.3,1) 40ms both">
+              <div style="display:flex;align-items:baseline;justify-content:space-between">
+                <div style="font-family:'Bodoni Moda',serif;font-size:17px;color:#132A1D">Aktueller Sync-Status</div>
+                <sc-if value="{{ sysD.clean }}" hint-placeholder-val="{{ false }}">
+                  <span style="font-size:10.5px;padding:5px 10px;border-radius:999px;background:rgba(47,107,76,.14);color:#2F6B4C;font-family:'IBM Plex Mono',monospace">MAKELLOS</span>
+                </sc-if>
+              </div>
+              <div style="margin-top:16px;display:flex;flex-direction:column;gap:8px">
+                <sc-for list="{{ sysD.heat }}" as="row" hint-placeholder-count="5">
+                  <div style="display:grid;grid-template-columns:104px 1fr;gap:10px;align-items:center">
+                    <span style="font-size:11px;color:#39473B;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ row.name }}</span>
+                    <div style="display:grid;grid-template-columns:repeat(14,1fr);gap:3px">
+                      <sc-for list="{{ row.cells }}" as="c" hint-placeholder-count="14">
+                        <div onClick="{{ c.pick }}" style="position:relative;height:16px;border-radius:2px;background:{{ c.fill }};cursor:pointer">
+                          <sc-if value="{{ c.hovered }}" hint-placeholder-val="{{ false }}">
+                            <div style="position:absolute;bottom:100%;left:50%;transform:translateX(-50%);margin-bottom:6px;padding:5px 8px;border-radius:3px;background:rgba(12,36,24,.95);color:#F2EBD9;white-space:nowrap;z-index:2;font-size:10px">{{ c.tip }}</div>
+                          </sc-if>
+                        </div>
+                      </sc-for>
+                    </div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+            <div style="padding:20px;border-radius:5px;background:linear-gradient(180deg,#F5EFE2,#EFE7D5);border:1px solid rgba(20,45,32,.13);box-shadow:0 16px 34px -28px rgba(20,45,32,.5);animation:kRise 640ms cubic-bezier(.16,1,.3,1) 90ms both">
+              <div style="font-family:'Bodoni Moda',serif;font-size:17px;color:#132A1D">Ladezeit der Datenpfade</div>
+              <div style="margin-top:14px;display:flex;flex-direction:column;gap:10px">
+                <sc-for list="{{ sysD.volume }}" as="v" hint-placeholder-count="5">
+                  <div style="display:grid;grid-template-columns:96px 1fr 50px;gap:10px;align-items:center">
+                    <span style="font-size:11px;color:#39473B;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ v.l }}</span>
+                    <span style="height:8px;border-radius:4px;background:rgba(20,45,32,.09);overflow:hidden"><i style="display:block;height:100%;border-radius:4px;background:{{ v.color }};width:{{ v.pct }}%;transition:width 700ms cubic-bezier(.16,1,.3,1)"></i></span>
+                    <span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#4C5A4E;text-align:right">{{ v.v }} ms</span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ detail.isListPage }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-top:16px;display:grid;grid-template-columns:1.6fr 1fr;gap:16px">
             <div style="padding:20px;border-radius:5px;background:linear-gradient(180deg,#F5EFE2,#EFE7D5);border:1px solid rgba(20,45,32,.13);box-shadow:0 16px 34px -28px rgba(20,45,32,.5);animation:kRise 640ms cubic-bezier(.16,1,.3,1) 60ms both">
-              <div style="font-family:'Bodoni Moda',serif;font-size:17px;color:#132A1D">{{ detail.listTitle }}</div>
+              <div style="display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:8px">
+                <div style="font-family:'Bodoni Moda',serif;font-size:17px;color:#132A1D">{{ detail.listTitle }}</div>
+                <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+                  <sc-for list="{{ detail.filterChips }}" as="f" hint-placeholder-count="3">
+                    <span onClick="{{ f.pick }}" style="font-size:10.5px;padding:4px 9px;border-radius:999px;cursor:pointer;background:{{ f.bg }};color:#4C5A4E;border:1px solid rgba(20,45,32,.12)">{{ f.label }}</span>
+                  </sc-for>
+                  <span onClick="{{ detail.sortToggle.pick }}" style="font-size:10.5px;padding:4px 9px;border-radius:999px;cursor:pointer;background:rgba(184,145,47,.12);color:#8C6B18;border:1px solid rgba(184,145,47,.3)">↕ {{ detail.sortToggle.label }}</span>
+                </div>
+              </div>
               <div style="margin-top:12px;display:flex;flex-direction:column">
                 <sc-for list="{{ detail.rows }}" as="r" hint-placeholder-count="5">
                   <div style="display:grid;grid-template-columns:1fr auto;gap:14px;align-items:center;padding:12px 0;border-bottom:1px solid rgba(20,45,32,.08);animation:kSlide 460ms cubic-bezier(.16,1,.3,1) both;animation-delay:{{ r.delay }}ms">
@@ -917,40 +1326,13 @@
                   </sc-for>
                 </div>
                 <div style="margin-top:16px;display:flex;gap:8px">
-                  <span onClick="{{ detail.goFinance }}" style="flex:1;font-size:11.5px;color:#EBD9AC;border:1px solid rgba(221,182,92,.34);padding:9px 12px;border-radius:3px;cursor:pointer;text-align:center;transition:background-color 180ms ease-out,transform 180ms cubic-bezier(.16,1,.3,1)" style-hover="background:rgba(221,182,92,.12)" style-active="transform:scale(.96)">Finanzen</span>
-                  <span onClick="{{ detail.goHealth }}" style="flex:1;font-size:11.5px;color:#EBD9AC;border:1px solid rgba(221,182,92,.34);padding:9px 12px;border-radius:3px;cursor:pointer;text-align:center;transition:background-color 180ms ease-out,transform 180ms cubic-bezier(.16,1,.3,1)" style-hover="background:rgba(221,182,92,.12)" style-active="transform:scale(.96)">Gesundheit</span>
+                  <sc-for list="{{ detail.crossLinks }}" as="c" hint-placeholder-count="2">
+                    <span onClick="{{ c.go }}" style="flex:1;font-size:11.5px;color:#EBD9AC;border:1px solid rgba(221,182,92,.34);padding:9px 12px;border-radius:3px;cursor:pointer;text-align:center;transition:background-color 180ms ease-out,transform 180ms cubic-bezier(.16,1,.3,1)" style-hover="background:rgba(221,182,92,.12)" style-active="transform:scale(.96)">{{ c.label }}</span>
+                  </sc-for>
                 </div>
               </div>
             </div>
           </div>
-
-          <sc-if value="{{ detail.isOperator }}" hint-placeholder-val="{{ false }}">
-            <div style="margin-top:16px;padding:20px;border-radius:5px;background:linear-gradient(180deg,#F5EFE2,#EFE7D5);border:1px solid rgba(20,45,32,.13);box-shadow:0 16px 34px -28px rgba(20,45,32,.5);animation:kRise 640ms cubic-bezier(.16,1,.3,1) 230ms both">
-              <div style="display:flex;align-items:baseline;justify-content:space-between;gap:16px">
-                <div>
-                  <div style="font-family:'Bodoni Moda',serif;font-size:17px;color:#132A1D">Second Brain durchsuchen</div>
-                  <div style="font-size:11.5px;color:#61705F;margin-top:3px">Read-only · sensible Dateien bleiben standardmäßig ausgeblendet</div>
-                </div>
-                <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#6C7B6E">ON-DEMAND</div>
-              </div>
-              <div style="margin-top:14px;display:grid;grid-template-columns:1fr auto;gap:8px">
-                <input value="{{ detail.searchQuery }}" onInput="{{ detail.searchInput }}" onKeyDown="{{ detail.searchKey }}" placeholder="Begriff oder Thema …" style="min-width:0;padding:11px 13px;border-radius:3px;border:1px solid rgba(20,45,32,.18);background:rgba(255,255,255,.5);color:#17251B;font:12.5px 'IBM Plex Sans',sans-serif;outline:none"/>
-                <span onClick="{{ detail.search }}" style="display:grid;place-items:center;padding:10px 18px;border-radius:3px;background:linear-gradient(180deg,#22553A,#173C28);color:#F1EADB;font-size:12px;font-weight:500;cursor:pointer;transition:transform 180ms cubic-bezier(.16,1,.3,1),filter 180ms ease-out" style-hover="filter:brightness(1.1)" style-active="transform:scale(.96)">Suchen</span>
-              </div>
-              <div style="margin-top:9px;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#6C7B6E">{{ detail.searchStatus }}</div>
-              <div style="margin-top:8px;display:flex;flex-direction:column">
-                <sc-for list="{{ detail.searchResults }}" as="r" hint-placeholder-count="3">
-                  <a href="{{ r.url }}" target="_blank" rel="noopener noreferrer" style="display:grid;grid-template-columns:1fr auto;gap:14px;padding:11px 0;border-bottom:1px solid rgba(20,45,32,.08);text-decoration:none;animation:kSlide 460ms cubic-bezier(.16,1,.3,1) both;animation-delay:{{ r.delay }}ms">
-                    <span>
-                      <span style="display:block;font-size:13px;color:#17251B;font-weight:500">{{ r.title }}</span>
-                      <span style="display:block;font-size:11px;color:#61705F;margin-top:2px">{{ r.excerpt }}</span>
-                    </span>
-                    <span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#7A8A7C;text-align:right">{{ r.path }}</span>
-                  </a>
-                </sc-for>
-              </div>
-            </div>
-          </sc-if>
         </sc-if>
       </div>
     </div>
@@ -994,7 +1376,7 @@
         </div>
         <div style="position:absolute;right:52px;top:44px;text-align:right;display:flex;flex-direction:column;gap:5px;animation:kSlide 700ms cubic-bezier(.16,1,.3,1) 320ms both">
           <span style="font-size:10px;letter-spacing:.24em;color:rgba(221,182,92,.7)">{{ boot.session }}</span>
-          <span style="font-size:9px;letter-spacing:.22em;color:rgba(221,182,92,.42)">{{ boot.nodeLabel }}</span>
+          <span style="font-size:9px;letter-spacing:.22em;color:rgba(221,182,92,.42)">KNOTEN 05 / 05 · TLS AKTIV</span>
         </div>
 
         <div style="position:absolute;left:52px;bottom:62px;display:flex;flex-direction:column;gap:7px">
@@ -1013,7 +1395,7 @@
 
         <div style="position:absolute;left:0;right:0;bottom:92px;text-align:center;animation:kRise 1100ms cubic-bezier(.16,1,.3,1) 4400ms both">
           <div style="font-family:'Bodoni Moda',serif;font-size:36px;color:#F6EDD7;letter-spacing:.01em">Lukes Kommandozentrale</div>
-          <div style="margin-top:11px;font-size:9.5px;letter-spacing:.36em;color:rgba(221,182,92,.72)">{{ boot.readyLabel }}</div>
+          <div style="margin-top:11px;font-size:9.5px;letter-spacing:.36em;color:rgba(221,182,92,.72)">ALLE SYSTEME BEREIT</div>
         </div>
 
         <div style="position:absolute;left:0;right:0;bottom:0;height:2px;background:rgba(221,182,92,.1)">
@@ -1073,7 +1455,9 @@ const easeOut=(t)=>1-Math.pow(1-t,4);
 class Component extends DCLogic {
   state={phase:'boot',bootOut:false,bootDone:false,no3d:false,bootStep:0,p:0,dp:0,detail:null,detailIn:false,detailClosing:false,
     hover:null,cat:null,egg:null,eggDate:'',focusOn:false,range:2,tick:0,
-    wbForm:{},wbMood:null,wbFactor:null,wbSaved:false,sbQuery:'',sbStatus:'',sbResults:[]};
+    wbForm:{},wbMood:null,wbFactor:null,wbSaved:false,selGoal:0,
+    taskOrder:null,opDays:14,alDays:14,mailDays:14,rowFilter:null,rowSortAZ:false,
+    sbQuery:'',sbStatus:'',sbResults:[]};
 
   D=window.KZLive.emptyData();
 
@@ -1383,7 +1767,7 @@ class Component extends DCLogic {
   onKey=(e)=>{
     if(e.key==='Escape'&&this.state.detail)this.closeDetail();
     if(e.key&&e.key.length===1){this.keys=(this.keys+e.key.toLowerCase()).slice(-6);
-      if(this.keys.endsWith('luke'))this.fireEgg('mono',4200);}
+      if(this.keys.endsWith('lukes'))this.fireEgg('mono',4200);}
   };
   fireEgg=(k,ms)=>{clearTimeout(this._e);this.setState({egg:k,eggDate:this.dateStr()});this._e=setTimeout(()=>this.setState({egg:null}),ms);};
 
@@ -1401,21 +1785,24 @@ class Component extends DCLogic {
       const sx=Math.max(.2,r.width/vw), sy=Math.max(.2,r.height/vh), s=Math.max(sx,sy);
       st={opacity:0,transform:'translate('+((r.left+r.width/2)-vw/2).toFixed(0)+'px,'+((r.top+r.height/2)-vh/2).toFixed(0)+'px) scale('+s.toFixed(3)+')'};}
     this._origin=st;
-    this.setState({detail:key,detailIn:false,detailClosing:false,hover:null,cat:null});
+    this.setState({detail:key,detailIn:false,detailClosing:false,hover:null,cat:null,rowFilter:null,rowSortAZ:false});
     requestAnimationFrame(()=>requestAnimationFrame(()=>{this.setState({detailIn:true});this.countUp('dp');}));
   };
   closeDetail=()=>{this.setState({detailClosing:true,detailIn:false});
     setTimeout(()=>this.setState({detail:null,detailClosing:false}),this.reduced?20:420);};
+  jumpDetail=(k)=>()=>{this.setState({detail:k,hover:null,cat:null},()=>this.countUp('dp'));};
 
   searchSecondBrain=async()=>{
     const query=String(this.state.sbQuery||'').trim();
     this.setState({sbStatus:'Suche läuft …',sbResults:[]});
-    const result=await window.KZLive.searchSecondBrain(query);
-    const matches=Array.isArray(result&&result.matches)?result.matches:[];
-    const status=result&&result.ok
-      ?matches.length+' Treffer · read-only'+(result.blockedSensitive?' · '+result.blockedSensitive+' sensible Dateien ausgeblendet':'')
-      :(result&&result.message)||'Suche nicht verfügbar.';
-    this.setState({sbStatus:status,sbResults:matches});
+    try{
+      const result=await window.KZLive.searchSecondBrain(query);
+      const matches=Array.isArray(result&&result.matches)?result.matches:[];
+      const status=result&&result.ok
+        ?matches.length+' Treffer · read-only'+(result.blockedSensitive?' · '+result.blockedSensitive+' sensible Dateien ausgeblendet':'')
+        :(result&&result.message)||'Suche nicht verfügbar.';
+      this.setState({sbStatus:status,sbResults:matches});
+    }catch(error){this.setState({sbStatus:(error&&error.message)||'Suche nicht verfügbar.',sbResults:[]});}
   };
 
   tod(){
@@ -1451,14 +1838,14 @@ class Component extends DCLogic {
   lineChart(id,title,vals,labels,color,glow,unitFn,w,h){
     const sourceVals=vals||[],sourceLabels=labels||[],s=this.smooth(sourceVals,w,h,14);
     const hov=this.state.hover&&this.state.hover.id===id?this.state.hover.i:-1;
-    const p=hov>=0?s.pts[hov]:null;
+    const pt=hov>=0?s.pts[hov]:null;
     return {title,sum:sourceVals.length?unitFn(sourceVals[sourceVals.length-1]):'–',gid:'g_'+id,color,glow,labels:sourceLabels,
       d:s.d,area:s.area,grid:[0,1,2,3].map(k=>({y:(14+k*(h-28)/3).toFixed(1)})),
       move:(e)=>{if(sourceVals.length)this.chartMove(id,sourceVals.length,e);},leave:()=>this.setState({hover:null}),
-      tip:{show:!!p,x:p?p.x.toFixed(1):0,y:p?p.y.toFixed(1):0,label:p?(sourceLabels[hov]||''):'',val:p?unitFn(p.v):'',
+      tip:{show:!!pt,x:pt?pt.x.toFixed(1):0,y:pt?pt.y.toFixed(1):0,label:pt?(sourceLabels[hov]||''):'',val:pt?unitFn(pt.v):'',
         style:{position:'absolute',pointerEvents:'none',padding:'7px 10px',borderRadius:'3px',background:'rgba(12,36,24,.95)',
           color:'#F2EBD9',boxShadow:'0 10px 24px -12px rgba(10,31,21,.9)',whiteSpace:'nowrap',
-          left:p?(p.x/w*100).toFixed(2)+'%':'0%',top:(p?p.y:0).toFixed(1)+'px',transform:'translate(-50%,-124%)'}}};
+          left:pt?(pt.x/w*100).toFixed(2)+'%':'0%',top:(pt?pt.y:0).toFixed(1)+'px',transform:'translate(-50%,-124%)'}}};
   }
 
   renderVals(){
@@ -1469,33 +1856,40 @@ class Component extends DCLogic {
       mittag:'radial-gradient(1200px 700px at 50% -12%,rgba(255,248,224,.55),transparent 60%)',
       abend:'radial-gradient(1100px 640px at 84% -6%,rgba(226,178,110,.42),transparent 62%),radial-gradient(900px 560px at 6% 12%,rgba(180,196,178,.3),transparent 60%)',
       nacht:'radial-gradient(1100px 660px at 50% -10%,rgba(120,146,132,.38),transparent 62%),radial-gradient(700px 500px at 90% 20%,rgba(184,145,47,.16),transparent 60%)'}[tod];
-    const greet={morgen:'Guten Morgen, Luke.',mittag:'Mittagsstand, Luke.',abend:'Guten Abend, Luke.',nacht:'Späte Schicht, Luke.'}[tod];
+    const greet={morgen:'Guten Morgen, Lukes.',mittag:'Mittagsstand, Lukes.',abend:'Guten Abend, Lukes.',nacht:'Späte Schicht, Lukes.'}[tod];
     const todLine={morgen:'MORGENLICHT · KOMMANDOZENTRALE AKTIV',mittag:'TAGBETRIEB · KOMMANDOZENTRALE AKTIV',
       abend:'ABENDLICHT · KOMMANDOZENTRALE AKTIV',nacht:'NACHTMODUS · KOMMANDOZENTRALE AKTIV'}[tod];
     const now=new Date();
     const todayIso=new Intl.DateTimeFormat('sv-SE',{timeZone:'Europe/Berlin'}).format(now);
     const dateLine=new Intl.DateTimeFormat('de-DE',{weekday:'short',day:'2-digit',month:'2-digit',year:'numeric',timeZone:'Europe/Berlin'}).format(now).toUpperCase();
     const sourceState=window.KZLive.sourceState();
-    const openTasks=D.tasks.length;
-    const due=D.tasks.filter(t=>t.deadline===todayIso||/heute|überfällig/i.test(t.due||'')).length;
+    const openTasks=(D.tasks||[]).length;
+    const due=(D.tasks||[]).filter(t=>t.deadline===todayIso||/heute|überfällig/i.test(t.due||'')).length;
+    const focusMinutes=(D.tasks||[]).slice(0,3).reduce((sum,t)=>sum+(Number(t.estimatedMinutes)||0),0);
     const sub={morgen:openTasks?openTasks+' offene Aufgaben. Der Operator hat den ersten sichtbaren Schritt vorbereitet.':'Keine offene Aufgabe im OPS. Die Quellenlage bleibt sichtbar.',
       mittag:openTasks?'Aktueller Stand: '+openTasks+' offene Aufgaben, davon '+due+' heute.':'Der aktuelle OPS-Stand enthält keine offene Aufgabe.',
       abend:D.wb.available?'Der Abendcheck ist freiwillig und kann mit einzelnen Angaben gespeichert werden.':'Der operative Stand ist geladen; der Abendcheck ist noch nicht eingerichtet.',
       nacht:openTasks?'Kurzer Blick auf den OPS-Stand: '+openTasks+' offene Aufgaben.':'Kurzer Blick: keine offene Aufgabe im OPS.'}[tod];
 
-    const tasks=D.tasks.map(t=>({...t,tick:t.status==='in Arbeit'?'▸':'',
-      dueColor:t.prio==='HOCH'?RUST:'#6C7B6E',
+    const baseOrder=S.taskOrder||D.tasks.map(t=>t.id||t.title);
+    const orderedTasks=[...baseOrder.map(id=>D.tasks.find(t=>(t.id||t.title)===id)).filter(Boolean),
+      ...D.tasks.filter(t=>!baseOrder.includes(t.id||t.title))];
+    const tasks=orderedTasks.map((t,pos)=>({ ...t,idx:pos,tick:t.status==='in Arbeit'?'▸':'',op:1,strike:'none',
+      checkBg:'transparent',checkFg:'#1B4632',dueColor:t.prio==='HOCH'?RUST:'#6C7B6E',
       prioBg:t.prio==='HOCH'?'rgba(140,74,32,.14)':t.prio==='MITTEL'?'rgba(184,145,47,.16)':'rgba(20,45,32,.08)',
       prioFg:t.prio==='HOCH'?RUST:t.prio==='MITTEL'?'#8C6B18':'#4C5A4E',
-      complete:(e)=>{e.stopPropagation();window.KZLive.completeTask(t.id);}}));
+      toggle:(e)=>{e.stopPropagation();window.KZLive.completeTask(t.id);},
+      dragStart:(e)=>{e.stopPropagation();this._dragId=t.id||t.title;},dragOver:(e)=>e.preventDefault(),
+      drop:(e)=>{e.preventDefault();e.stopPropagation();const from=this._dragId,to=t.id||t.title;if(!from||from===to)return;
+        const cur=(S.taskOrder||D.tasks.map(x=>x.id||x.title)).filter(id=>D.tasks.some(x=>(x.id||x.title)===id));
+        const fp=cur.indexOf(from),tp=cur.indexOf(to);if(fp<0||tp<0)return;const arr=cur.slice();arr.splice(fp,1);arr.splice(tp,0,from);this.setState({taskOrder:arr});this._dragId=null;}}));
 
     const alerts=D.alerts.map(a=>{const done=a.status==='ACKNOWLEDGED';
       const cols=a.sev===3?[RUST,RUST,RUST]:a.sev===2?[gold,gold,'rgba(20,45,32,.15)']:[GREENM,'rgba(20,45,32,.15)','rgba(20,45,32,.15)'];
       return {...a,op:done?.42:1,strike:done?'line-through':'none',c1:cols[0],c2:cols[1],c3:cols[2],
         ackLabel:done?'bestätigt':'Bestätigen',ack:(e)=>{e.stopPropagation();if(!done)window.KZLive.acknowledgeAlert(a.id);}};});
 
-    const inbox=D.inbox.map(it=>({...it,op:1,conf:it.conf,confLabel:it.conf+'%',
-      a1:'Annehmen',a2:'Ablehnen',a3:'Zurückstellen',
+    const inbox=D.inbox.map(it=>({...it,op:1,conf:it.conf,confLabel:it.conf+'%',a1:'Annehmen',a2:'Ablehnen',a3:'Zurückstellen',
       accept:(e)=>{e.stopPropagation();window.KZLive.reviewInbox(it.id,'ACCEPTED');},
       reject:(e)=>{e.stopPropagation();window.KZLive.reviewInbox(it.id,'REJECTED');},
       defer:(e)=>{e.stopPropagation();window.KZLive.reviewInbox(it.id,'DEFERRED');}}));
@@ -1510,339 +1904,108 @@ class Component extends DCLogic {
       ev:d.ev.slice(0,2).map(e=>({...e,bg:e.k==='g'?'rgba(184,145,47,.16)':e.k==='r'?'rgba(140,74,32,.13)':'rgba(27,70,50,.1)',
         accent:e.k==='g'?gold:e.k==='r'?RUST:GREENM,fg:'#1B2A1E',timeColor:'#6C7B6E'}))}))};
 
-    const F=D.fin, net=F.in-F.out;
-    const finSpark=this.smooth(F.income.map((v,i)=>v-F.expense[i]),300,58,6);
-    const criticalBudgets=F.budgets.filter(b=>b.limit>0&&b.spent/b.limit>.9).length;
-    const fin={meta:F.meta,net:F.available?this.eur(this.n(net)):'–',in:F.available?this.eur(this.n(F.in)):'–',out:F.available?this.eur(this.n(F.out)):'–',spark:finSpark,
-      budgetMeta:F.budgets.length+' AKTIV'+(criticalBudgets?' · '+criticalBudgets+' KRITISCH':''),
-      budgets:F.budgets.slice(0,3).map(b=>{const ratio=b.limit>0?b.spent/b.limit:0;return {label:b.label,pct:(Math.min(100,ratio*100)*p).toFixed(0),
-        val:nf(0).format(this.n(b.spent))+' / '+nf(0).format(b.limit),
-        fill:ratio>.9?RUST:ratio>.75?gold:GREENM};})};
+    const F=D.fin||{}, net=(Number(F.in)||0)-(Number(F.out)||0);
+    const finSpark=this.smooth((F.income||[]).map((v,i)=>v-(F.expense||[])[i]),300,58,6);
+    const criticalBudgets=(F.budgets||[]).filter(b=>b.limit>0&&b.spent/b.limit>.9).length;
+    const fin={meta:F.meta||'',net:F.available?this.eur(this.n(net)):'–',in:F.available?this.eur(this.n(F.in||0)):'–',out:F.available?this.eur(this.n(F.out||0)):'–',spark:finSpark,
+      budgetMeta:(F.budgets||[]).length+' AKTIV'+(criticalBudgets?' · '+criticalBudgets+' KRITISCH':''),
+      budgets:(F.budgets||[]).slice(0,3).map(b=>{const ratio=b.limit>0?b.spent/b.limit:0;return {label:b.label,pct:(Math.min(100,ratio*100)*p).toFixed(0),
+        val:nf(0).format(this.n(b.spent))+' / '+nf(0).format(b.limit),fill:ratio>.9?RUST:ratio>.75?gold:GREENM};})};
 
-    const H=D.hea, C=2*Math.PI*42, C2=2*Math.PI*31;
-    const stepPct=H.stepGoal>0?Math.min(1,H.steps/H.stepGoal)*p:0, sleepPct=H.sleepGoal>0&&H.sleep!=null?Math.min(1,H.sleep/H.sleepGoal)*p:0;
-    const wkMax=Math.max(1,...H.week);
-    const hea={steps:H.available?nf(0).format(this.n(H.steps)):'–',
-      ring:{c:C.toFixed(1),off:(C*(1-stepPct)).toFixed(1)},ring2:{c:C2.toFixed(1),off:(C2*(1-sleepPct)).toFixed(1)},
+    const H=D.hea||{}, C=2*Math.PI*42,C2=2*Math.PI*31;
+    const stepPct=H.stepGoal>0?Math.min(1,H.steps/H.stepGoal)*p:0,sleepPct=H.sleepGoal>0&&H.sleep!=null?Math.min(1,H.sleep/H.sleepGoal)*p:0;
+    const wkMax=Math.max(1,...(H.week||[]));
+    const hea={steps:H.available?nf(0).format(this.n(H.steps||0)):'–',ring:{c:C.toFixed(1),off:(C*(1-stepPct)).toFixed(1)},ring2:{c:C2.toFixed(1),off:(C2*(1-sleepPct)).toFixed(1)},
       stats:[{label:'Schlaf',val:H.sleep==null?'–':nf(1).format(this.n(H.sleep))+' h',trend:H.sleepGoal?'Ziel '+nf(1).format(H.sleepGoal)+' h':'',tc:GREENM},
         {label:'Gewicht',val:H.weight==null?'–':nf(1).format(this.n(H.weight))+' kg',trend:'',tc:GREENM},
-        {label:'Workouts',val:H.available?Math.round(this.n(H.workouts))+' erfasst':'–',trend:'',tc:'#6C7B6E'}],
-      avg:H.week.length?nf(0).format(this.n(H.week.reduce((a,b)=>a+b,0)/H.week.length)):'–',
-      week:H.week.map((v,i)=>({l:H.wdl[i],h:(8+v/wkMax*34).toFixed(0),delay:420+i*55,
-        fill:v>=H.stepGoal?GREENM:'rgba(27,70,50,.32)'}))};
+        {label:'Workouts',val:H.available?Math.round(this.n(H.workouts||0))+' erfasst':'–',trend:'',tc:'#6C7B6E'}],
+      avg:(H.week||[]).length?nf(0).format(this.n(H.week.reduce((a,b)=>a+b,0)/H.week.length)):'–',
+      week:(H.week||[]).map((v,i)=>({l:(H.wdl||[])[i]||'',h:(8+v/wkMax*34).toFixed(0),delay:420+i*55,fill:H.stepGoal>0&&v>=H.stepGoal?GREENM:'rgba(27,70,50,.32)'}))};
 
-    const W=D.weather, temps=W.hours.map(h=>h.v),wmin=temps.length?Math.min(...temps):0,wmax=temps.length?Math.max(...temps):0;
-    const weather={place:W.place+(W.feelsLike==null?'':' · gefühlt '+Math.round(W.feelsLike)+' °C'),temp:W.temp==null?'–':Math.round(this.n(W.temp))+'°',cond:W.cond,
+    const W=D.weather||{}, temps=(W.hours||[]).map(h=>h.v),wmin=temps.length?Math.min(...temps):0,wmax=temps.length?Math.max(...temps):0;
+    const weather={place:(W.place||'Wetterquelle')+(W.feelsLike==null?'':' · gefühlt '+Math.round(W.feelsLike)+' °C'),temp:W.temp==null?'–':Math.round(this.n(W.temp))+'°',cond:W.cond||'–',
       bg:tod==='nacht'?'linear-gradient(180deg,#EFE7D6,#E5DCC8)':'linear-gradient(180deg,#F7F1E4 0%,#F0E8D6 100%)',
-      hours:W.hours.slice(0,8).map((h,i)=>({t:h.t,h:(10+(h.v-wmin+1)/(wmax-wmin+1)*28).toFixed(0),delay:460+i*40,
-        fill:h.v>=21?gold:'rgba(27,70,50,.3)'}))};
+      hours:(W.hours||[]).slice(0,8).map((h,i)=>({t:h.t,h:(10+(h.v-wmin+1)/(wmax-wmin+1)*28).toFixed(0),delay:460+i*40,fill:h.rain!=null&&h.rain>=50?'#3E5C7E':h.v>=21?gold:'rgba(27,70,50,.3)'}))};
 
-    const goals=D.goals.map((g,i)=>{const c=2*Math.PI*43;
-      const raw=g.target>0?(g.down?g.target/Math.max(g.actual,.0001):g.actual/g.target):0;
-      const pct=Math.max(0,Math.min(1,raw))*p;
-      return {label:g.label,color:[GREEN,gold,GREENM][i%3],c:c.toFixed(1),off:(c*(1-pct)).toFixed(1),
-        pctLabel:Math.round(pct*100)+'%',
+    const goals=(D.goals||[]).map((g,i)=>{const c=2*Math.PI*43;const raw=g.target>0?(g.down?g.target/Math.max(g.actual,.0001):g.actual/g.target):0;const pct=Math.max(0,Math.min(1,raw))*p;
+      return {...g,label:g.label,color:[GREEN,gold,GREENM][i%3],c:c.toFixed(1),off:(c*(1-pct)).toFixed(1),pctLabel:Math.round(pct*100)+'%',
         detail:(g.unit==='€'?nf(0).format(this.n(g.actual)):nf(g.unit==='kg'?1:0).format(this.n(g.actual)))+' / '+nf(g.unit==='kg'?1:0).format(g.target)+' '+g.unit};});
+    const system=(D.system||[]).map(s=>({...s,dot:s.state==='error'?RUST:s.state==='warn'?gold:'#5FBF8A',tc:s.state==='error'?RUST:s.state==='warn'?'#8C6B18':'#6C7B6E'}));
 
-    const system=D.system.map(s=>({...s,dot:s.state==='error'?RUST:s.state==='warn'?gold:'#5FBF8A',tc:s.state==='error'?RUST:s.state==='warn'?'#8C6B18':'#6C7B6E'}));
-
-    const WB=D.wb, wbSpark=this.smooth(WB.last7,220,40,6);
+    const WB=D.wb||{},wbSpark=this.smooth(WB.last7||[],220,40,6);
+    const wbLatestScore=(WB.last7||[]).length?WB.last7[WB.last7.length-1]:null;
+    const wbAvg=(WB.last7||[]).length?WB.last7.reduce((a,b)=>a+b,0)/WB.last7.length:null;
     const wb={status:WB.available?'Aktueller OPS-Verlauf':'Einrichtung offen',mood:WB.mood||'–',factor:WB.factor||'–',
-      values:WB.labels.map((l,i)=>{const value=WB.values[i];return {label:l,val:value==null?'–':nf(0).format(this.n(value)),h:(value==null?0:value/10*62).toFixed(0),delay:700+i*60,
+      values:(WB.labels||[]).map((l,i)=>{const value=WB.values[i];return {label:l,val:value==null?'–':nf(0).format(this.n(value)),h:(value==null?0:value/10*62).toFixed(0),delay:700+i*60,
         fill:/Druck|Stress/i.test(l)?(value>6?RUST:'rgba(140,74,32,.4)'):(value>=7?GREEN:'rgba(27,70,50,.36)')};}),
       spark:{d:wbSpark.d,pts:wbSpark.pts.map(pt=>({x:pt.x.toFixed(1),y:pt.y.toFixed(1)}))}};
 
     const openTile=(k)=>(e)=>this.openDetail(k,e);
-    const open={operator:openTile('operator'),tasks:openTile('tasks'),alerts:openTile('alerts'),
-      weather:openTile('weather'),finance:openTile('finance'),health:openTile('health'),
-      calendar:openTile('calendar'),inbox:openTile('inbox'),mail:openTile('mail'),projects:openTile('projects'),
-      briefing:openTile('briefing'),goals:openTile('goals'),system:openTile('system'),wellbeing:openTile('wellbeing')};
-
+    const open={operator:openTile('operator'),tasks:openTile('tasks'),alerts:openTile('alerts'),weather:openTile('weather'),finance:openTile('finance'),health:openTile('health'),calendar:openTile('calendar'),inbox:openTile('inbox'),mail:openTile('mail'),projects:openTile('projects'),briefing:openTile('briefing'),goals:openTile('goals'),system:openTile('system'),wellbeing:openTile('wellbeing')};
     const dk=S.detail;
-    const META={operator:{k:'ENTSCHEIDUNGS-LENS',t:'Personal Operator',s:'Der nächste sichtbare Schritt, seine Begründung und was heute bewusst liegen bleibt.'},
-      tasks:{k:'AUFGABEN',t:'Aufgaben',s:'Alle offenen Aufgaben mit Priorität, Deadline und nächstem Schritt.'},
-      alerts:{k:'WARNUNGEN',t:'Alerts',s:'Nach Schweregrad sortiert, mit Quelle und Bestätigungsstand.'},
-      weather:{k:'WETTER',t:'Wetter',s:'Aktueller Stand und Stundenprognose für '+W.place+'.'},
-      finance:{k:'FINANZEN · '+F.meta,t:'Finanzen',s:'Cashflow, Budgets, Kategorien-Spend und die letzten Transaktionen.'},
-      health:{k:'GESUNDHEIT · HEUTE',t:'Gesundheit',s:'Schritte, Schlaf, Gewicht und Workouts mit Wochentrends aus dem Health-Sync.'},
-      calendar:{k:'KALENDER · '+D.weekMeta,t:'Kalenderwoche',s:'Termine der laufenden Woche; erkannte Überschneidungen werden markiert.'},
-      inbox:{k:'KI-INBOX',t:'KI-Inbox',s:'Unsichere Erkenntnisse zur Prüfung, mit Konfidenz und Quelle.'},
-      mail:{k:'MAIL',t:'Mail',s:'Operativ relevante Mails mit Grund der Relevanz.'},
-      projects:{k:'PROJEKTE',t:'Projekte',s:'Aktive Projekte mit Fortschritt, Health-Status und Blockern.'},
-      briefing:{k:'BRIEFING',t:'Briefing',s:'Das letzte generierte Briefing mit Kernaussage und Empfehlung.'},
-      goals:{k:'ZIELE',t:'Ziele',s:'Fortschritt Richtung definierter Ziele mit Zielwert und Ist-Wert.'},
-      system:{k:'SYSTEM',t:'System & Sync',s:'Systemgesundheit und Datenfrische aller angebundenen Quellen.'},
-      wellbeing:{k:'WELLBEING',t:'Abendcheck',s:'Sechs optionale Werte, Hauptgefühl, Einflussfaktor und der vorhandene Verlauf.'}}[dk]||{k:'',t:'',s:''};
+    const jump={operator:this.jumpDetail('operator'),tasks:this.jumpDetail('tasks'),alerts:this.jumpDetail('alerts'),weather:this.jumpDetail('weather'),finance:this.jumpDetail('finance'),health:this.jumpDetail('health'),calendar:this.jumpDetail('calendar'),inbox:this.jumpDetail('inbox'),mail:this.jumpDetail('mail'),projects:this.jumpDetail('projects'),briefing:this.jumpDetail('briefing'),goals:this.jumpDetail('goals'),system:this.jumpDetail('system'),wellbeing:this.jumpDetail('wellbeing')};
+    const META={operator:{k:'ENTSCHEIDUNGS-LENS',t:'Personal Operator',s:'Der nächste sichtbare Schritt, seine Begründung und was heute bewusst liegen bleibt.'},tasks:{k:'AUFGABEN',t:'Aufgaben',s:'Alle offenen Aufgaben mit Priorität, Deadline und nächstem Schritt.'},alerts:{k:'WARNUNGEN',t:'Alerts',s:'Nach Schweregrad sortiert, mit Quelle und Bestätigungsstand.'},weather:{k:'WETTER',t:'Wetter',s:'Aktueller Stand und Stundenprognose für '+(W.place||'den hinterlegten Standort')+'.'},finance:{k:'FINANZEN · '+(F.meta||''),t:'Finanzen',s:'Cashflow, Budgets, Kategorien-Spend und die letzten Transaktionen.'},health:{k:'GESUNDHEIT · HEUTE',t:'Gesundheit',s:'Schritte, Schlaf, Gewicht und Workouts mit Trends aus dem Health-Sync.'},calendar:{k:'KALENDER · '+(D.weekMeta||''),t:'Kalender',s:'Termine der geladenen Woche; erkannte Überschneidungen werden markiert.'},inbox:{k:'KI-INBOX',t:'KI-Inbox',s:'Unsichere Erkenntnisse zur Prüfung, mit Konfidenz und Quelle.'},mail:{k:'MAIL',t:'Mail',s:'Operativ relevante Mails mit Grund der Relevanz.'},projects:{k:'PROJEKTE',t:'Projekte',s:'Aktive Projekte mit Fortschritt, Health-Status und Blockern.'},briefing:{k:'BRIEFING',t:'Briefing',s:'Das letzte erfolgreich erzeugte Briefing mit Kernaussage und Empfehlung.'},goals:{k:'ZIELE',t:'Ziele',s:'Fortschritt Richtung definierter Ziele mit Zielwert und Ist-Wert.'},system:{k:'SYSTEM',t:'System & Sync',s:'Systemgesundheit und Datenfrische aller angebundenen Quellen.'},wellbeing:{k:'WELLBEING',t:'Abendcheck',s:'Sechs optionale Werte, Hauptgefühl, Einflussfaktor und der vorhandene Verlauf.'}}[dk]||{k:'',t:'',s:''};
 
     const durationLabel=(start,end)=>{const a=new Date(start),b=new Date(end),mins=Math.round((b-a)/60000);return Number.isFinite(mins)&&mins>0?mins+' Min':'';};
-    const operatorRows=D.tasks.slice(0,4).map((t,i)=>({title:t.title,
-      sub:(i===0?'Nächster sichtbarer Schritt · ':'Danach · ')+(t.next||'Kein nächster Schritt hinterlegt'),
-      meta:t.estimatedMinutes?t.estimatedMinutes+' Min':t.due,tag:i===0?'JETZT':i===1?'DANACH':'PAUSE'}));
-    const ROWS={
-      operator:operatorRows,
-      tasks:D.tasks.map(t=>({title:t.title,sub:'Nächster Schritt · '+t.next,meta:t.due,tag:t.prio})),
-      alerts:D.alerts.map(a=>({title:a.title,sub:[a.message,a.meta].filter(Boolean).join(' · '),meta:'',tag:a.sev===3?'KRITISCH':a.sev===2?'WICHTIG':'NORMAL'})),
-      weather:D.weather.hours.map(h=>({title:h.t+' Uhr',sub:[h.text,h.rain==null?'':'Regen '+h.rain+' %'].filter(Boolean).join(' · ')||D.weather.cond,meta:nf(0).format(h.v)+' °C',tag:h.rain!=null&&h.rain>=50?'REGEN':'PROGNOSE'})),
-      calendar:D.week.flatMap(d=>d.ev.map(e=>({title:e.l,sub:[d.wd+' '+d.n,e.t,e.calendar,e.location].filter(Boolean).join(' · '),meta:e.allDay?'Ganztägig':durationLabel(e.start,e.end),tag:e.k==='r'?'KOLLISION':e.k==='g'?'HEUTE':'NORMAL'}))),
-      inbox:D.inbox.map(i=>({title:i.text,sub:['Quelle '+i.source,i.reasoning].filter(Boolean).join(' · '),meta:i.conf+'%',tag:i.conf>=80?'HOCH':'PRÜFEN'})),
-      mail:D.mails.map(m=>({title:m.subject,sub:[m.from,m.reason].filter(Boolean).join(' · '),meta:m.date,tag:m.followUp?'NACHFASSEN':'RELEVANT'})),
-      projects:D.projects.map(pr=>({title:pr.title,sub:pr.blocker||pr.nextAction||'Kein Blocker hinterlegt',meta:pr.pct+'%',tag:pr.health.toUpperCase()})),
-      briefing:[
-        {title:D.briefing.core,sub:'Kernaussage',meta:D.briefing.meta,tag:'BRIEFING'},
-        {title:D.briefing.rec,sub:'Empfehlung',meta:'',tag:'AKTION'},
-        {title:D.briefing.priorities,sub:'Top-Prioritäten',meta:'',tag:'PRIORITÄT'}
-      ].filter(r=>r.title),
-      goals:D.goals.map(g=>({title:g.label,sub:'Ist '+g.actual+' '+g.unit+' · Ziel '+g.target+' '+g.unit,meta:'',tag:'AKTIV'})),
-      system:D.system.map(s=>({title:s.name,sub:[s.note,s.connection,'Stand '+s.last].filter(Boolean).join(' · '),meta:'',tag:s.state==='error'?'FEHLER':s.state==='warn'?'PRÜFEN':'BEREIT'})),
-      wellbeing:D.wb.labels.map((l,i)=>({title:l,sub:'Vorhandener OPS-Wert',meta:D.wb.values[i]==null?'–':D.wb.values[i]+'/10',tag:D.wb.values[i]==null?'OFFEN':'ERFASST'}))
-    }[dk]||[];
+    const ROWS={operator:D.tasks.slice(0,6).map((t,i)=>({title:t.title,sub:(i===0?'Nächster sichtbarer Schritt · ':'Danach · ')+(t.next||'Kein nächster Schritt hinterlegt'),meta:t.estimatedMinutes?t.estimatedMinutes+' Min':t.due,tag:i===0?'JETZT':i===1?'DANACH':'PAUSE'})),tasks:D.tasks.map(t=>({title:t.title,sub:'Nächster Schritt · '+t.next,meta:t.due,tag:t.prio})),alerts:D.alerts.map(a=>({title:a.title,sub:[a.message,a.meta].filter(Boolean).join(' · '),meta:'',tag:a.sev===3?'KRITISCH':a.sev===2?'WICHTIG':'NORMAL'})),weather:(W.hours||[]).map(h=>({title:h.t+' Uhr',sub:[h.text,h.rain==null?'':'Regen '+h.rain+' %'].filter(Boolean).join(' · ')||W.cond,meta:nf(0).format(h.v)+' °C',tag:h.rain!=null&&h.rain>=50?'REGEN':'PROGNOSE'})),calendar:D.week.flatMap(d=>d.ev.map(e=>({title:e.l,sub:[d.wd+' '+d.n,e.t,e.calendar,e.location].filter(Boolean).join(' · '),meta:e.allDay?'Ganztägig':durationLabel(e.start,e.end),tag:e.k==='r'?'KOLLISION':e.k==='g'?'HEUTE':'NORMAL'}))),inbox:D.inbox.map(i=>({title:i.text,sub:['Quelle '+i.source,i.reasoning].filter(Boolean).join(' · '),meta:i.conf+'%',tag:i.conf>=80?'HOCH':'PRÜFEN'})),mail:D.mails.map(m=>({title:m.subject,sub:[m.from,m.reason].filter(Boolean).join(' · '),meta:m.date,tag:m.followUp?'NACHFASSEN':'RELEVANT'})),projects:D.projects.map(pr=>({title:pr.title,sub:pr.blocker||pr.nextAction||'Kein Blocker hinterlegt',meta:pr.pct+'%',tag:pr.health.toUpperCase()})),briefing:[{title:D.briefing.core,sub:'Kernaussage',meta:D.briefing.meta,tag:'BRIEFING'},{title:D.briefing.rec,sub:'Empfehlung',meta:'',tag:'AKTION'},{title:D.briefing.priorities,sub:'Top-Prioritäten',meta:'',tag:'PRIORITÄT'}].filter(r=>r.title),goals:D.goals.map(g=>({title:g.label,sub:'Ist '+g.actual+' '+g.unit+' · Ziel '+g.target+' '+g.unit,meta:g.targetDate||'',tag:'AKTIV'})),system:D.system.map(s=>({title:s.name,sub:[s.note,s.connection,'Stand '+s.last].filter(Boolean).join(' · '),meta:'',tag:s.state==='error'?'FEHLER':s.state==='warn'?'PRÜFEN':'BEREIT'})),wellbeing:(WB.labels||[]).map((l,i)=>({title:l,sub:'Vorhandener OPS-Wert',meta:WB.values[i]==null?'–':WB.values[i]+'/10',tag:WB.values[i]==null?'OFFEN':'ERFASST'}))}[dk]||[];
 
     const countBy=(items,keyFn)=>items.reduce((out,item)=>{const key=keyFn(item)||'Ohne Kategorie';out[key]=(out[key]||0)+1;return out;},{});
-    const bars=(title,unit,items)=>{const clean=items||[],mx=Math.max(1,...clean.map(i=>i.p==null?Math.max(0,i.v):Math.max(0,i.p)));
-      return {title,unit,bars:clean.map((it,i)=>{const visual=it.p==null?Math.max(0,it.v):Math.max(0,it.p);return {label:it.l,val:it.d||nf(0).format(this.nd(it.v)),
-        pct:(visual/mx*100*(S.dp||0)).toFixed(1),color:it.c||GREENM,delay:60+i*55};})};};
-    const taskCounts=countBy(D.tasks,t=>t.prio);
-    const alertCounts=countBy(D.alerts,a=>a.status==='ACKNOWLEDGED'?'BESTÄTIGT':a.sev===3?'KRITISCH':a.sev===2?'WICHTIG':'NORMAL');
-    const mailCounts=countBy(D.mails,m=>m.category||m.reason||'Relevant');
-    const systemCounts=countBy(D.system,s=>s.state==='error'?'FEHLER':s.state==='warn'?'PRÜFEN':'BEREIT');
+    const bars=(title,unit,items)=>{const clean=items||[],mx=Math.max(1,...clean.map(i=>Math.max(0,Number(i.v)||0)));return {title,unit,bars:clean.map((it,i)=>({label:it.l,val:it.d||nf(0).format(this.nd(it.v)),pct:((Math.max(0,Number(it.v)||0)/mx)*100*(S.dp||0)).toFixed(1),color:it.c||GREENM,delay:60+i*55}))};};
+    const taskCounts=countBy(D.tasks,t=>t.prio),alertCounts=countBy(D.alerts,a=>a.status==='ACKNOWLEDGED'?'BESTÄTIGT':a.sev===3?'KRITISCH':a.sev===2?'WICHTIG':'NORMAL'),mailCounts=countBy(D.mails,m=>m.category||m.reason||'Relevant'),systemCounts=countBy(D.system,s=>s.state==='error'?'FEHLER':s.state==='warn'?'PRÜFEN':'BEREIT');
     const goalPct=g=>g.target>0?Math.max(0,Math.min(100,(g.down?g.target/Math.max(g.actual,.0001):g.actual/g.target)*100)):0;
-    const ASIDE={
-      operator:bars('Priorität der nächsten Aufgaben','KI-Punkte',D.tasks.slice(0,5).map(t=>({l:t.title,v:t.aiPriority,d:nf(0).format(t.aiPriority),c:t.prio==='HOCH'?RUST:t.prio==='MITTEL'?gold:GREENM}))),
-      tasks:bars('Offene Aufgaben nach Priorität','Anzahl',[
-        {l:'Hoch',v:taskCounts.HOCH||0,d:String(taskCounts.HOCH||0),c:RUST},
-        {l:'Mittel',v:taskCounts.MITTEL||0,d:String(taskCounts.MITTEL||0),c:gold},
-        {l:'Niedrig',v:taskCounts.NIEDRIG||0,d:String(taskCounts.NIEDRIG||0),c:GREENM}]),
-      projects:bars('Fortschritt je Projekt','Prozent',D.projects.map(pr=>({l:pr.title,v:pr.pct,d:nf(0).format(pr.pct)+' %',c:pr.health==='kritisch'?RUST:pr.health==='risiko'?gold:GREENM}))),
-      alerts:bars('Alerts nach aktuellem Status','Anzahl',Object.entries(alertCounts).map(([l,v])=>({l,v,d:String(v),c:l==='KRITISCH'||l==='FEHLER'?RUST:l==='WICHTIG'?gold:GREENM}))),
-      calendar:bars('Termine je Tag','Anzahl',D.week.map(d=>({l:d.wd,v:d.ev.length,d:String(d.ev.length),c:d.ev.some(e=>e.k==='r')?RUST:d.today?gold:GREENM}))),
-      inbox:bars('Erkenntnisse nach Konfidenz','Anzahl',[
-        {l:'ab 80 %',v:D.inbox.filter(i=>i.conf>=80).length,d:String(D.inbox.filter(i=>i.conf>=80).length),c:GREENM},
-        {l:'50–79 %',v:D.inbox.filter(i=>i.conf>=50&&i.conf<80).length,d:String(D.inbox.filter(i=>i.conf>=50&&i.conf<80).length),c:gold},
-        {l:'unter 50 %',v:D.inbox.filter(i=>i.conf<50).length,d:String(D.inbox.filter(i=>i.conf<50).length),c:RUST}]),
-      mail:bars('Relevanzgründe im aktuellen Stand','Anzahl',Object.entries(mailCounts).slice(0,6).map(([l,v])=>({l,v,d:String(v),c:GREENM}))),
-      goals:bars('Zielerreichung','Prozent',D.goals.map((g,i)=>({l:g.label,v:goalPct(g),d:nf(0).format(goalPct(g))+' %',c:[GREEN,gold,GREENM][i%3]}))),
-      system:bars('Quellen nach Status','Anzahl',Object.entries(systemCounts).map(([l,v])=>({l,v,d:String(v),c:l==='FEHLER'?RUST:l==='PRÜFEN'?gold:GREENM}))),
-      briefing:bars('Felder im letzten Briefing','Vorhanden',[
-        ['Kernaussage',D.briefing.core],['Empfehlung',D.briefing.rec],['Prioritäten',D.briefing.priorities],
-        ['Kalender',D.briefing.calendar],['Aufgaben',D.briefing.tasks],['Projekte',D.briefing.projects]
-      ].filter(x=>x[1]).map(x=>({l:x[0],v:1,d:'ja',c:GREENM}))),
-      weather:bars('Stundenprognose','Grad',D.weather.hours.map(h=>({l:h.t+' Uhr',v:h.v,p:h.v-wmin+1,d:nf(0).format(h.v)+' °C',c:h.rain!=null&&h.rain>=50?RUST:h.v>=21?gold:GREENM}))),
-      wellbeing:bars('Vorhandene Wohlbefindenswerte','von 10',D.wb.labels.map((l,i)=>({l,v:D.wb.values[i],d:D.wb.values[i]==null?'–':D.wb.values[i]+' / 10',c:/Druck|Stress/i.test(l)?RUST:GREEN})).filter(x=>x.v!=null))
-    }[dk]||{title:'',unit:'',bars:[]};
+    const ASIDE={operator:bars('Priorität der nächsten Aufgaben','KI-Punkte',D.tasks.slice(0,5).map(t=>({l:t.title,v:t.aiPriority,d:nf(0).format(t.aiPriority),c:t.prio==='HOCH'?RUST:t.prio==='MITTEL'?gold:GREENM}))),tasks:bars('Offene Aufgaben nach Priorität','Anzahl',[{l:'Hoch',v:taskCounts.HOCH||0,c:RUST},{l:'Mittel',v:taskCounts.MITTEL||0,c:gold},{l:'Niedrig',v:taskCounts.NIEDRIG||0,c:GREENM}]),projects:bars('Fortschritt je Projekt','Prozent',D.projects.map(pr=>({l:pr.title,v:pr.pct,d:nf(0).format(pr.pct)+' %',c:pr.health==='kritisch'?RUST:pr.health==='risiko'?gold:GREENM}))),alerts:bars('Alerts nach aktuellem Status','Anzahl',Object.entries(alertCounts).map(([l,v])=>({l,v,c:l==='KRITISCH'||l==='FEHLER'?RUST:l==='WICHTIG'?gold:GREENM}))),calendar:bars('Termine je Tag','Anzahl',D.week.map(d=>({l:d.wd,v:d.ev.length,c:d.ev.some(e=>e.k==='r')?RUST:d.today?gold:GREENM}))),inbox:bars('Aktuelle Konfidenz','Anzahl',[{l:'ab 80 %',v:D.inbox.filter(i=>i.conf>=80).length,c:GREENM},{l:'50–79 %',v:D.inbox.filter(i=>i.conf>=50&&i.conf<80).length,c:gold},{l:'unter 50 %',v:D.inbox.filter(i=>i.conf<50).length,c:RUST}]),mail:bars('Relevanzgründe aktuell','Anzahl',Object.entries(mailCounts).slice(0,6).map(([l,v])=>({l,v,c:GREENM}))),goals:bars('Zielerreichung','Prozent',D.goals.map((g,i)=>({l:g.label,v:goalPct(g),d:nf(0).format(goalPct(g))+' %',c:[GREEN,gold,GREENM][i%3]}))),system:bars('Quellen nach Status','Anzahl',Object.entries(systemCounts).map(([l,v])=>({l,v,c:l==='FEHLER'?RUST:l==='PRÜFEN'?gold:GREENM}))),briefing:bars('Felder im letzten Briefing','Vorhanden',[['Kernaussage',D.briefing.core],['Empfehlung',D.briefing.rec],['Prioritäten',D.briefing.priorities],['Kalender',D.briefing.calendar],['Aufgaben',D.briefing.tasks],['Projekte',D.briefing.projects]].filter(x=>x[1]).map(x=>({l:x[0],v:1,d:'ja',c:GREENM}))),weather:bars('Stundenprognose','Grad',(W.hours||[]).map(h=>({l:h.t+' Uhr',v:h.v,d:nf(0).format(h.v)+' °C',c:h.rain!=null&&h.rain>=50?'#3E5C7E':h.v>=21?gold:GREENM}))),wellbeing:bars('Vorhandene Wohlbefindenswerte','von 10',(WB.labels||[]).map((l,i)=>({l,v:WB.values[i],d:WB.values[i]==null?'–':WB.values[i]+' / 10',c:/Druck|Stress/i.test(l)?RUST:GREEN})).filter(x=>x.v!=null))}[dk]||{title:'',unit:'',bars:[]};
 
-    const avgProject=D.projects.length?D.projects.reduce((sum,pr)=>sum+pr.pct,0)/D.projects.length:0;
-    const collisions=D.week.reduce((sum,d)=>sum+d.ev.filter(e=>e.k==='r').length,0);
-    const wbAvg=WB.last7.length?WB.last7.reduce((a,b)=>a+b,0)/WB.last7.length:null;
-    const firstSystemIssue=D.system.find(s=>s.state==='error'||s.state==='warn');
-    const hottest=W.hours.length?W.hours.reduce((a,b)=>a.v>b.v?a:b):null;
-    const highestRain=W.hours.filter(h=>h.rain!=null).reduce((max,h)=>Math.max(max,h.rain),0);
-    const patternText=WB.pattern&&WB.pattern.candidate
-      ?'Der OPS-Verlauf markiert ein bestätigungspflichtiges Muster: '+(WB.pattern.reason||'auffällige Werte')+'. Es wird keine Anpassung automatisch ausgeführt.'
-      :WB.pattern&&WB.pattern.status==='INSUFFICIENT_DATA'
-        ?'Für eine Musterbewertung liegen noch nicht genügend Einträge vor.'
-        :'Im vorhandenen Verlauf wurde kein klares Muster markiert.';
-    const NOTES={
-      operator:{title:'Warum dieser Schritt',text:D.operator.why,
-        lines:[['Nächster Schritt',D.operator.step],['Aufgabe im OPS',D.tasks[0]?D.tasks[0].title:'Keine offene Aufgabe'],['Modus',D.operator.mode]]},
-      tasks:{title:'Aktueller Aufgabenstand',text:'Gezeigt werden ausschließlich offene Aufgaben aus dem OPS, sortiert durch den bestehenden Backend-Vertrag.',
-        lines:[['Offen',String(openTasks)],['Heute oder überfällig',String(due)],['Ohne nächsten Schritt',String(D.tasks.filter(t=>!t.next||/^Kein nächster Schritt/.test(t.next)).length)]]},
-      projects:{title:'Aktueller Projektstand',text:'Health-Status, Fortschritt und Blocker stammen direkt aus PROJECTS im OPS.',
-        lines:[['Aktiv',String(D.projects.length)],['Mit Blocker',String(D.projects.filter(pr=>pr.blocker).length)],['Ø Fortschritt',D.projects.length?nf(0).format(avgProject)+' %':'–']]},
-      alerts:{title:'Aktueller Warnungsstand',text:'Bestätigen schreibt den Status über die vorhandene auditierte OPS-Aktion; weitere Folgen werden nicht automatisch ausgeführt.',
-        lines:[['Offen',String(D.alerts.filter(a=>a.status!=='ACKNOWLEDGED').length)],['Kritisch',String(D.alerts.filter(a=>a.sev===3&&a.status!=='ACKNOWLEDGED').length)],['Bestätigt',String(D.alerts.filter(a=>a.status==='ACKNOWLEDGED').length)]]},
-      calendar:{title:'Struktur der Woche',text:'Die Ansicht zeigt die vom Kalender-Endpunkt gelieferte Woche. Überschneidungen werden lokal aus Start und Ende erkannt.',
-        lines:[['Termine',String(D.week.reduce((sum,d)=>sum+d.ev.length,0))],['Markierte Kollisionen',String(collisions)],['Zeitraum',D.weekMeta]]},
-      inbox:{title:'Prüf-Regel',text:'Die KI-Inbox bleibt bestätigungspflichtig. Eine Entscheidung aktualisiert den OPS-Status; eine externe Folgeaktion wird nicht automatisch ausgeführt.',
-        lines:[['Zur Prüfung',String(D.inbox.length)],['Ab 80 % Konfidenz',String(D.inbox.filter(i=>i.conf>=80).length)],['Unter 50 %',String(D.inbox.filter(i=>i.conf<50).length)]]},
-      mail:{title:'Quelle und Umfang',text:'Diese Ansicht liest ausschließlich operativ relevante Referenzen aus OPS.EMAIL_REFS; Gmail bleibt die Quelle der Wahrheit.',
-        lines:[['Relevant',String(D.mails.length)],['Nachfassen markiert',String(D.mails.filter(m=>m.followUp).length)],['Quelle','OPS.EMAIL_REFS']]},
-      goals:{title:'Ziel-Definition',text:'Ist-Wert, Zielwert, Einheit und Stichtag werden aus dem OPS übernommen. Abwärtsziele werden als Annäherung an den Zielwert dargestellt.',
-        lines:[['Aktiv',String(D.goals.length)],['Mit Zielwert',String(D.goals.filter(g=>g.target>0).length)],['Mit Stichtag',String(D.goals.filter(g=>g.targetDate).length)]]},
-      system:{title:'Quellenlage',text:firstSystemIssue?(firstSystemIssue.note||firstSystemIssue.name+' benötigt Prüfung.'):'Alle in dieser Ansicht gemeldeten Datenpfade sind bereit.',
-        lines:[['Angezeigt',String(D.system.length)],['Fehler',String(D.system.filter(s=>s.state==='error').length)],['Zu prüfen',String(D.system.filter(s=>s.state==='warn').length)]]},
-      briefing:{title:'Letzter erfolgreicher Stand',text:D.briefing.available?'Es wird das letzte erfolgreich erzeugte Briefing aus dem OPS gezeigt.':'Im OPS liegt aktuell kein erfolgreich erzeugtes Briefing vor.',
-        lines:[['Stand',D.briefing.meta||'–'],['Datenfrische',D.briefing.freshness||'nicht angegeben'],['Empfehlung',D.briefing.rec?'vorhanden':'nicht vorhanden']]},
-      weather:{title:'Aktueller Wetterstand',text:W.available?'Stand und Stundenwerte stammen aus dem bestehenden Wetter-Snapshot.':'Die Wetterquelle ist aktuell nicht verfügbar.',
-        lines:[['Aktuell',W.temp==null?'–':nf(0).format(W.temp)+' °C · '+W.cond],['Höchster Stundenwert',hottest?nf(0).format(hottest.v)+' °C · '+hottest.t:'–'],['Höchstes Regenrisiko',W.hours.some(h=>h.rain!=null)?nf(0).format(highestRain)+' %':'–']]},
-      wellbeing:{title:'Hinweis',text:patternText,
-        lines:[['Einträge im Verlauf',String(WB.last7.length)],['Ø vorhandener Verlauf',wbAvg==null?'–':nf(1).format(wbAvg)+' von 10'],['Letztes Hauptgefühl',WB.mood||'nicht angegeben']]}
-    }[dk]||{title:'',text:'',lines:[]};
+    const avgProject=D.projects.length?D.projects.reduce((a,b)=>a+b.pct,0)/D.projects.length:0,collisions=D.week.reduce((sum,d)=>sum+d.ev.filter(e=>e.k==='r').length,0),firstSystemIssue=D.system.find(s=>s.state==='error'||s.state==='warn'),hottest=(W.hours||[]).length?W.hours.reduce((a,b)=>a.v>b.v?a:b):null,highestRain=(W.hours||[]).filter(h=>h.rain!=null).reduce((m,h)=>Math.max(m,h.rain),0);
+    const patternText=WB.pattern&&WB.pattern.candidate?'Der OPS-Verlauf markiert ein bestätigungspflichtiges Muster: '+(WB.pattern.reason||'auffällige Werte')+'. Es wird keine Anpassung automatisch ausgeführt.':WB.pattern&&WB.pattern.status==='INSUFFICIENT_DATA'?'Für eine Musterbewertung liegen noch nicht genügend Einträge vor.':'Im vorhandenen Verlauf wurde kein klares Muster markiert.';
+    const NOTES={operator:{title:'Warum dieser Schritt',text:D.operator.why,lines:[['Nächster Schritt',D.operator.step],['Aufgabe im OPS',D.tasks[0]?D.tasks[0].title:'Keine offene Aufgabe'],['Modus',D.operator.mode]]},tasks:{title:'Aktueller Aufgabenstand',text:'Gezeigt werden ausschließlich offene Aufgaben aus dem OPS. Die Reihenfolge im Dashboard kann lokal sortiert werden; der OPS bleibt die Quelle der Wahrheit.',lines:[['Offen',String(openTasks)],['Heute oder überfällig',String(due)],['Ohne nächsten Schritt',String(D.tasks.filter(t=>!t.next||/^Kein nächster Schritt/.test(t.next)).length)]]},projects:{title:'Aktueller Projektstand',text:'Health-Status, Fortschritt und Blocker stammen direkt aus PROJECTS im OPS.',lines:[['Aktiv',String(D.projects.length)],['Mit Blocker',String(D.projects.filter(pr=>pr.blocker).length)],['Ø Fortschritt',D.projects.length?nf(0).format(avgProject)+' %':'–']]},alerts:{title:'Aktueller Warnungsstand',text:'Bestätigen schreibt den Status über die vorhandene auditierte OPS-Aktion; weitere Folgen werden nicht automatisch ausgeführt.',lines:[['Offen',String(D.alerts.filter(a=>a.status!=='ACKNOWLEDGED').length)],['Kritisch',String(D.alerts.filter(a=>a.sev===3&&a.status!=='ACKNOWLEDGED').length)],['Bestätigt',String(D.alerts.filter(a=>a.status==='ACKNOWLEDGED').length)]]},calendar:{title:'Struktur der Woche',text:'Die Ansicht zeigt die vom Kalender-Endpunkt gelieferte Woche. Überschneidungen werden aus Start und Ende erkannt.',lines:[['Termine',String(D.week.reduce((sum,d)=>sum+d.ev.length,0))],['Markierte Kollisionen',String(collisions)],['Zeitraum',D.weekMeta]]},inbox:{title:'Prüf-Regel',text:'Die KI-Inbox bleibt bestätigungspflichtig. Eine Entscheidung aktualisiert den OPS-Status; eine externe Folgeaktion wird nicht automatisch ausgeführt.',lines:[['Zur Prüfung',String(D.inbox.length)],['Ab 80 % Konfidenz',String(D.inbox.filter(i=>i.conf>=80).length)],['Unter 50 %',String(D.inbox.filter(i=>i.conf<50).length)]]},mail:{title:'Quelle und Umfang',text:'Diese Ansicht liest operativ relevante Referenzen aus OPS.EMAIL_REFS; Gmail bleibt die Quelle der Wahrheit.',lines:[['Relevant',String(D.mails.length)],['Nachfassen markiert',String(D.mails.filter(m=>m.followUp).length)],['Quelle','OPS.EMAIL_REFS']]},goals:{title:'Ziel-Definition',text:'Ist-Wert, Zielwert, Einheit und Stichtag werden aus dem OPS übernommen.',lines:[['Aktiv',String(D.goals.length)],['Mit Zielwert',String(D.goals.filter(g=>g.target>0).length)],['Mit Stichtag',String(D.goals.filter(g=>g.targetDate).length)]]},system:{title:'Quellenlage',text:firstSystemIssue?(firstSystemIssue.note||firstSystemIssue.name+' benötigt Prüfung.'):'Alle in dieser Ansicht gemeldeten Datenpfade sind bereit.',lines:[['Angezeigt',String(D.system.length)],['Fehler',String(D.system.filter(s=>s.state==='error').length)],['Zu prüfen',String(D.system.filter(s=>s.state==='warn').length)]]},briefing:{title:'Letzter erfolgreicher Stand',text:D.briefing.available?'Es wird das letzte erfolgreich erzeugte Briefing aus dem OPS gezeigt.':'Im OPS liegt aktuell kein erfolgreich erzeugtes Briefing vor.',lines:[['Stand',D.briefing.meta||'–'],['Datenfrische',D.briefing.freshness||'nicht angegeben'],['Empfehlung',D.briefing.rec?'vorhanden':'nicht vorhanden']]},weather:{title:'Aktueller Wetterstand',text:W.available?(W.stale?'Der letzte gültige Wetterstand bleibt sichtbar; die Aktualisierung ist derzeit beeinträchtigt.':'Stand und Stundenwerte stammen aus dem Wetter-Snapshot.'):'Die Wetterquelle ist aktuell nicht verfügbar.',lines:[['Aktuell',W.temp==null?'–':nf(0).format(W.temp)+' °C · '+W.cond],['Höchster Stundenwert',hottest?nf(0).format(hottest.v)+' °C · '+hottest.t:'–'],['Höchstes Regenrisiko',(W.hours||[]).some(h=>h.rain!=null)?nf(0).format(highestRain)+' %':'–']]},wellbeing:{title:'Hinweis',text:patternText,lines:[['Einträge im Verlauf',String((WB.last7||[]).length)],['Ø vorhandener Verlauf',wbAvg==null?'–':nf(1).format(wbAvg)+' von 10'],['Letztes Hauptgefühl',WB.mood||'nicht angegeben']]}}[dk]||{title:'',text:'',lines:[]};
 
-    const tagStyle=(t)=>t==='JETZT'||t==='KRITISCH'||t==='HOCH'?{bg:'rgba(140,74,32,.14)',fg:RUST}
-      :t==='PAUSE'||t==='NORMAL'||t==='NIEDRIG'?{bg:'rgba(20,45,32,.08)',fg:'#4C5A4E'}
-      :{bg:'rgba(184,145,47,.16)',fg:'#8C6B18'};
+    const tagStyle=(t)=>t==='JETZT'||t==='KRITISCH'||t==='HOCH'||t==='KOLLISION'||t==='FEHLER'?{bg:'rgba(140,74,32,.14)',fg:RUST}:t==='PAUSE'||t==='NORMAL'||t==='NIEDRIG'?{bg:'rgba(20,45,32,.08)',fg:'#4C5A4E'}:{bg:'rgba(184,145,47,.16)',fg:'#8C6B18'};
+    const rowTags=[...new Set(ROWS.map(r=>r.tag).filter(Boolean))],activeFilter=S.rowFilter&&rowTags.includes(S.rowFilter)?S.rowFilter:null;
+    let rowsBase=ROWS.filter(r=>!activeFilter||r.tag===activeFilter);if(S.rowSortAZ)rowsBase=[...rowsBase].sort((a,b)=>a.title.localeCompare(b.title,'de'));
+    const filterChips=[{label:'Alle',active:!activeFilter,bg:!activeFilter?'rgba(184,145,47,.22)':'rgba(255,255,255,.5)',pick:()=>this.setState({rowFilter:null})},...rowTags.map(t=>({label:t,active:activeFilter===t,bg:activeFilter===t?'rgba(184,145,47,.22)':'rgba(255,255,255,.5)',pick:()=>this.setState({rowFilter:t})}))];
+    const sortToggle={active:!!S.rowSortAZ,label:S.rowSortAZ?'A–Z':'Standard',pick:()=>this.setState(s=>({rowSortAZ:!s.rowSortAZ}))};
 
-    const stepGoalLabel=H.stepGoal>0?'Ziel '+nf(0).format(H.stepGoal):'Kein Zielwert im OPS';
-    const sleepGoalLabel=H.sleepGoal>0?'Ziel '+nf(1).format(H.sleepGoal)+' h':'Kein Zielwert im OPS';
-    const activeGoalLabel=H.activeGoal>0?'Ziel '+nf(0).format(H.activeGoal)+' Min':'Kein Zielwert im OPS';
-    const savingsRate=F.in>0?net/F.in*100:null;
-    const wbLatestScore=WB.last7.length?WB.last7[WB.last7.length-1]:null;
-    const LEDGER={
-      finance:[{label:'EINNAHMEN · '+F.meta,val:F.available?this.eur(this.nd(F.in)):'–',delta:'',tc:GREENM,note:'OPS-Finanzstand'},
-        {label:'AUSGABEN · '+F.meta,val:F.available?this.eur(this.nd(F.out)):'–',delta:'',tc:RUST,note:'OPS-Finanzstand'},
-        {label:'NETTO-CASHFLOW',val:F.available?this.eur(this.nd(net)):'–',delta:'',tc:net>=0?GREENM:RUST,note:F.transactionCount+' Transaktionen im Stand'},
-        {label:'NETTOQUOTE',val:savingsRate==null?'–':nf(1).format(this.nd(savingsRate))+' %',delta:'',tc:savingsRate!=null&&savingsRate>=0?GREENM:RUST,note:'Netto ÷ Einnahmen'}],
-      health:[{label:'SCHRITTE HEUTE',val:H.available?nf(0).format(this.nd(H.steps)):'–',delta:H.stepGoal>0?nf(0).format(H.steps/H.stepGoal*100)+' % Ziel':'',tc:GREENM,note:stepGoalLabel},
-        {label:'SCHLAF LETZTE NACHT',val:H.sleep==null?'–':nf(1).format(this.nd(H.sleep))+' h',delta:H.sleepGoal>0&&H.sleep!=null?nf(0).format(H.sleep/H.sleepGoal*100)+' % Ziel':'',tc:GREENM,note:sleepGoalLabel},
-        {label:'GEWICHT',val:H.weight==null?'–':nf(1).format(this.nd(H.weight))+' kg',delta:'',tc:GREENM,note:H.weights.length+' Messwerte im Verlauf'},
-        {label:'AKTIVMINUTEN',val:H.available?Math.round(this.nd(H.active))+' Min':'–',delta:H.activeGoal>0?nf(0).format(H.active/H.activeGoal*100)+' % Ziel':'',tc:'#8C6B18',note:activeGoalLabel+' · '+H.workouts+' Workouts'}],
-      wellbeing:[{label:'CHECK HEUTE',val:S.wbSaved?'Erledigt':(Object.keys(S.wbForm||{}).length+' / 6'),delta:S.wbSaved?'gespeichert':'offen',tc:S.wbSaved?GREENM:'#8C6B18',note:'freiwillig, jederzeit'},
-        {label:'DURCHSCHNITT VERLAUF',val:wbAvg==null?'–':nf(1).format(this.nd(wbAvg)),delta:'',tc:GREENM,note:WB.last7.length+' vorhandene Einträge'},
-        {label:'LETZTER TAGESWERT',val:wbLatestScore==null?'–':nf(1).format(this.nd(wbLatestScore)),delta:'',tc:'#6C7B6E',note:'von 10 möglichen'},
-        {label:'LETZTES HAUPTGEFÜHL',val:WB.mood||'–',delta:'',tc:GREENM,note:WB.factor?'Einfluss: '+WB.factor:'kein Einfluss angegeben'}]
-    }[dk]||[{label:'EINTRÄGE',val:String(ROWS.length),delta:'',tc:'#6C7B6E',note:'im aktuellen Zeitraum'},
-      {label:'BEREICH',val:META.t,delta:'',tc:'#6C7B6E',note:'Detailansicht'},
-      {label:'DATENPFAD',val:sourceState.label,delta:'',tc:sourceState.errors?RUST:sourceState.loading?gold:GREENM,note:'Browser ↔ Apps Script'},
-      {label:'QUELLE',val:dk==='mail'?'OPS.EMAIL_REFS':'OPS / verbundene Dienste',delta:'',tc:'#6C7B6E',note:'keine Demo-Werte'}];
+    // Claude's rich detail charts stay intact, but only real currently available data is used.
+    const taskPri=D.tasks.slice(0,7),taskPriMax=Math.max(1,...taskPri.map(t=>Number(t.aiPriority)||0));
+    const opD={bars:taskPri.map((t,i)=>({h:(18+(Number(t.aiPriority)||0)/taskPriMax*52).toFixed(0),fill:t.prio==='HOCH'?RUST:t.prio==='MITTEL'?gold:GREENM,delay:60+i*36,hovered:this.hv('opadh',i),tip:t.title+' · '+nf(0).format(t.aiPriority||0)+' Punkte',pick:()=>this.setState(s=>({hover:(s.hover&&s.hover.id==='opadh'&&s.hover.i===i)?null:{id:'opadh',i}}))})),rate:'LIVE · OPS',streak:'AKTUELL',log:D.tasks.slice(0,6).map((t,i)=>({d:t.due||'–',dec:t.title,delay:40+i*40,fg:t.prio==='HOCH'?RUST:t.prio==='MITTEL'?gold:GREENM,label:t.prio||'OFFEN'})),rangePick:[]};
+    const taskD={bars:taskPri.map((t,i)=>({l:(t.title||'').slice(0,12),v:Math.round(t.aiPriority||0),h:(10+(Number(t.aiPriority)||0)/taskPriMax*70*(S.dp||0)).toFixed(0),delay:60+i*50,fill:t.prio==='HOCH'?RUST:t.prio==='MITTEL'?gold:GREENM,hovered:this.hv('taskdone',i),tip:t.title+' · '+Math.round(t.aiPriority||0)+' KI-Punkte',enter:()=>this.setState({hover:{id:'taskdone',i}}),leave:()=>this.setState({hover:null})})),sum:D.tasks.length};
+    const currentAlerts=D.alerts.filter(a=>a.status!=='ACKNOWLEDGED').slice(0,14),alScale=68;
+    const alertD={bars:currentAlerts.map((a,i)=>({crit:(a.sev===3?alScale:0)*(S.dp||0),warn:(a.sev===2?alScale:0)*(S.dp||0),norm:(a.sev===1?alScale:0)*(S.dp||0),delay:50+i*30,hovered:this.hv('alh',i),tip:a.title,pick:()=>this.setState(s=>({hover:(s.hover&&s.hover.id==='alh'&&s.hover.i===i)?null:{id:'alh',i}}))})),clean:!currentAlerts.some(a=>a.sev>=2),rangePick:[]};
+    const wxHours=(W.hours||[]).slice(0,7),wxVals=wxHours.map(h=>h.v),wxS=this.smooth(wxVals,640,150,10);
+    const weathD={hiD:wxS.d,loD:wxS.d,band:'',days:wxHours.map((h,i)=>({wd:h.t,n:'',hi:nf(0).format(h.v),lo:nf(0).format(h.v),pop:h.rain==null?0:h.rain,cond:h.text||W.cond,delay:60+i*40,popH:(6+(h.rain==null?0:h.rain)/100*40).toFixed(0),popFill:h.rain!=null&&h.rain>=50?'#3E5C7E':GREENM}))};
+    const dayStartH=8,dayEndH=20,gridH=400,pxPerH=gridH/(dayEndH-dayStartH),parseT=(t)=>/^\d{2}:\d{2}$/.test(t||'')?(()=>{const [h,m]=t.split(':').map(Number);return h+m/60;})():dayStartH;
+    const calD={hourLabels:Array.from({length:dayEndH-dayStartH+1},(_,i)=>({label:String(dayStartH+i).padStart(2,'0')+':00',top:(i*pxPerH).toFixed(0)})),gridH,grid:D.week.map((d,i)=>({wd:d.wd,n:d.n,labelColor:d.today?'#8C6B18':'#7A8A7C',numColor:d.today?GREEN:'#39473B',headBorder:d.today?'rgba(184,145,47,.6)':'rgba(20,45,32,.12)',colBg:d.today?'rgba(184,145,47,.05)':'transparent',events:d.ev.map((e,ei)=>{const startH=parseT(e.t),top=Math.max(0,(startH-dayStartH)*pxPerH);const mins=(()=>{const a=new Date(e.start),b=new Date(e.end),m=(b-a)/60000;return Number.isFinite(m)&&m>0?m:60;})();return {t:e.t,l:e.l,top:top.toFixed(0),h:Math.max(24,mins/60*pxPerH).toFixed(0),delay:60+i*30+ei*40,bg:e.k==='g'?'rgba(184,145,47,.2)':e.k==='r'?'rgba(140,74,32,.16)':'rgba(27,70,50,.12)',border:e.k==='g'?'#B8912F':e.k==='r'?'#8C4A20':'#1B4632'};} )}))};
+    const confGroups=[{l:'< 50 %',v:D.inbox.filter(i=>i.conf<50).length},{l:'50–69 %',v:D.inbox.filter(i=>i.conf>=50&&i.conf<70).length},{l:'70–89 %',v:D.inbox.filter(i=>i.conf>=70&&i.conf<90).length},{l:'≥ 90 %',v:D.inbox.filter(i=>i.conf>=90).length}],icMax=Math.max(1,...confGroups.map(c=>c.v));
+    const inboxD={bars:confGroups.map((c,i)=>({l:c.l,v:c.v,h:(10+c.v/icMax*90*(S.dp||0)).toFixed(0),delay:60+i*60,fill:i>=2?GREENM:i===1?gold:RUST,hovered:this.hv('ibconf',i),tip:c.v+' aktuelle Erkenntnisse · '+c.l,pick:()=>this.setState(s=>({hover:(s.hover&&s.hover.id==='ibconf'&&s.hover.i===i)?null:{id:'ibconf',i}}))})),out:{accepted:'–',rejected:'–',deferred:'–'},acceptedPct:0,rejectedPct:0,deferredPct:0};
+    const mailGroups={};D.mails.forEach(m=>{const k=m.date||'aktuell';mailGroups[k]=(mailGroups[k]||0)+1;});const mailSeries=Object.entries(mailGroups).slice(-14),mailCatsObj=countBy(D.mails,m=>m.category||m.reason||'Relevant');
+    const mailDays=Math.min(14,Math.max(1,mailSeries.length)),mailD={vol:this.lineChart('mailvol','Relevante Mails · aktueller Stand',mailSeries.map(x=>x[1]),mailSeries.map(x=>x[0]),GREENM,'rgba(47,107,76,.4)',v=>v+' Mails',640,150),cats:Object.entries(mailCatsObj).slice(0,6).map(([l,v],i)=>({l,v,color:CATCOLORS[i%CATCOLORS.length]})),rangePick:[]};
+    const projD={spans:D.projects.map((pr,i)=>({title:pr.title,left:'0',width:'100',pct:Math.round(pr.pct*(S.dp||0)),fill:pr.health==='kritisch'?RUST:pr.health==='risiko'?gold:GREENM,delay:60+i*70,startLabel:'Fortschritt',endLabel:pr.deadline||'kein Stichtag'})),nowLeft:'0',nowLabel:'OPS-PROJEKTSTAND'};
+    const briefD={history:D.briefing&&D.briefing.available?[{d:(D.briefing.meta||'').split(' · ').slice(-1)[0]||'aktuell',t:(D.briefing.meta||'Briefing').split(' · ')[0],core:D.briefing.core,delay:40,fg:GREEN}]:[],hit:'–',hitC:(2*Math.PI*40).toFixed(1),hitOff:(2*Math.PI*40).toFixed(1)};
+    const selIndex=Math.min(S.selGoal||0,Math.max(0,D.goals.length-1)),selG=D.goals[selIndex]||{label:'Kein Ziel',actual:0,target:0,unit:'',down:false};
+    const goalD={picks:D.goals.map((g,i)=>{const act=selIndex===i;return {label:g.label,bg:act?'rgba(27,70,50,.12)':'rgba(255,255,255,.4)',fg:act?GREEN:'#4C5A4E',border:act?'rgba(184,145,47,.6)':'rgba(20,45,32,.16)',pick:()=>this.setState({selGoal:i})};}),traj:this.lineChart('goaltraj',selG.label+' · aktueller Stand',D.goals.length?[selG.actual]:[],D.goals.length?['Jetzt']:[],selG.down?RUST:GREENM,selG.down?'rgba(140,74,32,.35)':'rgba(47,107,76,.4)',v=>(selG.unit==='€'?nf(0).format(v)+' €':nf(selG.unit==='kg'?1:0).format(v)+' '+selG.unit),640,150),milestoneNote:'Historischer Zielverlauf ist im aktuellen OPS-Endpunkt noch nicht angebunden.',reached:selG.target>0&&(selG.down?selG.actual<=selG.target:selG.actual>=selG.target)};
+    const latencyRows=D.system.filter(s=>/^Datenpfad ·/.test(s.name||'')).map(s=>({l:(s.name||'').replace(/^Datenpfad · /,''),v:Number.parseFloat(s.last)||0})),sysVMax=Math.max(1,...latencyRows.map(v=>v.v));
+    const sysD={heat:D.system.map((s,si)=>({name:s.name,cells:[{fill:s.state==='error'?RUST:s.state==='warn'?'rgba(184,145,47,.85)':'rgba(47,107,76,.65)',hovered:this.hv('sysh',si),tip:s.name+' · '+(s.last||s.state),pick:()=>this.setState(st=>({hover:(st.hover&&st.hover.id==='sysh'&&st.hover.i===si)?null:{id:'sysh',i:si}}))}]})),volume:latencyRows.map((v,i)=>({...v,pct:(v.v/sysVMax*100*(S.dp||0)).toFixed(0),color:CATCOLORS[i%CATCOLORS.length]})),clean:D.system.every(s=>s.state!=='warn'&&s.state!=='error')};
 
-    const rn=[3,6,12][S.range];
-    const ranges=[['3 Monate',0],['6 Monate',1],['12 Monate',2]].map(([label,i])=>({label,
-      pick:()=>{this.setState({range:i});this.countUp('dp');},
-      bg:S.range===i?'rgba(27,70,50,.12)':'rgba(255,255,255,.4)',
-      border:S.range===i?'rgba(184,145,47,.6)':'rgba(20,45,32,.16)',
-      fg:S.range===i?GREEN:'#4C5A4E'}));
+    const avgConf=D.inbox.length?D.inbox.reduce((a,b)=>a+(Number(b.conf)||0),0)/D.inbox.length:null,openAlerts=D.alerts.filter(a=>a.status!=='ACKNOWLEDGED'),avgGoal=D.goals.length?D.goals.reduce((a,g)=>a+goalPct(g),0)/D.goals.length:null;
+    const LEDGER={finance:[{label:'EINNAHMEN '+(F.meta||''),val:F.available?this.eur(this.nd(F.in||0)):'–',delta:'',tc:GREENM,note:'aktueller OPS-Stand'},{label:'AUSGABEN '+(F.meta||''),val:F.available?this.eur(this.nd(F.out||0)):'–',delta:'',tc:RUST,note:'aktueller OPS-Stand'},{label:'NETTO-CASHFLOW',val:F.available?this.eur(this.nd(net)):'–',delta:'',tc:net>=0?GREENM:RUST,note:'Einnahmen minus Ausgaben'},{label:'BUDGETS',val:String((F.budgets||[]).length),delta:'',tc:criticalBudgets?gold:GREENM,note:criticalBudgets?criticalBudgets+' kritisch':'keins kritisch'}],health:[{label:'SCHRITTE HEUTE',val:H.available?nf(0).format(this.nd(H.steps||0)):'–',delta:H.stepGoal?nf(0).format(H.steps/H.stepGoal*100)+' % Ziel':'',tc:GREENM,note:H.stepGoal?'Ziel '+nf(0).format(H.stepGoal):'kein Zielwert'},{label:'SCHLAF LETZTE NACHT',val:H.sleep==null?'–':nf(1).format(this.nd(H.sleep))+' h',delta:'',tc:GREENM,note:H.sleepGoal?'Ziel '+nf(1).format(H.sleepGoal)+' h':'kein Zielwert'},{label:'GEWICHT',val:H.weight==null?'–':nf(1).format(this.nd(H.weight))+' kg',delta:'',tc:'#6C7B6E',note:'letzte Messung'},{label:'AKTIVMINUTEN',val:H.available?Math.round(this.nd(H.active||0))+' Min':'–',delta:'',tc:gold,note:H.activeGoal?'Ziel '+H.activeGoal:'kein Zielwert'}],wellbeing:[{label:'CHECK HEUTE',val:S.wbSaved?'Erledigt':(Object.keys(S.wbForm||{}).length+' / 6'),delta:S.wbSaved?'gespeichert':'offen',tc:S.wbSaved?GREENM:'#8C6B18',note:'freiwillig, jederzeit'},{label:'DURCHSCHNITT VERLAUF',val:wbAvg==null?'–':nf(1).format(wbAvg),delta:'',tc:GREENM,note:(WB.last7||[]).length+' vorhandene Einträge'},{label:'LETZTER TAGESWERT',val:wbLatestScore==null?'–':nf(1).format(wbLatestScore),delta:'',tc:'#6C7B6E',note:'von 10 möglichen'},{label:'LETZTES HAUPTGEFÜHL',val:WB.mood||'–',delta:'',tc:'#6C7B6E',note:WB.factor?'Einfluss: '+WB.factor:'kein Einfluss angegeben'}],operator:[{label:'OFFENE AUFGABEN',val:String(openTasks),delta:'',tc:'#6C7B6E',note:'OPS'},{label:'AKTUELLER SCHRITT',val:D.operator.step?'1':'0',delta:'',tc:GREENM,note:D.operator.step||'kein Schritt'},{label:'BRIEFING',val:D.briefing.available?'aktiv':'–',delta:'',tc:D.briefing.available?GREENM:'#6C7B6E',note:D.briefing.meta||'kein Stand'},{label:'MODUS',val:S.focusOn?'Fokus läuft':'bereit',delta:'',tc:S.focusOn?gold:'#6C7B6E',note:D.operator.mode||'–'}],tasks:[{label:'OFFEN',val:String(openTasks),delta:'',tc:'#6C7B6E',note:'OPS'},{label:'HOHE PRIORITÄT',val:String(D.tasks.filter(t=>t.prio==='HOCH').length),delta:'',tc:RUST,note:'AI-Priorität ≥ 80'},{label:'HEUTE / ÜBERFÄLLIG',val:String(due),delta:'',tc:due?gold:GREENM,note:'nach OPS-Deadline'},{label:'OHNE NÄCHSTEN SCHRITT',val:String(D.tasks.filter(t=>!t.next||/^Kein nächster Schritt/.test(t.next)).length),delta:'',tc:'#6C7B6E',note:'sollten konkretisiert werden'}],alerts:[{label:'OFFEN',val:String(openAlerts.length),delta:'',tc:'#6C7B6E',note:'unbestätigt'},{label:'KRITISCH',val:String(openAlerts.filter(a=>a.sev===3).length),delta:'',tc:RUST,note:'aktuell'},{label:'WICHTIG',val:String(openAlerts.filter(a=>a.sev===2).length),delta:'',tc:gold,note:'aktuell'},{label:'BESTÄTIGT',val:String(D.alerts.filter(a=>a.status==='ACKNOWLEDGED').length),delta:'',tc:GREENM,note:'im geladenen Stand'}],weather:[{label:'AKTUELL',val:W.temp==null?'–':Math.round(this.n(W.temp))+' °C',delta:W.stale?'veraltet':'',tc:W.stale?gold:'#6C7B6E',note:W.cond||'–'},{label:'HÖCHSTER STUNDENWERT',val:hottest?nf(0).format(hottest.v)+' °C':'–',delta:'',tc:'#6C7B6E',note:hottest?hottest.t+' Uhr':'keine Stundenwerte'},{label:'REGENRISIKO',val:(W.hours||[]).some(h=>h.rain!=null)?nf(0).format(highestRain)+' %':'–',delta:'',tc:highestRain>=50?'#3E5C7E':GREENM,note:'höchster geladener Stundenwert'},{label:'STATUS',val:W.available?(W.stale?'letzter Stand':'aktuell'):'nicht verfügbar',delta:'',tc:W.available?(W.stale?gold:GREENM):RUST,note:W.lastSuccessAt||W.error||'–'}],calendar:[{label:'TERMINE',val:String(D.week.reduce((a,d)=>a+d.ev.length,0)),delta:'',tc:'#6C7B6E',note:'geladene Woche'},{label:'KOLLISIONEN',val:String(collisions),delta:'',tc:collisions?RUST:GREENM,note:'erkannte Überschneidungen'},{label:'TAGE MIT TERMINEN',val:String(D.week.filter(d=>d.ev.length).length),delta:'',tc:'#6C7B6E',note:'von 7 Tagen'},{label:'ZEITRAUM',val:D.weekMeta||'–',delta:'',tc:'#6C7B6E',note:'Google Calendar'}],inbox:[{label:'ZUR PRÜFUNG',val:String(D.inbox.length),delta:'',tc:'#6C7B6E',note:'wartet auf Entscheidung'},{label:'AB 80 %',val:String(D.inbox.filter(i=>i.conf>=80).length),delta:'',tc:GREENM,note:'hohe Konfidenz'},{label:'Ø KONFIDENZ',val:avgConf==null?'–':nf(0).format(avgConf)+' %',delta:'',tc:'#6C7B6E',note:'aktuelle Warteschlange'},{label:'HISTORIE',val:'–',delta:'',tc:'#6C7B6E',note:'Entscheidungsverlauf noch nicht angebunden'}],mail:[{label:'RELEVANT',val:String(D.mails.length),delta:'',tc:'#6C7B6E',note:'OPS.EMAIL_REFS'},{label:'NACHFASSEN',val:String(D.mails.filter(m=>m.followUp).length),delta:'',tc:gold,note:'markiert'},{label:'RELEVANZGRÜNDE',val:String(Object.keys(mailCounts).length),delta:'',tc:'#6C7B6E',note:'im aktuellen Stand'},{label:'LETZTER STAND',val:D.mails[0]&&D.mails[0].date?D.mails[0].date:'–',delta:'',tc:'#6C7B6E',note:'neueste relevante Referenz'}],projects:[{label:'AKTIV',val:String(D.projects.length),delta:'',tc:'#6C7B6E',note:'OPS PROJECTS'},{label:'Ø FORTSCHRITT',val:D.projects.length?nf(0).format(avgProject)+' %':'–',delta:'',tc:'#6C7B6E',note:'über geladene Projekte'},{label:'KRITISCH',val:String(D.projects.filter(p=>p.health==='kritisch').length),delta:'',tc:RUST,note:'Health-Status'},{label:'MIT BLOCKER',val:String(D.projects.filter(p=>p.blocker).length),delta:'',tc:gold,note:'Blocker oder nächster Schritt'}],briefing:[{label:'LETZTER STAND',val:D.briefing.available?'vorhanden':'–',delta:'',tc:D.briefing.available?GREENM:'#6C7B6E',note:D.briefing.meta||'kein Briefing'},{label:'KERNAUSSAGE',val:D.briefing.core?'✓':'–',delta:'',tc:D.briefing.core?GREENM:'#6C7B6E',note:'aktueller Lauf'},{label:'EMPFEHLUNG',val:D.briefing.rec?'✓':'–',delta:'',tc:D.briefing.rec?GREENM:'#6C7B6E',note:'aktueller Lauf'},{label:'DATENFRISCHE',val:D.briefing.freshness||'–',delta:'',tc:'#6C7B6E',note:'laut Briefing'}],goals:[{label:'AKTIVE ZIELE',val:String(D.goals.length),delta:'',tc:'#6C7B6E',note:'OPS GOALS'},{label:'MIT ZIELWERT',val:String(D.goals.filter(g=>g.target>0).length),delta:'',tc:GREENM,note:'messbar'},{label:'Ø ZIELERREICHUNG',val:avgGoal==null?'–':nf(0).format(avgGoal)+' %',delta:'',tc:'#6C7B6E',note:'gleich gewichtet'},{label:'AUSGEWÄHLT',val:selG.label||'–',delta:'',tc:'#6C7B6E',note:selG.targetDate||'kein Stichtag'}],system:[{label:'QUELLEN / PFADE',val:String(D.system.length),delta:'',tc:'#6C7B6E',note:'im aktuellen Stand'},{label:'WARNUNGEN',val:String(D.system.filter(s=>s.state==='warn').length),delta:'',tc:gold,note:'zu prüfen'},{label:'FEHLER',val:String(D.system.filter(s=>s.state==='error').length),delta:'',tc:RUST,note:'aktuell'},{label:'FRONTEND-PFADE BEREIT',val:sourceState.ok+'/'+window.KZLive.sourceCount(),delta:'',tc:sourceState.errors?RUST:sourceState.loading?gold:GREENM,note:sourceState.label}]}[dk]||[{label:'EINTRÄGE',val:String(ROWS.length),delta:'',tc:'#6C7B6E',note:'im aktuellen Stand'},{label:'BEREICH',val:META.t,delta:'',tc:'#6C7B6E',note:'Detailansicht'},{label:'QUELLE',val:'OPS / Live',delta:'',tc:GREENM,note:'kein Demo-Datensatz'},{label:'STATUS',val:'bereit',delta:'',tc:GREENM,note:'Claude-Großansicht'}];
 
-    const rlab=rn+' Monate';
-    const finD={charts:[
-        this.lineChart('inc','Einnahmen, '+rlab,F.income.slice(-rn),F.months.slice(-rn),GREENM,'rgba(47,107,76,.4)',(v)=>this.eur(v),640,210),
-        this.lineChart('exp','Ausgaben, '+rlab,F.expense.slice(-rn),F.months.slice(-rn),RUST,'rgba(140,74,32,.38)',(v)=>this.eur(v),640,210)
-      ].map((c,i)=>({...c,delay:60+i*70})),
-      rings:F.budgets.map((b,i)=>{const c=2*Math.PI*41,ratio=b.limit>0?b.spent/b.limit:0,r=Math.min(1,ratio)*(S.dp||0);
-        return {label:b.label,color:ratio>.9?RUST:ratio>.75?gold:GREENM,
-          c:c.toFixed(1),off:(c*(1-r)).toFixed(1),pctLabel:b.limit>0?Math.round(ratio*100*(S.dp||0))+'%':'–',
-          val:nf(0).format(this.nd(b.spent))+' / '+nf(0).format(b.limit)+' €',
-          tc:ratio>.9?RUST:'#6C7B6E',
-          note:b.limit<=0?'Kein Planwert':b.limit-b.spent<0?nf(0).format(Math.abs(b.limit-b.spent))+' € über Plan':nf(0).format(b.limit-b.spent)+' € frei'};}),
-      donut:(()=>{const tot=F.cats.reduce((a,b)=>a+b.v,0),cir=2*Math.PI*38;let acc=0;
-        return F.cats.map((c,i)=>{const frac=tot>0?c.v/tot*(S.dp||0):0,len=cir*frac,off=-cir*acc;acc+=frac;
-          return {color:CATCOLORS[i%CATCOLORS.length],w:S.cat===i?14:11,dash:len.toFixed(2)+' '+(cir-len).toFixed(2),off:off.toFixed(2),
-            enter:()=>this.setState({cat:i}),leave:()=>this.setState({cat:null})};});})(),
-      donutVal:S.cat!=null?this.eur(F.cats[S.cat].v):this.eur(this.nd(F.cats.reduce((a,b)=>a+b.v,0))),
-      donutLabel:S.cat!=null?F.cats[S.cat].label:'Ausgaben gesamt',
-      legend:F.cats.map((c,i)=>({label:c.label,color:CATCOLORS[i%CATCOLORS.length],val:this.eur(this.nd(c.v)),op:S.cat==null||S.cat===i?1:.4})),
-      tx:F.tx.map(t=>({date:t.date,label:t.label,cat:t.cat,
-        color:CATCOLORS[Math.max(0,F.cats.findIndex(c=>c.label===t.cat))]||GREENM,
-        amount:(t.v>0?'+':'−')+nf(2).format(Math.abs(t.v))+' €',tc:t.v>0?GREENM:'#39473B'}))};
+    const rn=[3,6,12][S.range],ranges=[['3 Monate',0],['6 Monate',1],['12 Monate',2]].map(([label,i])=>({label,pick:()=>{this.setState({range:i});this.countUp('dp');},bg:S.range===i?'rgba(27,70,50,.12)':'rgba(255,255,255,.4)',border:S.range===i?'rgba(184,145,47,.6)':'rgba(20,45,32,.16)',fg:S.range===i?GREEN:'#4C5A4E'})),rlab=rn+' Monate';
+    const finD={charts:[this.lineChart('inc','Einnahmen, '+rlab,(F.income||[]).slice(-rn),(F.months||[]).slice(-rn),GREENM,'rgba(47,107,76,.4)',v=>this.eur(v),640,210),this.lineChart('exp','Ausgaben, '+rlab,(F.expense||[]).slice(-rn),(F.months||[]).slice(-rn),RUST,'rgba(140,74,32,.38)',v=>this.eur(v),640,210)].map((c,i)=>({...c,delay:60+i*70})),rings:(F.budgets||[]).map(b=>{const c=2*Math.PI*41,ratio=b.limit>0?b.spent/b.limit:0,r=Math.min(1,ratio)*(S.dp||0);return {label:b.label,color:ratio>.9?RUST:ratio>.75?gold:GREENM,c:c.toFixed(1),off:(c*(1-r)).toFixed(1),pctLabel:b.limit>0?Math.round(ratio*100*(S.dp||0))+'%':'–',val:nf(0).format(this.nd(b.spent))+' / '+nf(0).format(b.limit)+' €',tc:ratio>.9?RUST:'#6C7B6E',note:b.limit<=0?'Kein Planwert':b.limit-b.spent<0?nf(0).format(Math.abs(b.limit-b.spent))+' € über Plan':nf(0).format(b.limit-b.spent)+' € frei'};}),donut:(()=>{const cats=F.cats||[],tot=cats.reduce((a,b)=>a+b.v,0),cir=2*Math.PI*38;let acc=0;return cats.map((c,i)=>{const frac=tot>0?c.v/tot*(S.dp||0):0,len=cir*frac,off=-cir*acc;acc+=frac;return {color:CATCOLORS[i%CATCOLORS.length],w:S.cat===i?14:11,dash:len.toFixed(2)+' '+(cir-len).toFixed(2),off:off.toFixed(2),enter:()=>this.setState({cat:i}),leave:()=>this.setState({cat:null})};});})(),donutVal:S.cat!=null&&F.cats&&F.cats[S.cat]?this.eur(F.cats[S.cat].v):this.eur(this.nd((F.cats||[]).reduce((a,b)=>a+b.v,0))),donutLabel:S.cat!=null&&F.cats&&F.cats[S.cat]?F.cats[S.cat].label:'Ausgaben gesamt',legend:(F.cats||[]).map((c,i)=>({label:c.label,color:CATCOLORS[i%CATCOLORS.length],val:this.eur(this.nd(c.v)),op:S.cat==null||S.cat===i?1:.4})),tx:(F.tx||[]).map(t=>({date:t.date,label:t.label,cat:t.cat,color:CATCOLORS[Math.max(0,(F.cats||[]).findIndex(c=>c.label===t.cat))%CATCOLORS.length]||GREENM,amount:(t.v>0?'+':'−')+nf(2).format(Math.abs(t.v))+' €',tc:t.v>0?GREENM:'#39473B'}))};
+    const s14max=Math.max(1,...(H.steps14||[])),sleepMax=Math.max(1,...(H.sleep7||[]).map(d=>(d.total!=null?d.total:(d.deep||0)+(d.light||0)+(d.rem||0))));
+    const ringData=(label,note,color,glow,value,goal,display)=>{const c=2*Math.PI*42,ratio=goal>0?Math.min(1,(value||0)/goal):0;return {label,note,color,glow,val:display,c:c.toFixed(1),off:(c*(1-ratio*(S.dp||0))).toFixed(1),pctLabel:goal>0?Math.round((value||0)/goal*100*(S.dp||0))+'%':'–'};};
+    const heaD={rings:[ringData('Schritte',H.stepGoal?'Ziel '+nf(0).format(H.stepGoal):'Kein Zielwert',GREENM,'rgba(47,107,76,.45)',H.steps,H.stepGoal,H.available?nf(0).format(this.nd(H.steps||0)):'–'),ringData('Schlaf',H.sleepGoal?'Ziel '+nf(1).format(H.sleepGoal)+' h':'Kein Zielwert',GREEN,'rgba(27,70,50,.4)',H.sleep||0,H.sleepGoal,H.sleep==null?'–':nf(1).format(this.nd(H.sleep))+' h'),ringData('Aktivminuten',H.activeGoal?'Ziel '+H.activeGoal+' Min':'Kein Zielwert',gold,'rgba(184,145,47,.45)',H.active,H.activeGoal,H.available?Math.round(this.nd(H.active||0))+'′':'–')],workouts:(H.workoutsList||[]).map(w=>({...w,bg:w.load==='hoch'?'rgba(140,74,32,.13)':w.load==='mittel'?'rgba(184,145,47,.16)':'rgba(20,45,32,.08)',fg:w.load==='hoch'?RUST:w.load==='mittel'?'#8C6B18':'#4C5A4E'})),weight:this.lineChart('wgt','Gewicht',(H.weights||[]).slice(-rn),(H.weightLabels||[]).slice(-rn),GREENM,'rgba(47,107,76,.4)',v=>nf(1).format(v)+' kg',660,190),stepsSum:(H.steps14||[]).length?'Ø '+nf(0).format(this.nd(H.steps14.reduce((a,b)=>a+b,0)/H.steps14.length))+' Schritte':'Keine Schrittwerte',rangeLabel:(H.weights||[]).length?', letzte '+Math.min(rn,H.weights.length)+' Messwerte':'',steps:(H.steps14||[]).map((v,i)=>({l:(H.stepLabels||[])[i]||String(i+1),h:(14+v/s14max*126).toFixed(0),delay:120+i*38,fill:this.hv('s14',i)?GREEN:(H.stepGoal>0&&v>=H.stepGoal?GREENM:'rgba(27,70,50,.3)'),hovered:this.hv('s14',i),tip:nf(0).format(v)+' Schritte',enter:()=>this.setState({hover:{id:'s14',i}}),leave:()=>this.setState({hover:null})})),sleepLegend:[{label:'Tief',color:'#123A26'},{label:'Leicht / übrige Zeit',color:GREENM}],sleep:(H.sleep7||[]).map((d,i)=>{const tot=d.total!=null?d.total:(d.deep||0)+(d.light||0)+(d.rem||0),sc=110/sleepMax;return {l:d.label||(H.wdl||[])[i]||'',total:nf(1).format(tot),deep:((d.deep||0)*sc).toFixed(0),light:((d.light||0)*sc).toFixed(0),rem:((d.rem||0)*sc).toFixed(0),delay:150+i*55,hovered:this.hv('slp',i),tip:'Tief '+nf(1).format(d.deep||0)+' h · übrige Zeit '+nf(1).format((d.light||0)+(d.rem||0))+' h',enter:()=>this.setState({hover:{id:'slp',i}}),leave:()=>this.setState({hover:null})};})};
 
-    const s14max=Math.max(1,...H.steps14), sleepMax=Math.max(1,...H.sleep7.map(d=>d.total));
-    const ringData=(label,note,color,glow,value,goal,display)=>{const c=2*Math.PI*42,ratio=goal>0?Math.min(1,value/goal):0;return {label,note,color,glow,val:display,
-      c:c.toFixed(1),off:(c*(1-ratio*(S.dp||0))).toFixed(1),pctLabel:goal>0?Math.round(value/goal*100*(S.dp||0))+'%':'–'};};
-    const heaD={rings:[
-        ringData('Schritte',stepGoalLabel,GREENM,'rgba(47,107,76,.45)',H.steps,H.stepGoal,H.available?nf(0).format(this.nd(H.steps)):'–'),
-        ringData('Schlaf',sleepGoalLabel,GREEN,'rgba(27,70,50,.4)',H.sleep||0,H.sleepGoal,H.sleep==null?'–':nf(1).format(this.nd(H.sleep))+' h'),
-        ringData('Aktivminuten',activeGoalLabel,gold,'rgba(184,145,47,.45)',H.active,H.activeGoal,H.available?Math.round(this.nd(H.active))+'′':'–')],
-      workouts:H.workoutsList.map(w=>({...w,bg:w.load==='hoch'?'rgba(140,74,32,.13)':w.load==='mittel'?'rgba(184,145,47,.16)':'rgba(20,45,32,.08)',
-        fg:w.load==='hoch'?RUST:w.load==='mittel'?'#8C6B18':'#4C5A4E'})),
-      weight:this.lineChart('wgt','Gewicht',H.weights.slice(-rn),H.weightLabels.slice(-rn),GREENM,'rgba(47,107,76,.4)',(v)=>nf(1).format(v)+' kg',660,190),
-      stepsSum:H.steps14.length?'Ø '+nf(0).format(this.nd(H.steps14.reduce((a,b)=>a+b,0)/H.steps14.length))+' Schritte':'Keine Schrittwerte',
-      rangeLabel:H.weights.length?', letzte '+Math.min(rn,H.weights.length)+' Messwerte':'',
-      steps:H.steps14.map((v,i)=>({l:H.stepLabels[i]||String(i+1),h:(14+v/s14max*126).toFixed(0),delay:120+i*38,
-        fill:this.hv('s14',i)?GREEN:(H.stepGoal>0&&v>=H.stepGoal?GREENM:'rgba(27,70,50,.3)'),
-        hovered:this.hv('s14',i),tip:nf(0).format(v)+' Schritte',
-        enter:()=>this.setState({hover:{id:'s14',i}}),leave:()=>this.setState({hover:null})})),
-      sleepLegend:[{label:'Tief',color:'#123A26'},{label:'Leicht / übrige Zeit',color:GREENM}],
-      sleep:H.sleep7.map((d,i)=>{const tot=d.deep+d.light+d.rem,sc=110/sleepMax;
-        return {l:d.label||H.wdl[i]||'',total:nf(1).format(tot),deep:(d.deep*sc).toFixed(0),light:(d.light*sc).toFixed(0),rem:0,
-          delay:150+i*55,hovered:this.hv('slp',i),
-          tip:'Tief '+nf(1).format(d.deep)+' h · übrige Zeit '+nf(1).format(d.light)+' h',
-          enter:()=>this.setState({hover:{id:'slp',i}}),leave:()=>this.setState({hover:null})};})};
-
-    const bootOn=S.phase==='boot'||!S.bootDone;
-    const cursorOn=this.props.customCursor!==false;
-    const focusMinutes=D.tasks.slice(0,3).reduce((sum,t)=>sum+(t.estimatedMinutes||0),0);
-    const openAlerts=D.alerts.filter(a=>a.status!=='ACKNOWLEDGED');
-    const criticalAlerts=openAlerts.filter(a=>a.sev===3).length;
-    const warningSources=D.system.filter(s=>s.state==='warn'||s.state==='error').length;
-    const wbCount=Object.keys(S.wbForm||{}).length;
-    const wbHasData=wbCount>0||!!S.wbMood||!!S.wbFactor;
-    const wbCanSave=WB.available&&wbHasData;
-    const bootLog=window.KZLive.bootLog();
-
-    return {
-      cursorMode:cursorOn?'none':'default',cursorDisplay:cursorOn?'block':'none',
-      cursorRef:(el)=>{this.cursorEl=el;},
-      ambient:amb,showApp:S.phase!=='boot',
-      sourceState,
-      ui:{greeting:greet,subline:sub,todLine:todLine,dateLine:dateLine,footer:'DATENSTAND '+this.dateStr(),
-        openCount:String(Math.round(this.n(openTasks))),dueCount:String(Math.round(this.n(due))),
-        focus:focusMinutes?nf(1).format(this.n(focusMinutes/60))+' h':'–'},
-      op:{...D.operator,cta:S.focusOn?'Fokus läuft':'Fokus starten'},
-      startFocus:(e)=>{e.stopPropagation();this.setState(s=>({focusOn:!s.focusOn}));},
-      tasks:tasks.slice(0,5),tasksMeta:openTasks+' OFFEN · '+due+' HEUTE/ÜBERFÄLLIG',
-      alerts:alerts.slice(0,3),alertsMeta:openAlerts.length+' OFFEN'+(criticalAlerts?' · '+criticalAlerts+' KRITISCH':''),
-      inbox:inbox.slice(0,3),inboxMeta:D.inbox.length+' ZUR PRÜFUNG',
-      projects:projects.slice(0,4),projMeta:D.projects.length+' AKTIV',
-      mails:D.mails.slice(0,3),mailMeta:D.mails.length+' RELEVANT',
-      cal,fin,hea,weather,goals:goals.slice(0,3),goalsMeta:D.goals.length+' AKTIV',system:system.slice(0,5),sysMeta:warningSources+' ZU PRÜFEN',wb,
-      brief:D.briefing,open,weatherEgg:(e)=>{e.stopPropagation();this.weatherEgg();},crestClick:this.crest,
-      replayBoot:(e)=>{e.stopPropagation();window.KZLive.reload(this);this.boot();},
-      boot:{on:bootOn,skip:this.skipBoot,no3d:S.no3d,session:'SITZUNG 0x8F2C',
-        canvasRef:this.cvRef,pctRef:this.pctRef,barRef:this.barRef,
-        nodeLabel:'KNOTEN '+sourceState.ok+' / '+window.KZLive.sourceCount()+' · TLS AKTIV',
-        readyLabel:sourceState.errors?'TEILWEISE BEREIT':sourceState.ok<window.KZLive.sourceCount()?'DATENPFADE WERDEN GELADEN':'ALLE DATENPFADE BEREIT',
-        log:bootLog.slice(0,S.bootStep).map(l=>({text:l[0],code:l[1]})),
-        style:{position:'fixed',inset:0,zIndex:90,display:'grid',placeItems:'center',overflow:'hidden',
-          background:'radial-gradient(900px 700px at 50% 44%,#123522 0%,#0A1F14 46%,#050F0A 100%)',
-          transition:'opacity 700ms ease-out, clip-path 900ms cubic-bezier(.16,1,.3,1)',
-          opacity:S.bootOut?0:1,clipPath:S.bootOut?'circle(0% at 50% 46%)':'circle(140% at 50% 46%)',
-          pointerEvents:S.bootOut?'none':'auto'},
-        ticks:Array.from({length:12},(_,i)=>'rotate('+(i*30)+' 100 100)'),
-        lines:[{text:'SYSTEME WERDEN GEWECKT',color:'rgba(221,182,92,.75)',delay:300},
-          {text:'DATENPFADE · '+sourceState.ok+' VON '+window.KZLive.sourceCount()+' BEREIT',color:'rgba(221,182,92,.6)',delay:620},
-          {text:'KOMMANDOZENTRALE WIRD AKTIVIERT',color:'#F2DFA8',delay:940}]},
-      egg:{seal:S.egg==='seal',rain:S.egg==='rain',mono:S.egg==='mono',date:S.eggDate,
-        drops:Array.from({length:22},(_,i)=>({left:(3+i*4.4).toFixed(1),dur:(2200+((i*617)%1500)).toFixed(0),delay:((i*233)%1400).toFixed(0)}))},
-      wbD:{values:WB.labels.map((l,i)=>({label:l,val:(S.wbForm&&S.wbForm[i]!=null)?S.wbForm[i]:WB.values[i],
-          filled:!!(S.wbForm&&S.wbForm[i]!=null),
-          steps:Array.from({length:10},(_,k)=>({n:k+1,
-            bg:((S.wbForm&&S.wbForm[i]!=null?S.wbForm[i]:0)>=k+1)?(/Druck|Stress/i.test(l)?RUST:GREEN):'rgba(20,45,32,.07)',
-            fg:((S.wbForm&&S.wbForm[i]!=null?S.wbForm[i]:0)>=k+1)?'#F2EBD9':'#7A8A7C',
-            pick:()=>this.setState(s=>({wbForm:{...(s.wbForm||{}),[i]:k+1}}))}))})),
-        moods:(WB.options.feelings||[]).map(m=>({label:m,
-          bg:S.wbMood===m?'rgba(27,70,50,.14)':'rgba(255,255,255,.42)',
-          border:S.wbMood===m?'rgba(184,145,47,.6)':'rgba(20,45,32,.14)',
-          fg:S.wbMood===m?GREEN:'#4C5A4E',pick:()=>this.setState({wbMood:m})})),
-        factors:(WB.options.influences||[]).map(m=>({label:m,
-          bg:S.wbFactor===m?'rgba(184,145,47,.18)':'rgba(255,255,255,.42)',
-          border:S.wbFactor===m?'rgba(184,145,47,.6)':'rgba(20,45,32,.14)',
-          fg:S.wbFactor===m?'#8C6B18':'#4C5A4E',pick:()=>this.setState({wbFactor:m})})),
-        count:wbCount,
-        canSave:wbCanSave,
-        saved:!!S.wbSaved,
-        saveLabel:S.wbSaved?'Gespeichert ✓':!WB.available?'WELLBEING_LOG einrichten':wbCanSave?'Abendcheck speichern':'Mindestens eine Angabe',
-        saveBg:wbCanSave?'linear-gradient(180deg,#22553A,#173C28)':'rgba(20,45,32,.14)',
-        saveFg:wbCanSave?'#F1EADB':'#7A8A7C',
-        save:()=>{if(wbCanSave)window.KZLive.saveWellbeing(this);},
-        reset:()=>this.setState({wbForm:{},wbMood:null,wbFactor:null,wbSaved:false}),
-        spark:{d:wbSpark.d,pts:wbSpark.pts.map(pt=>({x:pt.x.toFixed(1),y:pt.y.toFixed(1)}))},
-        history:WB.last7.map((v,i)=>({l:WB.historyLabels[i]||String(i+1),
-          h:(16+v/10*104).toFixed(0),val:nf(1).format(v),delay:80+i*60,
-          fill:v>=7?GREEN:v>=6.5?GREENM:'rgba(27,70,50,.3)'})),
-        avg:wbAvg==null?'–':nf(1).format(wbAvg),patternText,historyCount:String(WB.last7.length),
-        latestScore:wbLatestScore==null?'–':nf(1).format(wbLatestScore)+' / 10',latestMood:WB.mood||'nicht angegeben'},
-      detail:{open:!!dk,isFinance:dk==='finance',isHealth:dk==='health',isWellbeing:dk==='wellbeing',isOperator:dk==='operator',
-        isGeneric:!!dk&&dk!=='finance'&&dk!=='health'&&dk!=='wellbeing',
-        kicker:META.k,title:META.t,sub:META.s,
-        listTitle:{operator:'Reihenfolge heute',tasks:'Offene Aufgaben',alerts:'Warnungen',weather:'Stundenprognose',
-          calendar:'Termine der Woche',inbox:'Zur Prüfung',mail:'Relevante Mails',projects:'Aktive Projekte',
-          briefing:'Letzte Briefings',goals:'Definierte Ziele',system:'Angebundene Quellen'}[dk]||'Einträge',
-        aside:ASIDE,notes:{...NOTES,lines:(NOTES.lines||[]).map(l=>({k:l[0],v:l[1]}))},
-        close:this.closeDetail,ranges:(dk==='finance'||dk==='health')?ranges:[],ledger:LEDGER.map((l,i)=>({...l,delay:40+i*60})),
-        rows:ROWS.map((r,i)=>({...r,delay:60+i*50,...tagStyle(r.tag)})),
-        searchQuery:S.sbQuery,searchStatus:S.sbStatus,searchResults:S.sbResults.map((r,i)=>({...r,delay:60+i*50})),
-        searchInput:(e)=>this.setState({sbQuery:e.target.value}),search:this.searchSecondBrain,
-        searchKey:(e)=>{if(e.key==='Enter')this.searchSecondBrain();},
-        goFinance:()=>this.setState({detail:'finance'},()=>this.countUp('dp')),
-        goHealth:()=>this.setState({detail:'health'},()=>this.countUp('dp')),
-        style:{position:'fixed',inset:0,zIndex:60,overflowY:'auto',willChange:'transform,opacity',
-          background:'linear-gradient(180deg,#EDE5D4 0%,#E5DCC9 100%)',
-          ...(S.detailIn?{opacity:1,transform:'none',transition:'transform 560ms cubic-bezier(.16,1,.3,1), opacity 380ms ease-out'}
-            :(S.detailClosing?{...this._origin,transition:'transform 400ms cubic-bezier(.4,0,.6,1), opacity 300ms ease-out'}
-              :{...(this._origin||{opacity:0}),transition:'none'}))}},
-      finD,heaD
-    };
-  }
-}
+    const wbCount=Object.keys(S.wbForm||{}).length,wbHasData=wbCount>0||!!S.wbMood||!!S.wbFactor,wbCanSave=WB.available&&wbHasData;
+    const bootOn=S.phase==='boot'||!S.bootDone,cursorOn=this.props.customCursor!==false,bootLog=window.KZLive.bootLog();
+    return {cursorMode:cursorOn?'none':'default',cursorDisplay:cursorOn?'block':'none',cursorRef:(el)=>{this.cursorEl=el;},ambient:amb,showApp:S.phase!=='boot',sourceState,
+      ui:{greeting:greet,subline:sub,todLine,dateLine,footer:'DATENSTAND '+this.dateStr(),openCount:String(Math.round(this.n(openTasks))),dueCount:String(Math.round(this.n(due))),focus:focusMinutes?nf(1).format(this.n(focusMinutes/60))+' h':'–'},
+      op:{...D.operator,cta:S.focusOn?'Fokus läuft':'Fokus starten'},startFocus:(e)=>{e.stopPropagation();this.setState(s=>({focusOn:!s.focusOn}));},tasks:tasks.slice(0,5),tasksMeta:openTasks+' OFFEN · '+due+' HEUTE/ÜBERFÄLLIG',alerts:alerts.slice(0,3),alertsMeta:openAlerts.length+' OFFEN'+(openAlerts.filter(a=>a.sev===3).length?' · '+openAlerts.filter(a=>a.sev===3).length+' KRITISCH':''),inbox:inbox.slice(0,3),inboxMeta:D.inbox.length+' ZUR PRÜFUNG',projects:projects.slice(0,4),projMeta:D.projects.length+' AKTIV',mails:D.mails.slice(0,3),mailMeta:D.mails.length+' RELEVANT',cal,fin,hea,weather,goals:goals.slice(0,3),goalsMeta:D.goals.length+' AKTIV',system:system.slice(0,5),sysMeta:D.system.filter(s=>s.state==='warn'||s.state==='error').length+' ZU PRÜFEN',wb,brief:D.briefing,open,
+      weatherEgg:(e)=>{e.stopPropagation();this.weatherEgg();},crestClick:this.crest,replayBoot:(e)=>{e.stopPropagation();window.KZLive.reload(this);this.boot();},
+      boot:{on:bootOn,skip:this.skipBoot,no3d:S.no3d,session:'SITZUNG 0x8F2C',canvasRef:this.cvRef,pctRef:this.pctRef,barRef:this.barRef,nodeLabel:'KNOTEN '+sourceState.ok+' / '+window.KZLive.sourceCount()+' · TLS AKTIV',readyLabel:sourceState.errors?'TEILWEISE BEREIT':sourceState.ok<window.KZLive.sourceCount()?'DATENPFADE WERDEN GELADEN':'ALLE DATENPFADE BEREIT',log:bootLog.slice(0,S.bootStep).map(l=>({text:l[0],code:l[1]})),style:{position:'fixed',inset:0,zIndex:90,display:'grid',placeItems:'center',overflow:'hidden',background:'radial-gradient(900px 700px at 50% 44%,#123522 0%,#0A1F14 46%,#050F0A 100%)',transition:'opacity 700ms ease-out, clip-path 900ms cubic-bezier(.16,1,.3,1)',opacity:S.bootOut?0:1,clipPath:S.bootOut?'circle(0% at 50% 46%)':'circle(140% at 50% 46%)',pointerEvents:S.bootOut?'none':'auto'},ticks:Array.from({length:12},(_,i)=>'rotate('+(i*30)+' 100 100)'),lines:[{text:'SYSTEME WERDEN GEWECKT',color:'rgba(221,182,92,.75)',delay:300},{text:'DATENPFADE · '+sourceState.ok+' VON '+window.KZLive.sourceCount()+' BEREIT',color:'rgba(221,182,92,.6)',delay:620},{text:'KOMMANDOZENTRALE WIRD AKTIVIERT',color:'#F2DFA8',delay:940}]},
+      egg:{seal:S.egg==='seal',rain:S.egg==='rain',mono:S.egg==='mono',date:S.eggDate,drops:Array.from({length:22},(_,i)=>({left:(3+i*4.4).toFixed(1),dur:(2200+((i*617)%1500)).toFixed(0),delay:((i*233)%1400).toFixed(0)}))},
+      wbD:{values:(WB.labels||[]).map((l,i)=>({label:l,val:(S.wbForm&&S.wbForm[i]!=null)?S.wbForm[i]:WB.values[i],filled:!!(S.wbForm&&S.wbForm[i]!=null),steps:Array.from({length:10},(_,k)=>({n:k+1,bg:((S.wbForm&&S.wbForm[i]!=null?S.wbForm[i]:0)>=k+1)?(/Druck|Stress/i.test(l)?RUST:GREEN):'rgba(20,45,32,.07)',fg:((S.wbForm&&S.wbForm[i]!=null?S.wbForm[i]:0)>=k+1)?'#F2EBD9':'#7A8A7C',pick:()=>this.setState(s=>({wbForm:{...(s.wbForm||{}),[i]:k+1}}))}))})),moods:((WB.options&&WB.options.feelings)||[]).map(m=>({label:m,bg:S.wbMood===m?'rgba(27,70,50,.14)':'rgba(255,255,255,.42)',border:S.wbMood===m?'rgba(184,145,47,.6)':'rgba(20,45,32,.14)',fg:S.wbMood===m?GREEN:'#4C5A4E',pick:()=>this.setState({wbMood:m})})),factors:((WB.options&&WB.options.influences)||[]).map(m=>({label:m,bg:S.wbFactor===m?'rgba(184,145,47,.18)':'rgba(255,255,255,.42)',border:S.wbFactor===m?'rgba(184,145,47,.6)':'rgba(20,45,32,.14)',fg:S.wbFactor===m?'#8C6B18':'#4C5A4E',pick:()=>this.setState({wbFactor:m})})),count:wbCount,canSave:wbCanSave,saved:!!S.wbSaved,saveLabel:S.wbSaved?'Gespeichert ✓':!WB.available?'WELLBEING_LOG einrichten':wbCanSave?'Abendcheck speichern':'Mindestens eine Angabe',saveBg:wbCanSave?'linear-gradient(180deg,#22553A,#173C28)':'rgba(20,45,32,.14)',saveFg:wbCanSave?'#F1EADB':'#7A8A7C',save:()=>{if(wbCanSave)window.KZLive.saveWellbeing(this);},reset:()=>this.setState({wbForm:{},wbMood:null,wbFactor:null,wbSaved:false}),spark:{d:wbSpark.d,pts:wbSpark.pts.map(pt=>({x:pt.x.toFixed(1),y:pt.y.toFixed(1)}))},history:(WB.last7||[]).map((v,i)=>({l:(WB.historyLabels||[])[i]||String(i+1),h:(16+v/10*104).toFixed(0),val:nf(1).format(v),delay:80+i*60,fill:v>=7?GREEN:v>=6.5?GREENM:'rgba(27,70,50,.3)'})),avg:wbAvg==null?'–':nf(1).format(wbAvg),patternText,historyCount:String((WB.last7||[]).length),latestScore:wbLatestScore==null?'–':nf(1).format(wbLatestScore)+' / 10',latestMood:WB.mood||'nicht angegeben'},
+      detail:{open:!!dk,isFinance:dk==='finance',isHealth:dk==='health',isWellbeing:dk==='wellbeing',isOperator:dk==='operator',isTasks:dk==='tasks',isAlerts:dk==='alerts',isWeather:dk==='weather',isCalendar:dk==='calendar',isInbox:dk==='inbox',isMail:dk==='mail',isProjects:dk==='projects',isBriefing:dk==='briefing',isGoals:dk==='goals',isSystem:dk==='system',isListPage:['operator','tasks','alerts','weather','calendar','inbox','mail','projects','briefing','goals','system'].includes(dk),kicker:META.k,title:META.t,sub:META.s,listTitle:{operator:'Reihenfolge heute',tasks:'Offene Aufgaben',alerts:'Warnungen',weather:'Stundenprognose',calendar:'Termine der Woche',inbox:'Zur Prüfung',mail:'Relevante Mails',projects:'Aktive Projekte',briefing:'Aktuelles Briefing',goals:'Definierte Ziele',system:'Angebundene Quellen'}[dk]||'Einträge',aside:ASIDE,notes:{...NOTES,lines:(NOTES.lines||[]).map(l=>({k:l[0],v:l[1]}))},close:this.closeDetail,ranges,ledger:(LEDGER||[]).map((l,i)=>({...l,delay:40+i*60})),rows:rowsBase.map((r,i)=>({...r,delay:60+i*50,...tagStyle(r.tag)})),filterChips,sortToggle,crossLinks:{operator:[{label:'Briefing',go:jump.briefing},{label:'Aufgaben',go:jump.tasks}],tasks:[{label:'Personal Operator',go:jump.operator},{label:'Projekte',go:jump.projects}],alerts:[{label:'System & Sync',go:jump.system},{label:'Finanzen',go:jump.finance}],weather:[{label:'Kalender',go:jump.calendar},{label:'Gesundheit',go:jump.health}],calendar:[{label:'Personal Operator',go:jump.operator},{label:'Aufgaben',go:jump.tasks}],inbox:[{label:'Mail',go:jump.mail},{label:'System & Sync',go:jump.system}],mail:[{label:'KI-Inbox',go:jump.inbox},{label:'Aufgaben',go:jump.tasks}],projects:[{label:'Finanzen',go:jump.finance},{label:'Aufgaben',go:jump.tasks}],briefing:[{label:'Personal Operator',go:jump.operator},{label:'Ziele',go:jump.goals}],goals:[{label:'Wellbeing',go:jump.wellbeing},{label:'Finanzen',go:jump.finance}],system:[{label:'Alerts',go:jump.alerts},{label:'Mail',go:jump.mail}]}[dk]||[],searchQuery:S.sbQuery,searchStatus:S.sbStatus,searchResults:S.sbResults.map((r,i)=>({...r,delay:60+i*50})),searchInput:(e)=>this.setState({sbQuery:e.target.value}),search:this.searchSecondBrain,searchKey:(e)=>{if(e.key==='Enter')this.searchSecondBrain();},style:{position:'fixed',inset:0,zIndex:60,overflowY:'auto',willChange:'transform,opacity',background:'linear-gradient(180deg,#EDE5D4 0%,#E5DCC9 100%)',...(S.detailIn?{opacity:1,transform:'none',transition:'transform 560ms cubic-bezier(.16,1,.3,1), opacity 380ms ease-out'}:(S.detailClosing?{...this._origin,transition:'transform 400ms cubic-bezier(.4,0,.6,1), opacity 300ms ease-out'}:{...(this._origin||{opacity:0}),transition:'none'}))}},finD,heaD,opD,taskD,alertD,weathD,calD,inboxD,mailD,projD,briefD,goalD,sysD};
+  }}
 
 </script>
 </body>

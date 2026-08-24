@@ -846,7 +846,7 @@
           <path d="M50 16 L78 27 L78 56 Q78 78 50 90 Q22 78 22 56 L22 27 Z" fill="rgba(221,182,92,.12)" stroke="#DDB65C" stroke-width="1.6"></path>
         </svg>
         <div style="margin-top:9px;font-family:'Bodoni Moda',serif;font-size:24.3px;color:#14311F;font-style:italic">Orden für Beharrlichkeit</div>
-        <div style="margin-top:4px;font-family:'IBM Plex Mono',monospace;font-size:12.2px;letter-spacing:.14em;color:#8C6B18">VERLIEHEN AN LUKE · {{ egg.date }}</div>
+        <div style="margin-top:4px;font-family:'IBM Plex Mono',monospace;font-size:12.2px;letter-spacing:.14em;color:#8C6B18">VERLIEHEN AN LUKES · {{ egg.date }}</div>
       </div>
     </div>
   </sc-if>
@@ -1188,7 +1188,7 @@ class Component extends DCLogic {
   onKey=(e)=>{
     if(e.key==='Escape'&&this.state.sheet)this.closeSheet();
     if(e.key&&e.key.length===1){this.keys=(this.keys+e.key.toLowerCase()).slice(-6);
-      if(this.keys.endsWith('luke'))this.fireEgg('mono',4200);}
+      if(this.keys.endsWith('lukes'))this.fireEgg('mono',4200);}
   };
   fireEgg=(k,ms)=>{clearTimeout(this._e);this.setState({egg:k,eggDate:this.dateStr()});this._e=setTimeout(()=>this.setState({egg:null}),ms);};
   crest=()=>{this._cc=(this._cc||0)+1;clearTimeout(this._cct);
@@ -1299,7 +1299,7 @@ class Component extends DCLogic {
       mittag:'radial-gradient(760px 560px at 50% -10%,rgba(255,248,224,.55),transparent 60%)',
       abend:'radial-gradient(700px 520px at 88% -6%,rgba(226,178,110,.42),transparent 62%),radial-gradient(560px 420px at 8% 12%,rgba(180,196,178,.3),transparent 60%)',
       nacht:'radial-gradient(700px 520px at 50% -10%,rgba(120,146,132,.38),transparent 62%),radial-gradient(500px 380px at 90% 20%,rgba(184,145,47,.16),transparent 60%)'}[tod];
-    const greet={morgen:'Guten Morgen, Luke.',mittag:'Mittagsstand, Luke.',abend:'Guten Abend, Luke.',nacht:'Späte Schicht, Luke.'}[tod];
+    const greet={morgen:'Guten Morgen, Lukes.',mittag:'Mittagsstand, Lukes.',abend:'Guten Abend, Lukes.',nacht:'Späte Schicht, Lukes.'}[tod];
     const todLine={morgen:'MORGENLICHT · AKTIV',mittag:'TAGBETRIEB · AKTIV',abend:'ABENDLICHT · AKTIV',nacht:'NACHTMODUS · AKTIV'}[tod];
     const todayIso=new Intl.DateTimeFormat('sv-SE',{timeZone:'Europe/Berlin'}).format(new Date());
     const openTasks=D.tasks.length;
