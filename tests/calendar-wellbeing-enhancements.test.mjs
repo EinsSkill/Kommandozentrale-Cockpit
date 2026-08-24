@@ -34,34 +34,58 @@ test('calendar endpoint supports day week month and hides Möglichkeiten by defa
   assert.match(server, /\['day', 'week', 'month'\]/);
   assert.match(server, /defaultVisible: !\/möglichkeit\/i/);
   assert.match(server, /CalendarApp\.getAllCalendars\(\)/);
-  assert.match(client, /kz\.calendar\.v1/);
-  for (const label of ['Tag', 'Woche', 'Monat', 'Heute', 'Kalender ▾']) {
+  assert.match(client, /kz\.calendar\.v2/);
+  for (const label of ['Tag', 'Woche', 'Monat', 'Heute', 'Kalender']) {
     assert.match(client, new RegExp(label));
   }
+});
+
+test('calendar redesign keeps dense views inside the tile and uses purpose-built day week month layouts', () => {
+  assert.match(client, /kz-cal-desktop/);
+  assert.match(client, /position:absolute/);
+  assert.match(client, /kz-week-strip/);
+  assert.match(client, /kz-agenda-list/);
+  assert.match(client, /kz-month-grid/);
+  assert.match(client, /kz-month-dots/);
+  assert.match(client, /openDay\(day\)/);
+  assert.doesNotMatch(client, /component\.D\.week\s*=/);
 });
 
 test('calendar selection remains presentation state and does not write Google Calendar', () => {
   assert.doesNotMatch(server, /cal\.createEvent|ev\.deleteEvent|CalendarApp\.createEvent/);
   assert.match(server, /cal\.getEvents\(range\.start, range\.end\)/);
   assert.match(client, /localStorage\.setItem\(PREF_KEY/);
+  assert.match(client, /selectStandardCalendars/);
+  assert.match(client, /selectAllCalendars/);
 });
 
-test('wellbeing can be backfilled while future entry dates are rejected', () => {
+test('wellbeing backfill reads the visible selected date and verifies the server saved the same logical date', () => {
   assert.match(server, /saveWellbeingEntryV2/);
   assert.match(server, /entryDate > today/);
   assert.match(server, /saveWellbeingEntryV1\(p\)/);
-  assert.match(client, /input\.type = 'date'/);
-  assert.match(client, /input\.max = todayKey\(\)/);
-  assert.match(client, /entryDate: state\.wellbeingDate/);
+  assert.match(client, /input\.type='date'/);
+  assert.match(client, /input\.max=todayKey\(\)/);
+  assert.match(client, /selectedWellbeingDate/);
+  assert.match(client, /entryDate/);
   assert.match(client, /saveWellbeingEntryV2/);
+  assert.match(client, /result\.entryDate/);
+  assert.match(client, /__kzBackfillV2/);
+  assert.match(client, /pointerdown',ensureAdapterPatch,true/);
+  assert.match(client, /wbSaved:todaySaved/);
+  assert.doesNotMatch(client, /kz\.wellbeing\.entryDate/);
 });
 
-test('desktop and mobile share the same enhancement layer and touch controls stay usable', () => {
-  assert.match(client, /findHosts/);
-  assert.match(client, /kzCalendarEnhanced/);
-  assert.match(client, /minHeight: mobile \? '44px' : '30px'/);
-  assert.match(client, /background: active \? GREEN/);
+test('desktop and mobile share the enhancement layer with cockpit styling and usable touch targets', () => {
   assert.match(client, /Kommandozentrale Mobil/);
+  assert.match(client, /#1B4632/);
+  assert.match(client, /#B8912F/);
+  assert.match(client, /min-height:44px/);
   assert.match(client, /observer\.disconnect\(\)/);
-  assert.match(client, /GOLD/);
+  assert.match(client, /kz-cal-popover/);
+});
+
+test('embedded enhancement JavaScript remains syntactically parseable', () => {
+  const match = client.match(/<script>([\s\S]*?)<\/script>/);
+  assert.ok(match, 'enhancement script block missing');
+  assert.doesNotThrow(() => new Function(match[1]));
 });
