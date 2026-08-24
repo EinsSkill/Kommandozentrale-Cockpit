@@ -1,26 +1,9 @@
 /**
  * Kommandozentrale – modular calendar + dated wellbeing extension.
  *
- * This file intentionally sorts after Code.gs. In Apps Script it provides the
- * web entry point that evaluates the original Claude template first and then
- * injects the small enhancement layer. The original desktop/mobile design
- * sources remain untouched and therefore stay design-lock compatible.
+ * The web entry point lives exclusively in Code.gs. This file only provides
+ * the calendar and wellbeing endpoints used by the shared enhancement layer.
  */
-function doGet(e) {
-  const view = e && e.parameter && e.parameter.view === 'mobile' ? 'MobileIndex' : 'Index';
-  const template = HtmlService.createTemplateFromFile(view);
-  template.webAppUrl = ScriptApp.getService().getUrl() || '';
-  const evaluated = template.evaluate();
-  const enhancement = HtmlService.createHtmlOutputFromFile('CalendarWellbeingEnhancements').getContent();
-  // The current mobile design calls this card "Heute im Kalender". Normalizing
-  // the label lets the shared enhancement layer find the same card on both
-  // desktop and mobile without editing the Claude source file itself.
-  const rendered = evaluated.getContent().replace('Heute im Kalender', 'Kalenderwoche');
-  const content = rendered.replace(/<\/body>\s*<\/html>\s*$/i, enhancement + '\n</body>\n</html>');
-  return HtmlService.createHtmlOutput(content)
-    .setTitle('Lukes Kommandozentrale')
-    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
-}
 
 /**
  * Reads an arbitrary day/week/month range from Google Calendar. Google
