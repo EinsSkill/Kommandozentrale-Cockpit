@@ -4,6 +4,10 @@
  * which calendars and date range the cockpit renders.
  */
 function getCalendarViewV4(request, force) {
+  if (typeof request === 'boolean') {
+    force = request;
+    request = null;
+  }
   const req = request && typeof request === 'object' ? request : {};
   const view = ['day', 'week', 'month'].indexOf(String(req.view || '').toLowerCase()) >= 0
     ? String(req.view).toLowerCase()
