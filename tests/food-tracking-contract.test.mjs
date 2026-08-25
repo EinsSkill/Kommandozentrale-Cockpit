@@ -21,7 +21,7 @@ test('Food-Tracking definiert den OPS-Datenvertrag', () => {
     'saveFoodPantryItemV1', 'consumeFoodPantryItemV1',
     'saveFoodShoppingItemV1', 'saveFoodRecipeV1'
   ]) assert.match(backend, new RegExp('function ' + fn + '\\('));
-  assert.match(backend, /sourceOfTruth: 'OPS\\.FOOD_\\*'/);
+  assert.match(backend, /sourceOfTruth: 'OPS\.FOOD_\*'/);
   assert.match(backend, /setupRequired: !configured/);
   assert.match(backend, /calories_estimate/);
   assert.match(backend, /protein_estimate/);
@@ -33,10 +33,10 @@ test('Ernährung ist als getrennte Desktop-/Mobile-Route eingebunden', () => {
   assert.match(code, /isFoodView/);
   assert.match(desktop, /data-screen-label="Ernährung — Desktop"/);
   assert.match(mobile, /data-screen-label="Ernährung — Mobil"/);
-  assert.match(desktop, /includeHtml_\\('ClaudeRuntime'\\)/);
-  assert.match(mobile, /includeHtml_\\('ClaudeRuntime'\\)/);
-  assert.doesNotMatch(desktop, /support\\.js/);
-  assert.doesNotMatch(mobile, /support\\.js/);
+  assert.match(desktop, /includeHtml_\('ClaudeRuntime'\)/);
+  assert.match(mobile, /includeHtml_\('ClaudeRuntime'\)/);
+  assert.doesNotMatch(desktop, /support\.js/);
+  assert.doesNotMatch(mobile, /support\.js/);
   assert.match(desktop, /preview/);
   assert.match(mobile, /preview/);
 });
@@ -53,9 +53,9 @@ test('Backend, Routen und eingebettete Scripts sind syntaktisch parsebar', () =>
   assert.doesNotThrow(() => new Function(code));
   assert.doesNotThrow(() => new Function(backend));
   const scripts = [
-    ...desktop.matchAll(/<script(?:\\s[^>]*)?data-dc-script[^>]*>([\\s\\S]*?)<\\/script>/gi),
-    ...mobile.matchAll(/<script(?:\\s[^>]*)?data-dc-script[^>]*>([\\s\\S]*?)<\\/script>/gi),
-    ...entry.matchAll(/<script(?:\\s[^>]*)?>([\\s\\S]*?)<\\/script>/gi)
+    ...desktop.matchAll(/<script(?:\s[^>]*)?data-dc-script[^>]*>([\s\S]*?)<\/script>/gi),
+    ...mobile.matchAll(/<script(?:\s[^>]*)?data-dc-script[^>]*>([\s\S]*?)<\/script>/gi),
+    ...entry.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/gi)
   ].map(match => match[1]);
   assert.equal(scripts.length, 3);
   scripts.forEach(script => assert.doesNotThrow(() => new Function(script)));
