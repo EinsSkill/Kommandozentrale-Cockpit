@@ -5,42 +5,58 @@ import { fileURLToPath } from 'node:url';
 import test from 'node:test';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
-const code = await readFile(join(root, 'src', 'FoodTracking.gs'), 'utf8');
-const enhancement = await readFile(join(root, 'src', 'FoodTrackingEnhancements.html'), 'utf8');
+const code = await readFile(join(root, 'src', 'Code.gs'), 'utf8');
+const backend = await readFile(join(root, 'src', 'FoodTracking.gs'), 'utf8');
+const entry = await readFile(join(root, 'src', 'FoodTrackingEnhancements.html'), 'utf8');
+const desktop = await readFile(join(root, 'src', 'FoodIndex.html'), 'utf8');
+const mobile = await readFile(join(root, 'src', 'FoodMobileIndex.html'), 'utf8');
 
 test('Food-Tracking definiert den OPS-Datenvertrag', () => {
-  assert.match(code, /const FOOD_SHEETS_V1/);
-  assert.match(code, /FOOD_PANTRY/);
-  assert.match(code, /FOOD_LOG/);
-  assert.match(code, /FOOD_RECIPES/);
-  assert.match(code, /FOOD_SHOPPING/);
-  assert.match(code, /function getFoodV1\(force\)/);
-  assert.match(code, /function setupFoodTrackingV1\(\)/);
-  assert.match(code, /function saveFoodEntryV1\(payload\)/);
-  assert.match(code, /function saveFoodPantryItemV1\(payload\)/);
-  assert.match(code, /function consumeFoodPantryItemV1\(payload\)/);
-  assert.match(code, /function saveFoodShoppingItemV1\(payload\)/);
-  assert.match(code, /function saveFoodRecipeV1\(payload\)/);
-  assert.match(code, /sourceOfTruth: 'OPS\.FOOD_\*'/);
-  assert.match(code, /setupRequired: !configured/);
-  assert.match(code, /calories_estimate/);
-  assert.match(code, /protein_estimate/);
+  assert.match(backend, /const FOOD_SHEETS_V1/);
+  for (const sheet of ['FOOD_PANTRY', 'FOOD_LOG', 'FOOD_RECIPES', 'FOOD_SHOPPING']) {
+    assert.match(backend, new RegExp(sheet));
+  }
+  for (const fn of [
+    'getFoodV1', 'setupFoodTrackingV1', 'saveFoodEntryV1',
+    'saveFoodPantryItemV1', 'consumeFoodPantryItemV1',
+    'saveFoodShoppingItemV1', 'saveFoodRecipeV1'
+  ]) assert.match(backend, new RegExp('function ' + fn + '\\('));
+  assert.match(backend, /sourceOfTruth: 'OPS\\.FOOD_\\*'/);
+  assert.match(backend, /setupRequired: !configured/);
+  assert.match(backend, /calories_estimate/);
+  assert.match(backend, /protein_estimate/);
 });
 
-test('Frontend zeigt keine erfundenen Ernährungswerte', () => {
-  assert.match(enhancement, /data-kz-food-card/);
-  assert.match(enhancement, /Ernährung & Vorrat/);
-  assert.match(enhancement, /getFoodV1/);
-  assert.match(enhancement, /setupFoodTrackingV1/);
-  assert.match(enhancement, /saveFoodEntryV1/);
-  assert.match(enhancement, /saveFoodPantryItemV1/);
-  assert.match(enhancement, /Noch keine FOOD_\*-Tabellen/);
-  assert.doesNotMatch(enhancement, /FIXTURE|mock|fake|demo/i);
+test('Ernährung ist als getrennte Desktop-/Mobile-Route eingebunden', () => {
+  assert.match(code, /FoodIndex/);
+  assert.match(code, /FoodMobileIndex/);
+  assert.match(code, /isFoodView/);
+  assert.match(desktop, /data-screen-label="Ernährung — Desktop"/);
+  assert.match(mobile, /data-screen-label="Ernährung — Mobil"/);
+  assert.match(desktop, /includeHtml_\\('ClaudeRuntime'\\)/);
+  assert.match(mobile, /includeHtml_\\('ClaudeRuntime'\\)/);
+  assert.doesNotMatch(desktop, /support\\.js/);
+  assert.doesNotMatch(mobile, /support\\.js/);
+  assert.match(desktop, /preview/);
+  assert.match(mobile, /preview/);
 });
 
-test('Apps-Script-Backend und Enhancement sind syntaktisch parsebar', () => {
+test('Hauptseite enthält nur einen kompakten Einstieg ohne erfundene Live-Werte', () => {
+  assert.match(entry, /data-kz-food-entry/);
+  assert.match(entry, /openFood/);
+  assert.match(entry, /getFoodV1/);
+  assert.match(entry, /FoodMobileIndex/);
+  assert.doesNotMatch(entry, /FIXTURE|mock|fake|demo/i);
+});
+
+test('Backend, Routen und eingebettete Scripts sind syntaktisch parsebar', () => {
   assert.doesNotThrow(() => new Function(code));
-  const scripts = [...enhancement.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/gi)].map(match => match[1]);
-  assert.ok(scripts.length >= 1);
+  assert.doesNotThrow(() => new Function(backend));
+  const scripts = [
+    ...desktop.matchAll(/<script(?:\\s[^>]*)?data-dc-script[^>]*>([\\s\\S]*?)<\\/script>/gi),
+    ...mobile.matchAll(/<script(?:\\s[^>]*)?data-dc-script[^>]*>([\\s\\S]*?)<\\/script>/gi),
+    ...entry.matchAll(/<script(?:\\s[^>]*)?>([\\s\\S]*?)<\\/script>/gi)
+  ].map(match => match[1]);
+  assert.equal(scripts.length, 3);
   scripts.forEach(script => assert.doesNotThrow(() => new Function(script)));
 });
