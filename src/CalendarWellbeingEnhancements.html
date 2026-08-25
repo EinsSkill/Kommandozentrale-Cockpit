@@ -77,7 +77,8 @@
     float:right; margin-top:6px; color:#7A8A7C; font:8px/1 'IBM Plex Mono',monospace;
   }
   .kz-large-all-day {
-    flex:0 0 auto; min-height:48px; border:1px solid rgba(20,45,32,.14); border-top:1px solid rgba(20,45,32,.08);
+    flex:0 0 auto; height:auto; min-height:48px; align-items:start;
+    border:1px solid rgba(20,45,32,.14); border-top:1px solid rgba(20,45,32,.08);
     overflow:hidden; background:rgba(247,241,228,.72);
   }
   .kz-large-all-day-label {
@@ -86,7 +87,7 @@
     border-right:1px solid rgba(20,45,32,.10);
   }
   .kz-large-all-day-cell {
-    min-width:0; min-height:46px; padding:4px; border-left:1px solid rgba(20,45,32,.10);
+    min-width:0; min-height:46px; height:max-content; align-self:start; padding:4px; border-left:1px solid rgba(20,45,32,.10);
     display:flex; flex-direction:column; gap:3px; overflow:hidden;
   }
   .kz-large-chip {
@@ -426,7 +427,7 @@
     if(!events.length){const empty=node('div','kz-cal-empty'),inner=node('div');inner.append(node('div',null,'Keine Termine'),node('div',null,'Dieser Tag ist im ausgewählten Kalenderfilter frei.'));inner.lastChild.style.marginTop='4px';inner.lastChild.style.fontSize='9px';inner.lastChild.style.color=MUTED;empty.appendChild(inner);list.appendChild(empty);}else events.forEach(event=>list.appendChild(renderEvent(event)));agenda.appendChild(list);return agenda;
   }
   function renderEvent(event){
-    const item=node('div','kz-event'),start=new Date(event.start),time=event.allDay?'GANZTAG':new Intl.DateTimeFormat('de-DE',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Berlin'}).format(start),timeEl=node('div','kz-event-time',time),rail=node('span','kz-event-rail');rail.style.background=eventColor(event);const main=node('div','kz-event-main'),title=node('div','kz-event-title',String(event.title||'(ohne Titel)'));title.title=String(event.title||'');const meta=node('div','kz-event-meta'),calendar=node('span',null,eventCalendarName(event));calendar.title=String(event.calendar||'');meta.appendChild(calendar);if(event.location){const location=node('span',null,'· '+String(event.location));location.title=String(event.location);meta.appendChild(location);}main.append(title,meta);item.append(timeEl,rail,main);return item;
+    const item=node('div','kz-event'),start=new Date(event.start),time=isAllDayEvent(event)?'GANZTAG':new Intl.DateTimeFormat('de-DE',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Berlin'}).format(start),timeEl=node('div','kz-event-time',time),rail=node('span','kz-event-rail');rail.style.background=eventColor(event);const main=node('div','kz-event-main'),title=node('div','kz-event-title',String(event.title||'(ohne Titel)'));title.title=String(event.title||'');const meta=node('div','kz-event-meta'),calendar=node('span',null,eventCalendarName(event));calendar.title=String(event.calendar||'');meta.appendChild(calendar);if(event.location){const location=node('span',null,'· '+String(event.location));location.title=String(event.location);meta.appendChild(location);}main.append(title,meta);item.append(timeEl,rail,main);return item;
   }
   function renderWeek(){
     const body=node('div','kz-cal-body'),start=rangeStart(),anchor=parseKey(state.anchorDate)||new Date(),strip=node('div','kz-week-strip');
@@ -461,9 +462,21 @@
     return {start:start,end:end};
   }
 
+  function isAllDayEvent(event){
+    if(!event)return false;
+    if(event.allDay===true||event.allDay===1||/^(true|1)$/i.test(String(event.allDay||'')))return true;
+    const start=new Date(event.start),end=new Date(event.end);
+    if(!Number.isFinite(start.getTime())||!Number.isFinite(end.getTime())||end<=start)return false;
+    const startsAtMidnight=start.getHours()===0&&start.getMinutes()===0&&start.getSeconds()===0;
+    const endsAtMidnight=end.getHours()===0&&end.getMinutes()===0&&end.getSeconds()===0;
+    const startDay=new Date(start);startDay.setHours(0,0,0,0);
+    const endDay=new Date(end);endDay.setHours(0,0,0,0);
+    return startsAtMidnight&&endsAtMidnight&&endDay>startDay;
+  }
+
   function largeTimeSegmentsForDay(day){
     const bounds=largeDayBounds(day),items=[];
-    state.events.filter(event=>!event.allDay&&eventOverlapsDay(event,day)).forEach(event=>{
+    state.events.filter(event=>!isAllDayEvent(event)&&eventOverlapsDay(event,day)).forEach(event=>{
       const rawStart=new Date(event.start),rawEnd=new Date(event.end);
       const startMs=Math.max(rawStart.getTime(),bounds.start.getTime());
       const endMs=Math.min((Number.isFinite(rawEnd.getTime())?rawEnd.getTime():startMs+60000),bounds.end.getTime());
@@ -486,7 +499,7 @@
   }
 
   function largeAllDayEventsForDay(day){
-    return state.events.filter(event=>!!event.allDay&&eventOverlapsDay(event,day));
+    return state.events.filter(event=>isAllDayEvent(event)&&eventOverlapsDay(event,day));
   }
 
   function renderLargeDayHeader(day){

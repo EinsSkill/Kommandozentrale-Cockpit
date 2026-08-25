@@ -47,6 +47,10 @@ test('calendar redesign keeps dense views inside the tile and uses purpose-built
   assert.match(client, /kz-cal-detail/);
   assert.match(client, /renderLargeTimeGrid/);
   assert.match(client, /largeTimeSegmentsForDay/);
+  assert.match(client, /function isAllDayEvent/);
+  assert.match(client, /!isAllDayEvent\\(event\\)/);
+  assert.match(client, /filter\\(event=>isAllDayEvent\\(event\\)/);
+  assert.match(client, /height:max-content/);
   assert.match(client, /position:absolute/);
   assert.match(client, /kz-week-strip/);
   assert.match(client, /kz-agenda-list/);
