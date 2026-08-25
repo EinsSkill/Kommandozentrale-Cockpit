@@ -47,11 +47,16 @@ const WELLBEING_INFLUENCES = [
 ];
 
 function doGet(e) {
-  const view = e && e.parameter && e.parameter.view === 'mobile' ? 'MobileIndex' : 'Index';
+  const requestedView = e && e.parameter ? String(e.parameter.view || '') : '';
+  const view = requestedView === 'food' ? 'FoodIndex'
+    : requestedView === 'food-mobile' ? 'FoodMobileIndex'
+    : requestedView === 'mobile' ? 'MobileIndex'
+    : 'Index';
+  const isFoodView = view === 'FoodIndex' || view === 'FoodMobileIndex';
   const template = HtmlService.createTemplateFromFile(view);
   template.webAppUrl = ScriptApp.getService().getUrl() || '';
   const evaluated = template.evaluate();
-  const enhancement = [
+  const enhancement = isFoodView ? '' : [
     HtmlService.createHtmlOutputFromFile('CalendarWellbeingEnhancements').getContent(),
     HtmlService.createHtmlOutputFromFile('FoodTrackingEnhancements').getContent()
   ].join('\n');
@@ -60,7 +65,7 @@ function doGet(e) {
   const rendered = evaluated.getContent().replace('Heute im Kalender', 'Kalenderwoche');
   const content = rendered.replace(/<\/body>\s*<\/html>\s*$/i, enhancement + '\n</body>\n</html>');
   return HtmlService.createHtmlOutput(content)
-    .setTitle('Lukes Kommandozentrale')
+    .setTitle(isFoodView ? 'Ernährung · Lukes Kommandozentrale' : 'Lukes Kommandozentrale')
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }
 

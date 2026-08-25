@@ -29,7 +29,8 @@ test('mobile Claude source is retained and routed without external support.js', 
   const style = mobile.match(/<style>([\s\S]*?)<\/style>/)?.[1];
   assert.ok(style, 'mobile Claude stylesheet missing');
   assert.equal(createHash('sha256').update(style).digest('hex'), '5adc33a567a3c3f99c247ecdbd7619a085d84a26cd23af492e03a8777fbd4f3a');
-  assert.match(code, /e\.parameter\.view === 'mobile' \? 'MobileIndex' : 'Index'/);
+  assert.match(code, /requestedView === 'mobile' \? 'MobileIndex'/);
+  assert.match(code, /: 'Index';/);
   assert.match(code, /template\.webAppUrl = ScriptApp\.getService\(\)\.getUrl\(\)/);
   assert.match(index, /searchParams\.set\('view', 'mobile'\)/);
   assert.match(index, /publishedUrl = '[^']*webAppUrl[^']*'/);

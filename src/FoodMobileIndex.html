@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<?!= includeHtml_('ClaudeRuntime'); ?>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400&family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  html,body{margin:0;padding:0;width:100%;max-width:100%;overflow-x:hidden}
+  body{font-family:Archivo,system-ui,sans-serif;font-size:20.5px;line-height:1.5;color:#142219;background:#CFC6B0;-webkit-font-smoothing:antialiased;-webkit-text-size-adjust:100%;text-size-adjust:100%;overscroll-behavior-y:none;box-sizing:border-box}
+  *,*::before,*::after{box-sizing:border-box}
+  a{color:#1B4632;text-decoration:none;border-bottom:1px solid rgba(184,145,47,.5)}
+  a:hover{color:#8C6B18;border-bottom-color:#B8912F}
+  ::selection{background:rgba(184,145,47,.28)}
+  @keyframes kRise{from{opacity:0;transform:translateY(14px) scale(.97)}to{opacity:1;transform:none}}
+  @keyframes kFadeIn{from{opacity:0}to{opacity:1}}
+  @keyframes kBreathe{0%,100%{opacity:.5}50%{opacity:1}}
+  @keyframes kRiseUp{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+  @media (prefers-reduced-motion: reduce){*,*::before,*::after{animation-duration:.001ms !important;animation-delay:0ms !important;transition-duration:.001ms !important}}
+</style>
+</helmet>
+
+<div data-screen-label="Ernährung — Mobil" style="position:relative;width:100%;max-width:100%;box-sizing:border-box;min-height:100dvh;overflow-x:hidden;background:linear-gradient(180deg,#E9E1D0 0%,#E1D8C5 100%)">
+
+  <div style="position:relative;z-index:5;display:flex;flex-direction:column;width:100%;max-width:100%;box-sizing:border-box;min-height:100dvh">
+
+    <div style="position:sticky;top:0;z-index:40;background:linear-gradient(180deg,#0A1F15 0%,#102C1E 100%);border-bottom:1px solid rgba(184,145,47,.45);box-shadow:0 8px 22px -16px rgba(10,31,21,.7)">
+      <div style="padding:calc(12px + env(safe-area-inset-top,0px)) 16px 12px;display:flex;align-items:center;gap:12px">
+        <a href="<?= webAppUrl ?>?view=mobile" style="width:44px;height:44px;flex:0 0 auto;display:grid;place-items:center;margin-left:-4px;border-bottom:none">
+          <svg viewBox="0 0 100 100" width="34" height="34" aria-hidden="true">
+            <circle cx="50" cy="50" r="45" fill="none" stroke="#B8912F" stroke-width="1.4" opacity=".55"></circle>
+            <path d="M50 16 L76 27 L76 55 Q76 76 50 88 Q24 76 24 55 L24 27 Z" fill="rgba(184,145,47,.14)" stroke="#DDB65C" stroke-width="1.6"></path>
+            <text x="50" y="70" text-anchor="middle" fill="#EFD9A0" style="font-family:'Bodoni Moda',serif;font-size:26px;font-weight:600;letter-spacing:-1px">LK</text>
+          </svg>
+        </a>
+        <div style="display:flex;flex-direction:column;gap:1px;min-width:0">
+          <div style="font-family:'Bodoni Moda',serif;font-size:21.1px;font-weight:500;color:#F4EDDC">Ernährung</div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:12.2px;color:#C9AE6C;letter-spacing:.06em">Kommandozentrale</div>
+        </div>
+        <div style="flex:1"></div>
+        <span style="width:6px;height:6px;border-radius:50%;background:#5FBF8A;box-shadow:0 0 8px #5FBF8A;animation:kBreathe 2.6s ease-in-out infinite;flex:0 0 auto"></span>
+      </div>
+      <div style="display:flex;gap:8px;padding:0 16px 12px;overflow-x:auto">
+        <span onClick="{{ setSub.heute }}" style="flex:0 0 auto;font-size:14.3px;padding:8px 14px;border-radius:999px;white-space:nowrap;background:{{ subBg.heute }};color:{{ subFg.heute }};border:1px solid {{ subBorder.heute }}">Heute</span>
+        <span onClick="{{ setSub.woche }}" style="flex:0 0 auto;font-size:14.3px;padding:8px 14px;border-radius:999px;white-space:nowrap;background:{{ subBg.woche }};color:{{ subFg.woche }};border:1px solid {{ subBorder.woche }}">Wochenplan</span>
+        <span onClick="{{ setSub.vorrat }}" style="flex:0 0 auto;font-size:14.3px;padding:8px 14px;border-radius:999px;white-space:nowrap;background:{{ subBg.vorrat }};color:{{ subFg.vorrat }};border:1px solid {{ subBorder.vorrat }}">Vorrat</span>
+        <span onClick="{{ setSub.einkauf }}" style="flex:0 0 auto;font-size:14.3px;padding:8px 14px;border-radius:999px;white-space:nowrap;background:{{ subBg.einkauf }};color:{{ subFg.einkauf }};border:1px solid {{ subBorder.einkauf }}">Einkauf</span>
+        <span onClick="{{ setSub.rezepte }}" style="flex:0 0 auto;font-size:14.3px;padding:8px 14px;border-radius:999px;white-space:nowrap;background:{{ subBg.rezepte }};color:{{ subFg.rezepte }};border:1px solid {{ subBorder.rezepte }}">Rezepte</span>
+        <span onClick="{{ setSub.verlauf }}" style="flex:0 0 auto;font-size:14.3px;padding:8px 14px;border-radius:999px;white-space:nowrap;background:{{ subBg.verlauf }};color:{{ subFg.verlauf }};border:1px solid {{ subBorder.verlauf }}">Verlauf</span>
+      </div>
+    </div>
+
+    <div style="flex:1;width:100%;max-width:100%;box-sizing:border-box;padding:18px 16px calc(28px + 74px + env(safe-area-inset-bottom, 0px));display:flex;flex-direction:column;gap:16px">
+
+      <sc-if value="{{ subOn.heute }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:16px;animation:kRise 420ms cubic-bezier(.16,1,.3,1) both">
+          <div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:12.8px;letter-spacing:.08em;color:#7A8A7C">{{ ui.weekday }}</div>
+            <div style="font-family:'Bodoni Moda',serif;font-size:30.7px;line-height:1.15;color:#132A1D;margin-top:2px">{{ ui.dateLine }}</div>
+            <div style="margin-top:6px;font-size:15.4px;color:#4C5A4E">Dein heutiger Überblick</div>
+          </div>
+
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <span onClick="{{ openMeal }}" style="flex:1;min-width:150px;text-align:center;font-size:14.3px;color:#0C2418;background:linear-gradient(180deg,#E2C271,#C09B36);padding:13px 10px;border-radius:10px;font-weight:600">+ Mahlzeit</span>
+            <span onClick="{{ setSub.einkauf }}" style="flex:1;min-width:120px;text-align:center;font-size:14.3px;color:#1B4632;background:rgba(27,70,50,.07);border:1px solid rgba(27,70,50,.22);padding:13px 10px;border-radius:10px">+ Einkauf</span>
+            <span onClick="{{ setSub.vorrat }}" style="flex:1;min-width:120px;text-align:center;font-size:14.3px;color:#1B4632;background:rgba(27,70,50,.07);border:1px solid rgba(27,70,50,.22);padding:13px 10px;border-radius:10px">Vorrat</span>
+          </div>
+
+          <sc-if value="{{ ui.demoEmptyBanner }}" hint-placeholder-val="{{ false }}">
+            <div style="border-radius:12px;padding:14px 15px;background:rgba(20,45,32,.05);border:1px dashed rgba(20,45,32,.22);font-size:13.6px;color:#4C5A4E;line-height:1.4">Noch keine Daten eingerichtet. So wirkt der Bereich ohne Einträge.</div>
+          </sc-if>
+
+          <div style="display:flex;gap:16px;align-items:center;padding:14px;border-radius:12px;background:rgba(255,255,255,.4);border:1px solid rgba(20,45,32,.1)">
+            <div style="position:relative;width:88px;height:88px;flex:0 0 auto;border-radius:50%;background:{{ macroDonut.bg }};animation:kFadeIn 500ms ease-out both">
+              <div style="position:absolute;inset:11px;border-radius:50%;background:#F1E9D9;display:grid;place-items:center">
+                <div style="text-align:center">
+                  <div style="font-family:'Bodoni Moda',serif;font-size:16.6px;color:#1B4632">{{ ui.kcalDisplay }}</div>
+                  <div style="font-size:8px;color:#7A8A7C">KCAL</div>
+                </div>
+              </div>
+            </div>
+            <div style="flex:1;display:flex;flex-direction:column;gap:6px">
+              <sc-for list="{{ macroLegend }}" as="mc" hint-placeholder-count="3">
+                <div style="display:flex;align-items:center;gap:7px">
+                  <span style="width:8px;height:8px;border-radius:2px;background:{{ mc.color }};flex:0 0 auto"></span>
+                  <span style="font-size:12.2px;color:#39473B;flex:1">{{ mc.label }}</span>
+                  <span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:#4C5A4E">{{ mc.val }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+          <div style="font-size:12.2px;color:#7A8A7C">≈ Geschätzt, keine exakten Angaben und keine Zielwerte.</div>
+
+          <div style="padding:16px;border-radius:14px;background:linear-gradient(180deg,#F5EFE2,#EFE7D5);border:1px solid rgba(20,45,32,.13);box-shadow:0 10px 22px -18px rgba(20,45,32,.5)">
+            <div style="font-family:'Bodoni Moda',serif;font-size:19.2px;color:#132A1D">Heute gegessen</div>
+            <div style="display:flex;flex-direction:column;gap:14px;margin-top:12px">
+              <sc-for list="{{ mealGroups }}" as="g" hint-placeholder-count="4">
+                <div>
+                  <div style="display:flex;align-items:baseline;justify-content:space-between;padding-bottom:8px;border-bottom:1px solid rgba(20,45,32,.1)">
+                    <span style="font-size:15px;font-weight:600;color:#1B4632">{{ g.label }}</span>
+                    <span style="font-family:'IBM Plex Mono',monospace;font-size:12.8px;color:#6C7B6E">{{ g.kcalSum }}</span>
+                  </div>
+                  <sc-if value="{{ g.hasItems }}" hint-placeholder-val="{{ true }}">
+                    <sc-for list="{{ g.items }}" as="m" hint-placeholder-count="1">
+                      <div style="padding:10px 0;border-bottom:1px solid rgba(20,45,32,.06)">
+                        <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px">
+                          <span style="font-size:14.7px;color:#17251B">{{ m.name }}</span>
+                          <span style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:#4C5A4E;white-space:nowrap">{{ m.kcalLabel }}</span>
+                        </div>
+                        <div style="font-size:12.2px;color:#7A8A7C;margin-top:2px">{{ m.time }} · {{ m.portion }}</div>
+                      </div>
+                    </sc-for>
+                  </sc-if>
+                  <sc-if value="{{ g.empty }}" hint-placeholder-val="{{ false }}">
+                    <div style="padding:12px 0;font-size:13.6px;color:#8A9A8C">Noch nichts eingetragen</div>
+                  </sc-if>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ subOn.woche }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;gap:10px;animation:kRise 420ms cubic-bezier(.16,1,.3,1) both">
+          <div style="font-family:'Bodoni Moda',serif;font-size:24px;color:#132A1D">Wochenplanung</div>
+          <sc-for list="{{ weekDays }}" as="d" hint-placeholder-count="7">
+            <div style="padding:14px 16px;border-radius:12px;background:rgba(255,255,255,.4);border:1px solid rgba(20,45,32,.1)">
+              <div style="display:flex;align-items:baseline;justify-content:space-between">
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:12.8px;letter-spacing:.06em;color:#6C7B6E">{{ d.label }}</span>
+                <span style="font-size:11.5px;padding:3px 9px;border-radius:999px;background:{{ d.badgeBg }};color:{{ d.badgeFg }}">{{ d.badgeLabel }}</span>
+              </div>
+              <div style="margin-top:8px;font-size:15.4px;color:#17251B">{{ d.dish }}</div>
+              <sc-if value="{{ d.hasPortions }}" hint-placeholder-val="{{ true }}">
+                <div style="margin-top:5px;font-size:12.8px;color:#4C5A4E">{{ d.portionsLabel }}</div>
+              </sc-if>
+              <sc-if value="{{ d.hasNote }}" hint-placeholder-val="{{ false }}">
+                <div style="margin-top:3px;font-size:12.2px;color:#8C6B18">{{ d.note }}</div>
+              </sc-if>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ subOn.vorrat }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;gap:12px;animation:kRise 420ms cubic-bezier(.16,1,.3,1) both">
+          <div style="font-family:'Bodoni Moda',serif;font-size:24px;color:#132A1D">Vorrat</div>
+          <input value="{{ vorratQ }}" onChange="{{ onVorratQ }}" placeholder="Suchen…" style="font-size:14.3px;padding:11px 14px;border-radius:10px;border:1px solid rgba(20,45,32,.2);background:rgba(255,255,255,.5);color:#17251B;font-family:Archivo,sans-serif"></input>
+          <div style="display:flex;gap:7px;overflow-x:auto;padding-bottom:2px">
+            <sc-for list="{{ vorratCats }}" as="vc" hint-placeholder-count="8">
+              <span onClick="{{ vc.select }}" style="flex:0 0 auto;font-size:12.8px;padding:7px 13px;border-radius:999px;white-space:nowrap;background:{{ vc.bg }};color:{{ vc.fg }};border:1px solid {{ vc.border }}">{{ vc.label }}</span>
+            </sc-for>
+          </div>
+          <sc-if value="{{ ui.demoEmptyBanner }}" hint-placeholder-val="{{ false }}">
+            <div style="border-radius:12px;padding:14px 15px;background:rgba(20,45,32,.05);border:1px dashed rgba(20,45,32,.22);font-size:13.6px;color:#4C5A4E">Noch keine Vorratsdaten eingerichtet.</div>
+          </sc-if>
+          <sc-for list="{{ pantryCatsView }}" as="c" hint-placeholder-count="8">
+            <div style="padding:15px 16px;border-radius:14px;background:linear-gradient(180deg,#F5EFE2,#EFE7D5);border:1px solid rgba(20,45,32,.13);box-shadow:0 10px 22px -18px rgba(20,45,32,.5)">
+              <div style="display:flex;align-items:baseline;justify-content:space-between">
+                <span style="font-family:'Bodoni Moda',serif;font-size:16.6px;color:#132A1D">{{ c.label }}</span>
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:#6C7B6E">{{ c.count }}</span>
+              </div>
+              <sc-for list="{{ c.items }}" as="it" hint-placeholder-count="2">
+                <div style="padding:10px 0;border-bottom:1px solid rgba(20,45,32,.07)">
+                  <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px">
+                    <span style="font-size:14.3px;color:{{ it.nameColor }};text-decoration:{{ it.strike }}">{{ it.name }}</span>
+                    <span style="font-size:11px;padding:2px 8px;border-radius:999px;background:{{ it.badgeBg }};color:{{ it.badgeFg }};white-space:nowrap">{{ it.badgeLabel }}</span>
+                  </div>
+                  <div style="font-size:12.2px;color:#7A8A7C;margin-top:2px">{{ it.qty }} · {{ it.location }}</div>
+                </div>
+              </sc-for>
+              <sc-if value="{{ c.isEmpty }}" hint-placeholder-val="{{ false }}">
+                <div style="padding:10px 0;font-size:13.6px;color:#8A9A8C">Keine Einträge in dieser Kategorie.</div>
+              </sc-if>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ subOn.einkauf }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;gap:12px;animation:kRise 420ms cubic-bezier(.16,1,.3,1) both">
+          <div style="display:flex;align-items:baseline;justify-content:space-between">
+            <div style="font-family:'Bodoni Moda',serif;font-size:24px;color:#132A1D">Einkaufsliste</div>
+            <span onClick="{{ noop }}" style="font-size:13px;color:#0C2418;background:linear-gradient(180deg,#E2C271,#C09B36);padding:9px 14px;border-radius:10px;font-weight:600">+ Artikel</span>
+          </div>
+          <div style="font-size:13.6px;color:#4C5A4E">{{ shopOpenCount }} offen · {{ shopDoneCount }} erledigt</div>
+
+          <div style="font-size:13.6px;font-weight:600;color:#1B4632;letter-spacing:.02em;margin-top:4px">Für geplante Gerichte</div>
+          <sc-for list="{{ shopPlanned }}" as="grp" hint-placeholder-count="2">
+            <div style="padding:14px 16px;border-radius:12px;background:rgba(255,255,255,.4);border:1px solid rgba(20,45,32,.1)">
+              <div style="font-size:11.5px;letter-spacing:.06em;color:#7A8A7C;text-transform:uppercase">{{ grp.cat }}</div>
+              <sc-for list="{{ grp.items }}" as="si" hint-placeholder-count="2">
+                <div onClick="{{ si.toggle }}" style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid rgba(20,45,32,.07);cursor:pointer">
+                  <span style="width:16px;height:16px;border-radius:4px;border:1.5px solid {{ si.checkBorder }};background:{{ si.checkBg }};flex:0 0 auto;transition:background 160ms ease-out"></span>
+                  <span style="flex:1;font-size:14px;color:{{ si.fg }};text-decoration:{{ si.strike }}">{{ si.name }} <span style="color:#8C6B18;font-size:11px">{{ si.market }}</span></span>
+                  <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#6C7B6E;flex:0 0 auto">{{ si.qty }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </sc-for>
+
+          <div style="font-size:13.6px;font-weight:600;color:#1B4632;letter-spacing:.02em;margin-top:4px">Sonstiger Einkauf</div>
+          <sc-for list="{{ shopOther }}" as="grp" hint-placeholder-count="2">
+            <div style="padding:14px 16px;border-radius:12px;background:rgba(255,255,255,.4);border:1px solid rgba(20,45,32,.1)">
+              <div style="font-size:11.5px;letter-spacing:.06em;color:#7A8A7C;text-transform:uppercase">{{ grp.cat }}</div>
+              <sc-for list="{{ grp.items }}" as="si" hint-placeholder-count="2">
+                <div onClick="{{ si.toggle }}" style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid rgba(20,45,32,.07);cursor:pointer">
+                  <span style="width:16px;height:16px;border-radius:4px;border:1.5px solid {{ si.checkBorder }};background:{{ si.checkBg }};flex:0 0 auto;transition:background 160ms ease-out"></span>
+                  <span style="flex:1;font-size:14px;color:{{ si.fg }};text-decoration:{{ si.strike }}">{{ si.name }}</span>
+                  <span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:#9AAE9C;flex:0 0 auto">{{ si.price }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </sc-for>
+          <div style="font-size:11.5px;color:#9AAE9C">Preise sind Beispielwerte ohne Budgetlogik.</div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ subOn.rezepte }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;gap:12px;animation:kRise 420ms cubic-bezier(.16,1,.3,1) both">
+          <div style="font-family:'Bodoni Moda',serif;font-size:24px;color:#132A1D">Rezepte</div>
+          <div style="display:flex;gap:7px;overflow-x:auto;padding-bottom:2px">
+            <sc-for list="{{ tagChips }}" as="tc" hint-placeholder-count="5">
+              <span onClick="{{ tc.toggle }}" style="flex:0 0 auto;font-size:12.2px;padding:6px 12px;border-radius:999px;white-space:nowrap;background:{{ tc.bg }};color:{{ tc.fg }};border:1px solid {{ tc.border }}">{{ tc.label }}</span>
+            </sc-for>
+          </div>
+          <div style="font-size:13.6px;font-weight:600;color:#1B4632">Favoriten</div>
+          <sc-for list="{{ recipesFav }}" as="r" hint-placeholder-count="3">
+            <div onClick="{{ r.open }}" style="display:flex;gap:12px;padding:13px;border-radius:12px;background:rgba(255,255,255,.4);border:1px solid rgba(20,45,32,.1)">
+              <div style="width:56px;height:56px;flex:0 0 auto;border-radius:8px;background:linear-gradient(135deg,#EADFC4,#D8CBA6);display:grid;place-items:center">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" opacity=".45"><path d="M7 3v6a2 2 0 0 0 2 2v10M7 3v8M10 3v6M14 3c-1.7 0-2.5 2-2.5 4.4 0 2 1 3.1 2.5 3.6V21" stroke="#5B4A21" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+              </div>
+              <div style="flex:1;min-width:0">
+                <div style="display:flex;justify-content:space-between;gap:8px">
+                  <span style="font-size:14.7px;color:#17251B">{{ r.title }}</span>
+                  <span style="font-size:12px;color:#B8912F;white-space:nowrap">{{ r.stars }}</span>
+                </div>
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#7A8A7C;margin-top:3px">{{ r.meta }}</div>
+              </div>
+            </div>
+          </sc-for>
+          <div style="font-size:13.6px;font-weight:600;color:#1B4632;margin-top:6px">Noch nicht bewertet</div>
+          <sc-for list="{{ recipesUnrated }}" as="r" hint-placeholder-count="2">
+            <div onClick="{{ r.open }}" style="display:flex;gap:12px;padding:13px;border-radius:12px;background:rgba(255,255,255,.4);border:1px solid rgba(20,45,32,.1)">
+              <div style="width:56px;height:56px;flex:0 0 auto;border-radius:8px;background:linear-gradient(135deg,#EADFC4,#D8CBA6);display:grid;place-items:center">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" opacity=".45"><path d="M7 3v6a2 2 0 0 0 2 2v10M7 3v8M10 3v6M14 3c-1.7 0-2.5 2-2.5 4.4 0 2 1 3.1 2.5 3.6V21" stroke="#5B4A21" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+              </div>
+              <div style="flex:1;min-width:0">
+                <span style="font-size:14.7px;color:#17251B">{{ r.title }}</span>
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#7A8A7C;margin-top:3px">{{ r.meta }}</div>
+              </div>
+            </div>
+          </sc-for>
+
+          <div style="padding:15px 16px;border-radius:14px;background:linear-gradient(180deg,#F5EFE2,#EFE7D5);border:1px solid rgba(20,45,32,.13);box-shadow:0 10px 22px -18px rgba(20,45,32,.5);margin-top:6px">
+            <div style="font-family:'Bodoni Moda',serif;font-size:16.6px;color:#132A1D">Vorlieben &amp; Abneigungen</div>
+            <div style="font-size:11.5px;letter-spacing:.06em;color:#7A8A7C;text-transform:uppercase;margin-top:10px">Mag besonders</div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px">
+              <sc-for list="{{ prefLikes }}" as="t" hint-placeholder-count="3">
+                <span style="font-size:12px;padding:5px 11px;border-radius:999px;background:rgba(184,145,47,.12);color:#8C6B18;border:1px solid rgba(184,145,47,.3)">{{ t }}</span>
+              </sc-for>
+            </div>
+            <div style="font-size:11.5px;letter-spacing:.06em;color:#7A8A7C;text-transform:uppercase;margin-top:12px">Eher nicht</div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px">
+              <sc-for list="{{ prefDislikes }}" as="t" hint-placeholder-count="2">
+                <span style="font-size:12px;padding:5px 11px;border-radius:999px;background:rgba(20,45,32,.05);color:#6C7B6E;border:1px solid rgba(20,45,32,.15)">{{ t }}</span>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ subOn.verlauf }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;gap:12px;animation:kRise 420ms cubic-bezier(.16,1,.3,1) both">
+          <div style="font-family:'Bodoni Moda',serif;font-size:24px;color:#132A1D">Verlauf und Muster</div>
+          <div style="padding:16px;border-radius:14px;background:linear-gradient(180deg,#F5EFE2,#EFE7D5);border:1px solid rgba(20,45,32,.13);box-shadow:0 10px 22px -18px rgba(20,45,32,.5)">
+            <div style="display:flex;align-items:baseline;justify-content:space-between">
+              <span style="font-family:'Bodoni Moda',serif;font-size:16.6px;color:#132A1D">Kalorien, 7 Tage</span>
+              <span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:#6C7B6E">Ø {{ historyAvg }}</span>
+            </div>
+            <div style="display:flex;align-items:flex-end;gap:6px;height:80px;margin-top:14px;clip-path:{{ chartClip }};transition:clip-path 900ms cubic-bezier(.16,1,.3,1)">
+              <sc-for list="{{ historyWeek }}" as="d" hint-placeholder-count="7">
+                <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px">
+                  <i style="width:100%;max-width:22px;border-radius:2px;background:#2F6B4C;height:{{ d.h }}px;transform-origin:bottom;animation:kRiseUp 620ms cubic-bezier(.16,1,.3,1) both"></i>
+                  <span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#7A8A7C">{{ d.l }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+          <div style="padding:15px 16px;border-radius:14px;background:rgba(255,255,255,.4);border:1px solid rgba(20,45,32,.1)">
+            <div style="font-family:'Bodoni Moda',serif;font-size:15.4px;color:#132A1D">Häufig gekocht</div>
+            <sc-for list="{{ historyFrequent }}" as="h" hint-placeholder-count="3">
+              <div style="display:flex;justify-content:space-between;margin-top:8px">
+                <span style="font-size:13.6px;color:#39473B">{{ h.name }}</span>
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#6C7B6E">{{ h.count }}</span>
+              </div>
+            </sc-for>
+          </div>
+          <div style="padding:15px 16px;border-radius:14px;background:rgba(255,255,255,.4);border:1px solid rgba(20,45,32,.1)">
+            <div style="font-family:'Bodoni Moda',serif;font-size:15.4px;color:#132A1D">Selten oder schlecht bewertet</div>
+            <sc-for list="{{ historyRare }}" as="h" hint-placeholder-count="2">
+              <div style="display:flex;justify-content:space-between;margin-top:8px">
+                <span style="font-size:13.6px;color:#39473B">{{ h.name }}</span>
+                <span style="font-size:12px;color:#8C4A20">{{ h.note }}</span>
+              </div>
+            </sc-for>
+          </div>
+          <div style="font-size:13.6px;font-weight:600;color:#1B4632;letter-spacing:.02em;margin-top:4px">Erkannte Muster</div>
+          <sc-for list="{{ patterns }}" as="p" hint-placeholder-count="3">
+            <div style="padding:14px 15px;border-radius:12px;background:rgba(255,255,255,.4);border:1px solid rgba(20,45,32,.1)">
+              <span style="font-size:11px;padding:3px 9px;border-radius:999px;background:{{ p.tagBg }};color:{{ p.tagFg }};letter-spacing:.03em">{{ p.tagLabel }}</span>
+              <div style="margin-top:8px;font-size:14px;color:#17251B;line-height:1.45">{{ p.text }}</div>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+
+    </div>
+
+    <div style="position:fixed;left:0;right:0;bottom:0;width:100%;box-sizing:border-box;z-index:60;display:flex;background:linear-gradient(180deg,#102C1E 0%,#0A1F15 100%);border-top:1px solid rgba(184,145,47,.4);box-shadow:0 -10px 26px -18px rgba(5,15,10,.9);padding:6px 2px calc(6px + env(safe-area-inset-bottom, 0px))">
+      <a href="<?= webAppUrl ?>?view=mobile" style="flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:8px 2px;min-height:62px;border-radius:10px;color:#7A8A7C;border-bottom:none">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none"><circle cx="12" cy="12" r="8.4" stroke="currentColor" stroke-width="1.6"></circle><path d="M14.4 9.6 L12.9 13.4 L9.6 14.4 L11.1 10.6 Z" fill="currentColor"></path></svg>
+        <span style="font-size:11px">Heute</span>
+      </a>
+      <a href="<?= webAppUrl ?>?view=mobile" style="flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:8px 2px;min-height:62px;border-radius:10px;color:#7A8A7C;border-bottom:none">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none"><ellipse cx="12" cy="8.2" rx="7" ry="2.8" stroke="currentColor" stroke-width="1.6"></ellipse><path d="M5 8.2v7.4c0 1.55 3.13 2.8 7 2.8s7-1.25 7-2.8V8.2" stroke="currentColor" stroke-width="1.6"></path></svg>
+        <span style="font-size:11px">Finanzen</span>
+      </a>
+      <a href="<?= webAppUrl ?>?view=mobile" style="flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:8px 2px;min-height:62px;border-radius:10px;color:#7A8A7C;border-bottom:none">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none"><path d="M3 12.5h3.4l1.8-4.8 2.6 9.6 2.2-7.4 1.6 2.6h4.4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+        <span style="font-size:11px">Gesundheit</span>
+      </a>
+      <a href="<?= webAppUrl ?>?view=mobile" style="flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:8px 2px;min-height:62px;border-radius:10px;color:#7A8A7C;border-bottom:none">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none"><path d="M12 3.2C7.5 9 5.6 12.3 5.6 15.4a6.4 6.4 0 0 0 12.8 0c0-3.1-1.9-6.4-6.4-12.2Z" stroke="currentColor" stroke-width="1.6"></path></svg>
+        <span style="font-size:11px">Wellbeing</span>
+      </a>
+      <div style="flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:8px 2px;min-height:62px;border-radius:10px;color:#DDB65C;background:rgba(221,182,92,.12)">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none"><path d="M7 3v6a2 2 0 0 0 2 2v10M7 3v8M10 3v6M14 3c-1.7 0-2.5 2-2.5 4.4 0 2 1 3.1 2.5 3.6V21" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+        <span style="font-size:11px">Ernährung</span>
+        <i style="width:4px;height:4px;border-radius:50%;background:#DDB65C"></i>
+      </div>
+      <a href="<?= webAppUrl ?>?view=mobile" style="flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:8px 2px;min-height:62px;border-radius:10px;color:#7A8A7C;border-bottom:none">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none"><circle cx="7.2" cy="7.2" r="1.9" fill="currentColor"></circle><circle cx="16.8" cy="7.2" r="1.9" fill="currentColor"></circle><circle cx="7.2" cy="16.8" r="1.9" fill="currentColor"></circle><circle cx="16.8" cy="16.8" r="1.9" fill="currentColor"></circle></svg>
+        <span style="font-size:11px">Mehr</span>
+      </a>
+    </div>
+  </div>
+
+  <sc-if value="{{ modal.meal }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;inset:0;z-index:70;display:flex;align-items:flex-end;background:rgba(15,26,18,.45);animation:kFadeIn 220ms ease-out both" onClick="{{ closeMealBg }}">
+      <div style="width:100%;max-height:88vh;overflow-y:auto;border-radius:16px 16px 0 0;padding:22px 18px calc(24px + env(safe-area-inset-bottom,0px));background:linear-gradient(180deg,#F5EFE2 0%,#EEE6D5 100%);border-top:1px solid rgba(20,45,32,.18);animation:kRise 320ms cubic-bezier(.16,1,.3,1) both" onClick="{{ stop }}">
+        <div style="display:flex;align-items:baseline;justify-content:space-between">
+          <span style="font-family:'Bodoni Moda',serif;font-size:19.2px;color:#132A1D">Mahlzeit eintragen</span>
+          <span onClick="{{ closeMeal }}" style="cursor:pointer;color:#7A8A7C;font-size:20px;line-height:1">×</span>
+        </div>
+        <div style="margin-top:14px;display:flex;gap:8px;overflow-x:auto">
+          <sc-for list="{{ mealTypeChips }}" as="mt" hint-placeholder-count="4">
+            <span style="flex:0 0 auto;font-size:13px;padding:8px 13px;border-radius:999px;background:{{ mt.bg }};color:{{ mt.fg }};border:1px solid {{ mt.border }};white-space:nowrap">{{ mt.label }}</span>
+          </sc-for>
+        </div>
+        <div style="margin-top:12px;display:flex;flex-direction:column;gap:10px">
+          <input placeholder="Bezeichnung" style="width:100%;font-size:14px;padding:12px 13px;border-radius:10px;border:1px solid rgba(20,45,32,.2);background:rgba(255,255,255,.6);color:#17251B;font-family:Archivo,sans-serif;box-sizing:border-box"></input>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <input type="time" defaultValue="12:30" style="width:100%;font-size:14px;padding:12px 13px;border-radius:10px;border:1px solid rgba(20,45,32,.2);background:rgba(255,255,255,.6);color:#17251B;font-family:Archivo,sans-serif;box-sizing:border-box"></input>
+            <input placeholder="Portion" style="width:100%;font-size:14px;padding:12px 13px;border-radius:10px;border:1px solid rgba(20,45,32,.2);background:rgba(255,255,255,.6);color:#17251B;font-family:Archivo,sans-serif;box-sizing:border-box"></input>
+          </div>
+          <input placeholder="Grobe Kalorienschätzung (optional)" style="width:100%;font-size:14px;padding:12px 13px;border-radius:10px;border:1px solid rgba(20,45,32,.2);background:rgba(255,255,255,.6);color:#17251B;font-family:Archivo,sans-serif;box-sizing:border-box"></input>
+        </div>
+        <span onClick="{{ closeMeal }}" style="display:block;text-align:center;margin-top:16px;font-size:14.3px;color:#0C2418;background:linear-gradient(180deg,#E2C271,#C09B36);padding:13px;border-radius:10px;font-weight:600">Eintragen</span>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ recipeSelData }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;inset:0;z-index:70;overflowY:auto;background:linear-gradient(180deg,#EDE5D4 0%,#E5DCC9 100%);animation:kRise 380ms cubic-bezier(.16,1,.3,1) both;padding:calc(16px + env(safe-area-inset-top,0px)) 16px 40px">
+      <span onClick="{{ closeRecipe }}" style="font-size:13px;color:#1B4632;cursor:pointer;border-bottom:1px solid rgba(184,145,47,.5)">← Zurück</span>
+      <div style="margin-top:14px;height:150px;border-radius:14px;background:linear-gradient(135deg,#EADFC4,#D8CBA6);display:grid;place-items:center">
+        <svg viewBox="0 0 24 24" width="36" height="36" fill="none" opacity=".4"><path d="M7 3v6a2 2 0 0 0 2 2v10M7 3v8M10 3v6M14 3c-1.7 0-2.5 2-2.5 4.4 0 2 1 3.1 2.5 3.6V21" stroke="#5B4A21" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+      </div>
+      <div style="margin-top:16px;font-family:'Bodoni Moda',serif;font-size:24px;color:#132A1D">{{ recipeSelData.title }}</div>
+      <div style="margin-top:6px;display:flex;gap:4px">
+        <sc-for list="{{ recipeSelData.starEls }}" as="se" hint-placeholder-count="5">
+          <span onClick="{{ se.select }}" style="font-size:22px;color:{{ se.color }};cursor:pointer;line-height:1">★</span>
+        </sc-for>
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px">
+        <sc-for list="{{ recipeSelData.tags }}" as="t" hint-placeholder-count="3">
+          <span style="font-size:11.5px;padding:4px 10px;border-radius:999px;background:rgba(27,70,50,.08);color:#1B4632">{{ t }}</span>
+        </sc-for>
+      </div>
+      <div style="display:flex;gap:22px;margin-top:16px;padding:14px 0;border-top:1px solid rgba(20,45,32,.1);border-bottom:1px solid rgba(20,45,32,.1)">
+        <div><div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.08em;color:#7A8A7C">PORTIONEN</div><div style="font-family:'Bodoni Moda',serif;font-size:17px;color:#1B4632">{{ recipeSelData.portions }}</div></div>
+        <div><div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.08em;color:#7A8A7C">KCAL/PORTION</div><div style="font-family:'Bodoni Moda',serif;font-size:17px;color:#1B4632">{{ recipeSelData.kcal }}</div></div>
+      </div>
+      <div style="margin-top:16px;font-family:'Bodoni Moda',serif;font-size:16.6px;color:#132A1D">Zutaten</div>
+      <sc-for list="{{ recipeSelData.ingredients }}" as="ing" hint-placeholder-count="5">
+        <div style="display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid rgba(20,45,32,.07);font-size:14px;color:#39473B"><span>{{ ing.name }}</span><span style="font-family:'IBM Plex Mono',monospace;color:#6C7B6E">{{ ing.qty }}</span></div>
+      </sc-for>
+      <div style="margin-top:14px;font-size:12.5px;color:#9AAE9C">Grobe Nährwertangabe pro Portion, keine exakte Analyse.</div>
+    </div>
+  </sc-if>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const MEALTYPES=[{key:'breakfast',label:'Frühstück'},{key:'lunch',label:'Mittagessen'},{key:'dinner',label:'Abendessen'},{key:'snacks',label:'Snacks'}];
+const MEALS_DEMO={
+  breakfast:[{time:'07:40',name:'Haferflocken mit Beeren und Joghurt',portion:'1 Schüssel, ca. 350 g',kcal:410}],
+  lunch:[{time:'12:55',name:'Hähnchen-Gemüse-Pfanne mit Reis',portion:'1 Portion, ca. 420 g',kcal:590}],
+  dinner:[],
+  snacks:[{time:'16:15',name:'Apfel und eine Handvoll Mandeln',portion:'1 Stück + 20 g',kcal:180}]
+};
+const WEEK_DEMO=[
+  {label:'Montag',dish:'Linsen-Gemüse-Pfanne',type:'cook',portions:4,note:'Ergibt Reste für Di & Mi'},
+  {label:'Dienstag',dish:'Reste: Linsen-Gemüse-Pfanne',type:'leftover',portions:1,note:''},
+  {label:'Mittwoch',dish:'Reste: Linsen-Gemüse-Pfanne',type:'leftover',portions:1,note:''},
+  {label:'Donnerstag',dish:'Ofengemüse mit Feta',type:'cook',portions:2,note:''},
+  {label:'Freitag',dish:'Pasta mit Tomatensauce',type:'cook',portions:3,note:'Ergibt Reste für Samstag'},
+  {label:'Samstag',dish:'Reste: Pasta mit Tomatensauce',type:'leftover',portions:1,note:''},
+  {label:'Sonntag',dish:'Noch nicht geplant',type:'open',portions:null,note:''}
+];
+const PANTRY_DEMO=[
+  {key:'grund',label:'Grundzutaten',items:[
+    {name:'Olivenöl',qty:'480 ml',location:'Küchenschrank',status:'ok'},
+    {name:'Mehl (Type 550)',qty:'900 g',location:'Vorratsregal',status:'ok'},
+    {name:'Zucker',qty:'150 g',location:'Vorratsregal',status:'low'}]},
+  {key:'beilagen',label:'Nudeln, Reis & Beilagen',items:[
+    {name:'Basmatireis',qty:'1.2 kg',location:'Vorratsregal',status:'ok'},
+    {name:'Vollkornnudeln',qty:'250 g',location:'Vorratsregal',status:'low'},
+    {name:'Couscous',qty:'0',location:'Vorratsregal',status:'used'}]},
+  {key:'gemuese',label:'Gemüse & Obst',items:[
+    {name:'Karotten',qty:'6 Stück',location:'Kühlschrank',status:'ok'},
+    {name:'Zucchini',qty:'1 Stück',location:'Kühlschrank',status:'critical'},
+    {name:'Äpfel',qty:'3 Stück',location:'Obstkorb',status:'low'}]},
+  {key:'eiweiss',label:'Fleisch & Eiweiß',items:[
+    {name:'Hähnchenbrust',qty:'400 g',location:'Kühlschrank',status:'ok'},
+    {name:'Feta',qty:'80 g',location:'Kühlschrank',status:'critical'},
+    {name:'Eier',qty:'4 Stück',location:'Kühlschrank',status:'low'}]},
+  {key:'tk',label:'Tiefkühlprodukte',items:[]},
+  {key:'gewuerze',label:'Gewürze & Saucen',items:[
+    {name:'Currypulver',qty:'gut gefüllt',location:'Gewürzregal',status:'ok'},
+    {name:'Sojasauce',qty:'1/4 Flasche',location:'Küchenschrank',status:'low'}]},
+  {key:'fruehstueck',label:'Frühstück',items:[
+    {name:'Haferflocken',qty:'600 g',location:'Vorratsregal',status:'ok'},
+    {name:'Joghurt',qty:'2 Becher',location:'Kühlschrank',status:'ok'}]},
+  {key:'getraenke',label:'Getränke & Snacks',items:[
+    {name:'Mandeln',qty:'50 g',location:'Vorratsregal',status:'critical'},
+    {name:'Kaffee',qty:'ausreichend',location:'Küchenschrank',status:'ok'}]}
+];
+const SHOP_PLANNED=[
+  {cat:'Gemüse & Obst',items:[
+    {name:'Zucchini',qty:'2 Stück',market:'REWE',prio:'normal',done:false},
+    {name:'Karotten',qty:'1 kg',market:'REWE',prio:'normal',done:false}]},
+  {cat:'Fleisch & Eiweiß',items:[
+    {name:'Feta',qty:'200 g',market:'Aldi',prio:'dringend',done:false},
+    {name:'Hähnchenbrust',qty:'500 g',market:'Aldi',prio:'normal',done:true}]}
+];
+const SHOP_OTHER=[
+  {cat:'Frühstück',items:[{name:'Haferflocken',qty:'1 kg',price:'2,49 €',done:false}]},
+  {cat:'Getränke & Snacks',items:[{name:'Mandeln',qty:'250 g',price:'3,79 €',done:false},{name:'Kaffeebohnen',qty:'500 g',price:'8,99 €',done:false}]}
+];
+const RECIPES_DEMO=[
+  {id:'curry',title:'Linsen-Gemüse-Pfanne',rating:5,tags:['Meal Prep','günstig','vegetarisch'],portions:4,kcal:480,last:'vor 3 Tagen',ingredients:[{name:'Rote Linsen',qty:'250 g'},{name:'Tomatenpassata',qty:'400 ml'},{name:'Karotten',qty:'2 Stück'},{name:'Currypulver',qty:'2 EL'},{name:'Reis',qty:'300 g'}]},
+  {id:'ofengemuese',title:'Ofengemüse mit Feta',rating:4,tags:['schnell','vegetarisch'],portions:2,kcal:420,last:'vor 6 Tagen',ingredients:[{name:'Zucchini',qty:'1 Stück'},{name:'Paprika',qty:'2 Stück'},{name:'Feta',qty:'150 g'}]},
+  {id:'pasta',title:'Pasta mit Tomatensauce',rating:4,tags:['schnell','günstig'],portions:3,kcal:560,last:'vor 8 Tagen',ingredients:[{name:'Vollkornnudeln',qty:'300 g'},{name:'Tomaten',qty:'400 g Dose'}]},
+  {id:'poke',title:'Hähnchen-Gemüse-Pfanne',rating:4,tags:['proteinreich'],portions:2,kcal:590,last:'heute',ingredients:[{name:'Hähnchenbrust',qty:'400 g'},{name:'Reis',qty:'200 g'}]},
+  {id:'fisch',title:'Lachs mit Ofenkartoffeln',rating:null,tags:['proteinreich'],portions:2,kcal:610,last:'noch nie',ingredients:[{name:'Lachsfilet',qty:'300 g'},{name:'Kartoffeln',qty:'500 g'}]},
+  {id:'salat',title:'Quinoa-Salat mit Kichererbsen',rating:null,tags:['vegetarisch'],portions:3,kcal:390,last:'noch nie',ingredients:[{name:'Quinoa',qty:'200 g'},{name:'Kichererbsen',qty:'400 g Dose'}]}
+];
+const HISTORY_WEEK=[{l:'Mo',h:78},{l:'Di',h:66},{l:'Mi',h:88},{l:'Do',h:58},{l:'Fr',h:100},{l:'Sa',h:72},{l:'So',h:34}];
+const PATTERNS=[
+  {tag:'confirmed',tagLabel:'Bestätigte Präferenz',text:'Currygerichte gehören zu deinen am häufigsten wiederholten Rezepten.'},
+  {tag:'observed',tagLabel:'Beobachtetes Muster',text:'Montags wird meist die größte Portion der Woche gekocht.'},
+  {tag:'unclear',tagLabel:'Noch unklar',text:'An Wochenenden fehlt öfter ein Frühstückseintrag.'}
+];
+const PREF_LIKES=['Würzige Reispfannen','Ofengemüse','Alles mit Feta','Meal Prep'];
+const PREF_DISLIKES=['Kokos-Curry','Fisch mit Gräten','sehr scharfe Gerichte'];
+const STATUS_STYLE={
+  ok:{label:'vorhanden',bg:'rgba(27,70,50,.08)',fg:'#1B4632'},
+  low:{label:'bald aufbrauchen',bg:'rgba(184,145,47,.16)',fg:'#8C6B18'},
+  critical:{label:'fast leer',bg:'rgba(140,74,32,.14)',fg:'#8C4A20'},
+  used:{label:'aufgebraucht',bg:'rgba(20,45,32,.06)',fg:'#8A9A8C'}
+};
+const WEEKDAY_NAMES=['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'];
+const MONTH_NAMES=['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
+
+class Component extends DCLogic {
+  state={sub:'heute',demoEmpty:new URLSearchParams(window.location.search).get('preview')!=='1',vorratQ:'',vorratCat:'all',modal:{meal:false},recipeSel:null,
+    recipeRating:{},recipeTagFilter:[],shopDoneOverride:{},
+    kcalAnim:Object.values(MEALS_DEMO).flat().reduce((a,m)=>a+m.kcal,0),chartIn:true};
+  totalKcal(){return this.state.demoEmpty?0:Object.values(MEALS_DEMO).flat().reduce((a,m)=>a+m.kcal,0);}
+  animateTo(key,target,dur=650){
+    if(this._animTimer)clearInterval(this._animTimer);
+    const start=this.state[key]||0,t0=Date.now();
+    this._animTimer=setInterval(()=>{
+      const p=Math.min(1,(Date.now()-t0)/dur);const v=start+(target-start)*(1-Math.pow(1-p,4));
+      this.setState({[key]:Math.round(v)});
+      if(p>=1)clearInterval(this._animTimer);
+    },30);
+  }
+  setSubKey=(k)=>()=>this.setState({sub:k});
+  openMeal=()=>this.setState({modal:{meal:true}});
+  closeMeal=()=>this.setState({modal:{meal:false}});
+  closeMealBg=()=>this.closeMeal();
+  stop=(e)=>{if(e&&e.stopPropagation)e.stopPropagation();};
+  onVorratQ=(e)=>this.setState({vorratQ:e.target.value});
+  setVorratCat=(k)=>()=>this.setState({vorratCat:k});
+  toggleShopDone=(id)=>()=>this.setState(s=>({shopDoneOverride:{...s.shopDoneOverride,[id]:!(s.shopDoneOverride[id])}}));
+  toggleTag=(t)=>()=>this.setState(s=>{const has=s.recipeTagFilter.includes(t);return {recipeTagFilter:has?s.recipeTagFilter.filter(x=>x!==t):[...s.recipeTagFilter,t]};});
+  setRating=(n)=>()=>this.setState(s=>({recipeRating:{...s.recipeRating,[s.recipeSel]:n}}));
+  openRecipe=(id)=>()=>this.setState({recipeSel:id});
+  closeRecipe=()=>this.setState({recipeSel:null});
+  noop=()=>{};
+
+  renderVals(){
+    const S=this.state;
+    const now=new Date();
+    const ui={weekday:WEEKDAY_NAMES[now.getDay()].toUpperCase(),dateLine:now.getDate()+'. '+MONTH_NAMES[now.getMonth()]+' '+now.getFullYear(),demoEmptyBanner:S.demoEmpty,kcalDisplay:S.demoEmpty?'–':('≈ '+S.kcalAnim)};
+    const macros=S.demoEmpty?{protein:0,carbs:0,fat:0}:{protein:54,carbs:132,fat:38};
+    const macroTotal=macros.protein+macros.carbs+macros.fat||1;
+    const pPct=(macros.protein/macroTotal*100),cPct=pPct+(macros.carbs/macroTotal*100);
+    const macroDonut={bg:S.demoEmpty?'conic-gradient(#E4DCCB 0% 100%)':('conic-gradient(#2F6B4C 0% '+pPct.toFixed(1)+'%, #B8912F '+pPct.toFixed(1)+'% '+cPct.toFixed(1)+'%, #8C4A20 '+cPct.toFixed(1)+'% 100%)')};
+    const macroLegend=[
+      {color:'#2F6B4C',label:'Protein',val:S.demoEmpty?'–':'≈ '+macros.protein+' g'},
+      {color:'#B8912F',label:'Kohlenhydrate',val:S.demoEmpty?'–':'≈ '+macros.carbs+' g'},
+      {color:'#8C4A20',label:'Fett',val:S.demoEmpty?'–':'≈ '+macros.fat+' g'}
+    ];
+
+    const subOn={},subBg={},subFg={},subBorder={},setSub={};
+    ['heute','woche','vorrat','einkauf','rezepte','verlauf'].forEach(k=>{
+      const active=S.sub===k;subOn[k]=active;
+      subBg[k]=active?'rgba(184,145,47,.16)':'rgba(255,255,255,.4)';
+      subFg[k]=active?'#8C6B18':'#4C5A4E';
+      subBorder[k]=active?'rgba(184,145,47,.4)':'rgba(20,45,32,.12)';
+      setSub[k]=this.setSubKey(k);
+    });
+
+    const mealGroups=MEALTYPES.map(mt=>{
+      const items=S.demoEmpty?[]:(MEALS_DEMO[mt.key]||[]);
+      const kcalSum=items.reduce((a,m)=>a+m.kcal,0);
+      return {label:mt.label,items:items.map(m=>({...m,kcalLabel:'≈ '+m.kcal+' kcal'})),hasItems:items.length>0,empty:items.length===0,kcalSum:items.length?('≈ '+kcalSum+' kcal'):''};
+    });
+    const totalKcal=S.demoEmpty?0:Object.values(MEALS_DEMO).flat().reduce((a,m)=>a+m.kcal,0);
+    const macroCards=S.demoEmpty?[{label:'KALORIEN',val:'–'},{label:'PROTEIN',val:'–'},{label:'KOHLENHYDRATE',val:'–'},{label:'FETT',val:'–'}]:[
+      {label:'KALORIEN',val:'≈ '+totalKcal},{label:'PROTEIN',val:'≈ 54 g'},{label:'KOHLENHYDRATE',val:'≈ 132 g'},{label:'FETT',val:'≈ 38 g'}];
+
+    const weekDays=WEEK_DEMO.map(d=>{
+      const badge=d.type==='cook'?{label:'Kochtag',bg:'rgba(184,145,47,.16)',fg:'#8C6B18'}:d.type==='leftover'?{label:'Restetag',bg:'rgba(27,70,50,.08)',fg:'#1B4632'}:{label:'offen',bg:'rgba(20,45,32,.05)',fg:'#8A9A8C'};
+      return {label:d.label,dish:d.dish,badgeLabel:badge.label,badgeBg:badge.bg,badgeFg:badge.fg,hasPortions:!!d.portions,portionsLabel:d.portions?(d.portions+' Portion'+(d.portions>1?'en':'')):'',hasNote:!!d.note,note:d.note};
+    });
+
+    const vorratCatsAll=[{key:'all',label:'Alle'},...PANTRY_DEMO.map(c=>({key:c.key,label:c.label}))];
+    const vorratCats=vorratCatsAll.map(c=>({label:c.label,select:this.setVorratCat(c.key),
+      bg:S.vorratCat===c.key?'rgba(27,70,50,.12)':'rgba(255,255,255,.4)',
+      fg:S.vorratCat===c.key?'#1B4632':'#4C5A4E',
+      border:S.vorratCat===c.key?'rgba(27,70,50,.3)':'rgba(20,45,32,.15)'}));
+
+    const q=S.vorratQ.trim().toLowerCase();
+    const pantryCatsView=(S.demoEmpty?[]:PANTRY_DEMO)
+      .filter(c=>S.vorratCat==='all'||S.vorratCat===c.key)
+      .map(c=>{
+        const items=c.items.filter(it=>!q||it.name.toLowerCase().includes(q));
+        return {label:c.label,count:items.length+' Artikel',isEmpty:items.length===0,
+          items:items.map(it=>{const st=STATUS_STYLE[it.status];return {name:it.name,nameColor:it.status==='used'?'#8A9A8C':'#17251B',strike:it.status==='used'?'line-through':'none',qty:it.qty,location:it.location,badgeLabel:st.label,badgeBg:st.bg,badgeFg:st.fg};})};
+      });
+
+    const mapShopGroup=(groups,prefix)=>groups.map((g,gi)=>({cat:g.cat,items:g.items.map((i,ii)=>{
+      const id=prefix+'|'+gi+'|'+ii;
+      const done=S.shopDoneOverride[id]!==undefined?S.shopDoneOverride[id]:i.done;
+      return {name:i.name,qty:i.qty,market:i.market||'',fg:done?'#9AAE9C':'#17251B',strike:done?'line-through':'none',checkBg:done?'#2F6B4C':'transparent',checkBorder:done?'#2F6B4C':'rgba(20,45,32,.3)',price:i.price||'',toggle:this.toggleShopDone(id),done};
+    })}));
+    const shopPlannedFull=mapShopGroup(SHOP_PLANNED,'p');
+    const shopOtherFull=mapShopGroup(SHOP_OTHER,'o');
+    const shopPlanned=S.demoEmpty?[]:shopPlannedFull;
+    const shopOther=S.demoEmpty?[]:shopOtherFull;
+    const shopAllFlat=[...shopPlannedFull,...shopOtherFull].flatMap(g=>g.items);
+    const shopOpenCount=S.demoEmpty?0:shopAllFlat.filter(i=>!i.done).length;
+    const shopDoneCount=S.demoEmpty?0:shopAllFlat.filter(i=>i.done).length;
+
+    const mealTypeChips=MEALTYPES.map((mt,i)=>({label:mt.label,bg:i===0?'rgba(184,145,47,.16)':'rgba(255,255,255,.4)',fg:i===0?'#8C6B18':'#4C5A4E',border:i===0?'rgba(184,145,47,.4)':'rgba(20,45,32,.15)'}));
+
+    const ALL_TAGS=[...new Set(RECIPES_DEMO.flatMap(r=>r.tags))];
+    const tagChips=ALL_TAGS.map(t=>({label:t,toggle:this.toggleTag(t),
+      bg:S.recipeTagFilter.includes(t)?'rgba(184,145,47,.16)':'rgba(255,255,255,.4)',
+      fg:S.recipeTagFilter.includes(t)?'#8C6B18':'#4C5A4E',
+      border:S.recipeTagFilter.includes(t)?'rgba(184,145,47,.4)':'rgba(20,45,32,.15)'}));
+    const matchesTags=(r)=>S.recipeTagFilter.length===0||S.recipeTagFilter.every(t=>r.tags.includes(t));
+    const starStr=(n)=>n?('★'.repeat(n)+'☆'.repeat(5-n)):'unbewertet';
+    const recipesFav=RECIPES_DEMO.filter(r=>(S.recipeRating[r.id]??r.rating)>=4&&matchesTags(r)).map(r=>({title:r.title,stars:starStr(S.recipeRating[r.id]??r.rating),meta:r.portions+' Port. · ≈'+r.kcal+' kcal',open:this.openRecipe(r.id)}));
+    const recipesUnrated=RECIPES_DEMO.filter(r=>!(S.recipeRating[r.id]??r.rating)&&matchesTags(r)).map(r=>({title:r.title,meta:r.portions+' Port. · ≈'+r.kcal+' kcal',open:this.openRecipe(r.id)}));
+    const recipeSelRaw=S.recipeSel?RECIPES_DEMO.find(r=>r.id===S.recipeSel):null;
+    const curRating=recipeSelRaw?(S.recipeRating[recipeSelRaw.id]??recipeSelRaw.rating??0):0;
+    const recipeSelData=recipeSelRaw?{title:recipeSelRaw.title,tags:recipeSelRaw.tags,stars:starStr(curRating),portions:recipeSelRaw.portions,kcal:recipeSelRaw.kcal,ingredients:recipeSelRaw.ingredients,
+      starEls:[1,2,3,4,5].map(n=>({select:this.setRating(n),color:n<=curRating?'#B8912F':'rgba(20,45,32,.2)'}))}:null;
+
+    const maxKcalH=Math.max(...HISTORY_WEEK.map(d=>d.h));
+    const chartClip=S.chartIn?'inset(0 0% 0 0)':'inset(0 100% 0 0)';
+    const historyWeek=HISTORY_WEEK.map(d=>({l:d.l,h:d.h}));
+    const historyAvg=Math.round(HISTORY_WEEK.reduce((a,d)=>a+d.h,0)/HISTORY_WEEK.length*22);
+    const historyFrequentRaw=[{name:'Linsen-Gemüse-Pfanne',count:5},{name:'Pasta mit Tomatensauce',count:4},{name:'Ofengemüse mit Feta',count:3}];
+    const maxFreq=Math.max(...historyFrequentRaw.map(h=>h.count));
+    const historyFrequent=historyFrequentRaw.map(h=>({name:h.name,count:h.count+'×',pct:Math.round(h.count/maxFreq*100)}));
+    const historyRare=[{name:'Lachs mit Ofenkartoffeln',note:'noch nie'},{name:'Quinoa-Salat',note:'noch nie'}];
+    const patterns=PATTERNS.map(p=>({text:p.text,tagLabel:p.tagLabel,
+      tagBg:p.tag==='confirmed'?'rgba(184,145,47,.16)':p.tag==='observed'?'rgba(27,70,50,.08)':'rgba(20,45,32,.06)',
+      tagFg:p.tag==='confirmed'?'#8C6B18':p.tag==='observed'?'#1B4632':'#6C7B6E'}));
+
+    return {ui,subOn,subBg,subFg,subBorder,setSub,mealGroups,macroCards,macroDonut,macroLegend,weekDays,vorratQ:S.vorratQ,onVorratQ:this.onVorratQ,
+      vorratCats,pantryCatsView,shopPlanned,shopOther,shopOpenCount,shopDoneCount,mealTypeChips,tagChips,recipesFav,recipesUnrated,
+      recipeSelData,chartClip,historyWeek,historyAvg,historyFrequent,historyRare,patterns,prefLikes:PREF_LIKES,prefDislikes:PREF_DISLIKES,
+      modal:S.modal,openMeal:this.openMeal,closeMeal:this.closeMeal,closeMealBg:this.closeMealBg,stop:this.stop,closeRecipe:this.closeRecipe,noop:this.noop};
+  }
+}
+
+</script>
+</body>
+</html>
