@@ -32,7 +32,8 @@ test('Ernährung ist als getrennte Desktop-/Mobile-Route eingebunden', () => {
   assert.match(code, /FoodMobileIndex/);
   assert.match(code, /isFoodView/);
   assert.match(code, /let enhancement = ''/);
-  assert.match(code, /Optional enhancement layers must never blank the core cockpit/);
+  assert.match(code, /safeIncludeHtml_\(/);
+  assert.match(code, /Logger\.log/);
   assert.match(desktop, /data-screen-label="Ernährung — Desktop"/);
   assert.match(mobile, /data-screen-label="Ernährung — Mobil"/);
   assert.match(desktop, /includeHtml_\('ClaudeRuntime'\)/);
