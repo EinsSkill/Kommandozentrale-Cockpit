@@ -56,10 +56,18 @@ function doGet(e) {
   const template = HtmlService.createTemplateFromFile(view);
   template.webAppUrl = ScriptApp.getService().getUrl() || '';
   const evaluated = template.evaluate();
-  const enhancement = isFoodView ? '' : [
-    HtmlService.createHtmlOutputFromFile('CalendarWellbeingEnhancements').getContent(),
-    HtmlService.createHtmlOutputFromFile('FoodTrackingEnhancements').getContent()
-  ].join('\n');
+  let enhancement = '';
+  if (!isFoodView) {
+    try {
+      enhancement = [
+        HtmlService.createHtmlOutputFromFile('CalendarWellbeingEnhancements').getContent(),
+        HtmlService.createHtmlOutputFromFile('FoodTrackingEnhancements').getContent()
+      ].join('\n');
+    } catch (error) {
+      // Optional enhancement layers must never blank the core cockpit.
+      console.error('Enhancement layer unavailable: ' + String(error && error.message ? error.message : error));
+    }
+  }
   // Mobile currently labels the card "Heute im Kalender"; normalize it so the
   // shared enhancement layer can address the same calendar surface on both views.
   const rendered = evaluated.getContent().replace('Heute im Kalender', 'Kalenderwoche');

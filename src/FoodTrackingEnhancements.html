@@ -17,6 +17,7 @@
 <script>
 (function () {
   'use strict';
+  try {
   var state = { food: null };
   var navigating = false;
   function isMobile() {
@@ -99,5 +100,8 @@
   }
   render();
   callFood().then(function (food) { state.food = food; render(); });
+  } catch (error) {
+    if (window.console && console.error) console.error('Food entry unavailable: ' + String(error && error.message ? error.message : error));
+  }
 })();
 </script>
