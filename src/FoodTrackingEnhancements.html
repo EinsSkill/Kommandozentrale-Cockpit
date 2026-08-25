@@ -1,266 +1,102 @@
-<style id="kz-food-tracking-styles">
-  .kz-food-card,.kz-food-panel,.kz-food-nav{font-family:Archivo,system-ui,sans-serif;box-sizing:border-box;color:#17251B}
-  .kz-food-card *,.kz-food-panel *,.kz-food-nav *{box-sizing:border-box}
-  .kz-food-card{position:relative;border:1px solid rgba(20,45,32,.14);border-radius:8px;background:linear-gradient(145deg,#F7F1E4,#EDE5D3);box-shadow:0 14px 30px -24px rgba(20,45,32,.58);padding:16px;min-width:0}
-  .kz-food-card.kz-food-desktop{grid-column:1 / span 12;margin-top:0}
-  .kz-food-card.kz-food-mobile{position:fixed;left:12px;right:12px;bottom:84px;z-index:59;box-shadow:0 18px 38px -20px rgba(10,31,21,.75)}
-  .kz-food-card-head,.kz-food-panel-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px}
-  .kz-food-title{font-family:'Bodoni Moda',serif;font-size:18px;color:#132A1D;line-height:1.15}
-  .kz-food-kicker{font:10px/1.2 'IBM Plex Mono',monospace;letter-spacing:.1em;color:#7A8A7C;text-transform:uppercase}
-  .kz-food-meta{font-size:11px;color:#6C7B6E;margin-top:4px}
-  .kz-food-status{font:9px/1 'IBM Plex Mono',monospace;letter-spacing:.06em;padding:5px 8px;border-radius:999px;background:rgba(27,70,50,.08);color:#1B4632;border:1px solid rgba(27,70,50,.17);white-space:nowrap}
-  .kz-food-status.is-warn{background:rgba(184,145,47,.12);color:#8C6B18;border-color:rgba(184,145,47,.35)}
-  .kz-food-stat-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:14px}
-  .kz-food-stat{padding:10px 9px;border-radius:6px;background:rgba(255,255,255,.35);border:1px solid rgba(20,45,32,.08);min-width:0}
-  .kz-food-stat-label{font:9px/1.2 'IBM Plex Mono',monospace;letter-spacing:.06em;color:#7A8A7C;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .kz-food-stat-value{font-family:'Bodoni Moda',serif;font-size:22px;color:#1B4632;margin-top:4px;font-variant-numeric:tabular-nums}
-  .kz-food-stat-unit{font:9px Archivo,system-ui,sans-serif;color:#6C7B6E}
-  .kz-food-card-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:12px}
-  .kz-food-card-note{font-size:11px;color:#61705F;line-height:1.35;min-width:0}
-  .kz-food-button{appearance:none;border:1px solid rgba(27,70,50,.25);border-radius:5px;background:linear-gradient(180deg,#22553A,#173C28);color:#F4EDDC;padding:9px 13px;min-height:36px;font:500 11px Archivo,system-ui,sans-serif;cursor:pointer;white-space:nowrap;transition:transform 140ms ease,filter 160ms ease,background 160ms ease}
-  .kz-food-button:hover{filter:brightness(1.1)}
-  .kz-food-button:active{transform:scale(.96)}
-  .kz-food-button.is-secondary{background:rgba(255,255,255,.35);color:#1B4632;border-color:rgba(27,70,50,.2)}
-  .kz-food-button.is-gold{background:linear-gradient(180deg,#E2C271,#C09B36);color:#102C1E;border-color:rgba(184,145,47,.45)}
-  .kz-food-nav{appearance:none;display:inline-flex;align-items:center;gap:7px;padding:7px 12px;border:1px solid rgba(184,145,47,.4);border-radius:999px;background:rgba(184,145,47,.1);color:#EBD9AC;font:500 11px Archivo,system-ui,sans-serif;cursor:pointer;white-space:nowrap}
-  .kz-food-nav i{width:6px;height:6px;border-radius:50%;background:#DDB65C;box-shadow:0 0 7px rgba(221,182,92,.65)}
-  .kz-food-mobile-nav{position:fixed;top:12px;right:12px;z-index:61;box-shadow:0 10px 24px -16px rgba(10,31,21,.8)}
-  .kz-food-panel{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;padding:24px;background:rgba(8,18,12,.55)}
-  .kz-food-panel-shell{width:min(1040px,100%);max-height:min(900px,calc(100vh - 48px));overflow:auto;border:1px solid rgba(184,145,47,.46);border-radius:12px;background:linear-gradient(180deg,#F7F1E4 0%,#EDE5D3 100%);box-shadow:0 28px 80px -30px rgba(5,15,10,.88);padding:22px}
-  .kz-food-panel-close{appearance:none;width:38px;height:38px;border:1px solid rgba(20,45,32,.16);border-radius:50%;background:rgba(255,255,255,.32);color:#4C5A4E;cursor:pointer;font-size:20px;line-height:1}
-  .kz-food-panel-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:14px;margin-top:18px}
-  .kz-food-section{padding:16px;border:1px solid rgba(20,45,32,.12);border-radius:8px;background:rgba(255,255,255,.28);min-width:0}
-  .kz-food-section-title{font-family:'Bodoni Moda',serif;font-size:17px;color:#132A1D}
-  .kz-food-section-sub{font-size:11px;color:#7A8A7C;margin-top:3px}
-  .kz-food-list{display:flex;flex-direction:column;gap:7px;margin-top:12px}
-  .kz-food-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid rgba(20,45,32,.08)}
-  .kz-food-row:last-child{border-bottom:0}
-  .kz-food-row-main{min-width:0}
-  .kz-food-row-title{font-size:13px;font-weight:500;color:#1B2A1E;overflow-wrap:anywhere}
-  .kz-food-row-meta{font-size:10px;color:#7A8A7C;margin-top:3px;overflow-wrap:anywhere}
-  .kz-food-row-value{font:11px 'IBM Plex Mono',monospace;color:#1B4632;white-space:nowrap;font-variant-numeric:tabular-nums}
-  .kz-food-empty{padding:18px 8px;text-align:center;color:#7A8A7C;font-size:12px;border:1px dashed rgba(20,45,32,.15);border-radius:6px}
-  .kz-food-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;padding-top:14px;border-top:1px solid rgba(20,45,32,.1)}
-  .kz-food-form{display:flex;flex-direction:column;gap:11px;margin-top:16px}
-  .kz-food-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-  .kz-food-field{display:flex;flex-direction:column;gap:5px}
-  .kz-food-field.is-wide{grid-column:1 / -1}
-  .kz-food-field label{font:10px/1.2 'IBM Plex Mono',monospace;letter-spacing:.05em;color:#6C7B6E;text-transform:uppercase}
-  .kz-food-field input,.kz-food-field select,.kz-food-field textarea{width:100%;border:1px solid rgba(20,45,32,.18);border-radius:5px;background:rgba(255,255,255,.52);color:#17251B;padding:9px 10px;font:13px Archivo,system-ui,sans-serif;outline:none}
-  .kz-food-field textarea{min-height:70px;resize:vertical}
-  .kz-food-field input:focus,.kz-food-field select:focus,.kz-food-field textarea:focus{border-color:rgba(184,145,47,.8);box-shadow:0 0 0 3px rgba(184,145,47,.12)}
-  .kz-food-form-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:4px}
-  .kz-food-error{margin-top:10px;padding:9px 11px;border-radius:5px;background:rgba(140,74,32,.1);border:1px solid rgba(140,74,32,.23);color:#8C4A20;font-size:11px;line-height:1.35}
-  @media (max-width:760px){
-    .kz-food-card.kz-food-desktop{display:none}
-    .kz-food-stat-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}
-    .kz-food-stat{padding:8px 5px}
-    .kz-food-stat-value{font-size:18px}
-    .kz-food-stat-label{font-size:7.5px}
-    .kz-food-card-foot{align-items:flex-end}
-    .kz-food-panel{align-items:flex-end;padding:0}
-    .kz-food-panel-shell{max-height:92vh;border-radius:12px 12px 0 0;padding:17px 14px calc(22px + env(safe-area-inset-bottom,0px));}
-    .kz-food-panel-grid{grid-template-columns:1fr;gap:10px}
-    .kz-food-form-grid{grid-template-columns:1fr}
-    .kz-food-field.is-wide{grid-column:auto}
-    .kz-food-mobile-nav{top:10px;right:10px}
-  }
+<style id="kz-food-entry-styles">
+  .kz-food-entry{font-family:Archivo,system-ui,sans-serif;box-sizing:border-box;color:#17251B}
+  .kz-food-entry *{box-sizing:border-box}
+  .kz-food-entry.kz-food-entry-desktop{grid-column:1 / span 12;position:relative;margin-top:0;padding:20px 22px;display:flex;align-items:center;gap:18px;border:1px solid rgba(20,45,32,.14);border-radius:5px;background:linear-gradient(180deg,#F5EFE2 0%,#EEE6D5 100%);box-shadow:0 14px 30px -22px rgba(20,45,32,.5);cursor:pointer;transition:transform 180ms ease,box-shadow 180ms ease}
+  .kz-food-entry.kz-food-entry-desktop:hover{transform:translateY(-2px);box-shadow:0 18px 34px -22px rgba(20,45,32,.62)}
+  .kz-food-entry-icon{width:42px;height:42px;display:grid;place-items:center;flex:0 0 auto;color:#1B4632;border:1px solid rgba(184,145,47,.42);border-radius:50%;background:rgba(184,145,47,.08)}
+  .kz-food-entry-title{font-family:'Bodoni Moda',serif;font-size:20px;color:#132A1D;line-height:1.1}
+  .kz-food-entry-sub{margin-top:4px;font-size:11.5px;color:#6C7B6E}
+  .kz-food-entry-status{margin-left:auto;font:10px 'IBM Plex Mono',monospace;letter-spacing:.06em;color:#8C6B18;white-space:nowrap}
+  .kz-food-entry-arrow{font:18px 'IBM Plex Mono',monospace;color:#B8912F}
+  .kz-food-entry.kz-food-entry-mobile{position:fixed;left:12px;right:12px;bottom:84px;z-index:59;padding:13px 15px;display:flex;align-items:center;gap:11px;border:1px solid rgba(184,145,47,.4);border-radius:12px;background:linear-gradient(180deg,#F5EFE2,#EEE6D5);box-shadow:0 18px 38px -20px rgba(10,31,21,.75);cursor:pointer}
+  .kz-food-entry-mobile .kz-food-entry-icon{width:34px;height:34px}
+  .kz-food-entry-mobile .kz-food-entry-title{font-size:16px}
+  .kz-food-entry-mobile .kz-food-entry-sub{font-size:10.5px}
+  .kz-food-entry-mobile .kz-food-entry-status{font-size:8px}
+  .kz-food-entry-nav{appearance:none;display:inline-flex;align-items:center;gap:7px;margin-left:10px;padding:7px 12px;border:1px solid rgba(184,145,47,.4);border-radius:999px;background:rgba(184,145,47,.1);color:#EBD9AC;font:500 11px Archivo,system-ui,sans-serif;cursor:pointer;white-space:nowrap}
+  .kz-food-entry-nav i{width:6px;height:6px;border-radius:50%;background:#DDB65C;box-shadow:0 0 7px rgba(221,182,92,.65)}
+  .kz-food-entry-mobile-nav{position:fixed;top:10px;right:10px;z-index:61}
 </style>
-
 <script>
 (function () {
   'use strict';
-
-  var state = { food: null, panel: null, form: null, error: '' };
-  var number = function (value) {
-    var parsed = Number(value);
-    return Number.isFinite(parsed) ? parsed : 0;
-  };
-  var text = function (value) { return value == null ? '' : String(value); };
-  var shortNumber = function (value) { return Math.round(number(value)).toLocaleString('de-DE'); };
-  var node = function (tag, className, value) {
-    var item = document.createElement(tag);
-    if (className) item.className = className;
-    if (value != null) item.textContent = value;
-    return item;
-  };
-  var button = function (label, className, handler) {
-    var item = node('button', 'kz-food-button ' + (className || ''), label);
-    item.type = 'button';
-    item.addEventListener('click', handler);
-    return item;
-  };
-  var call = function (name) {
-    var args = Array.prototype.slice.call(arguments, 1);
-    return new Promise(function (resolve, reject) {
+  var state = { food: null };
+  function isMobile() {
+    return window.matchMedia ? window.matchMedia('(max-width: 760px)').matches : window.innerWidth <= 760;
+  }
+  function openFood() {
+    var url = new URL(window.location.href);
+    url.search = '';
+    url.searchParams.set('view', isMobile() ? 'food-mobile' : 'food');
+    window.location.assign(url.toString());
+  }
+  function callFood() {
+    return new Promise(function (resolve) {
       if (!window.google || !google.script || !google.script.run) {
-        reject(new Error('Apps-Script-Verbindung ist in dieser Vorschau nicht verfügbar.'));
+        resolve(null);
         return;
       }
-      google.script.run.withSuccessHandler(resolve).withFailureHandler(function (error) {
-        reject(new Error(error && error.message ? error.message : String(error)));
-      })[name].apply(google.script.run, args);
+      google.script.run.withSuccessHandler(resolve).withFailureHandler(function () { resolve(null); }).getFoodV1(false);
     });
-  };
-  var getFood = function (force) { return call('getFoodV1', !!force); };
-
-  function ensureCard() {
-    if (document.querySelector('[data-kz-food-card]')) return document.querySelector('[data-kz-food-card]');
-    var card = node('section', 'kz-food-card');
-    card.setAttribute('data-kz-food-card', '1');
-    var screen = document.querySelector('[data-screen-label="Kommandozentrale"]');
+  }
+  function entryCard() {
+    if (document.querySelector('[data-kz-food-entry]')) return document.querySelector('[data-kz-food-entry]');
+    var card = document.createElement('section');
+    card.className = 'kz-food-entry';
+    card.setAttribute('data-kz-food-entry', '1');
+    card.addEventListener('click', openFood);
+    var screen = document.querySelector('[data-screen-label="Kommandozentrale"],[data-screen-label="Kommandozentrale Mobil"]');
     var desktopTile = screen && screen.querySelector('[data-tile="wellbeing"]');
-    if (desktopTile && desktopTile.parentNode) {
-      card.classList.add('kz-food-desktop');
+    if (!isMobile() && desktopTile && desktopTile.parentNode) {
+      card.classList.add('kz-food-entry-desktop');
       desktopTile.parentNode.insertBefore(card, desktopTile);
     } else {
-      card.classList.add('kz-food-mobile');
+      card.classList.add('kz-food-entry-mobile');
       document.body.appendChild(card);
     }
     return card;
   }
-
-  function renderCard() {
-    var card = ensureCard();
-    card.textContent = '';
-    var food = state.food || {};
-    var head = node('div', 'kz-food-card-head');
-    var titleWrap = node('div');
-    titleWrap.appendChild(node('div', 'kz-food-kicker', 'PERSÖNLICHE DATEN · ERNÄHRUNG'));
-    titleWrap.appendChild(node('div', 'kz-food-title', 'Ernährung & Vorrat'));
-    titleWrap.appendChild(node('div', 'kz-food-meta', food.available ? 'OPS-Daten aktuell verbunden' : 'Noch keine FOOD_*-Tabellen im OPS')); 
-    head.appendChild(titleWrap);
-    var status = node('span', 'kz-food-status' + (food.available ? '' : ' is-warn'), food.available ? 'LIVE' : 'EINRICHTUNG');
-    head.appendChild(status);
-    card.appendChild(head);
-
-    var grid = node('div', 'kz-food-stat-grid');
-    var totals = food.today && food.today.totals ? food.today.totals : {};
-    [['KCAL', shortNumber(totals.calories), 'ca.'], ['EIWEISS', shortNumber(totals.protein), 'g'], ['MAHLZEITEN', String((food.today && food.today.meals || []).length), 'heute'], ['VORRAT', String((food.pantry || []).length), 'Einträge']].forEach(function (item) {
-      var stat = node('div', 'kz-food-stat');
-      stat.appendChild(node('div', 'kz-food-stat-label', item[0]));
-      var value = node('div', 'kz-food-stat-value', item[1]);
-      value.appendChild(node('span', 'kz-food-stat-unit', ' ' + item[2]));
-      stat.appendChild(value); grid.appendChild(stat);
-    });
-    card.appendChild(grid);
-
-    var foot = node('div', 'kz-food-card-foot');
-    foot.appendChild(node('div', 'kz-food-card-note', food.available ? 'Mahlzeiten, Vorräte und grobe Nährwerte werden fortlaufend gesammelt.' : 'Einmal einrichten, danach können Mahlzeiten und Vorräte direkt erfasst werden.'));
-    foot.appendChild(button('Ernährung öffnen →', 'is-gold', openPanel));
-    card.appendChild(foot);
+  function render() {
+    var card = entryCard();
+    card.innerHTML = '';
+    var icon = document.createElement('div');
+    icon.className = 'kz-food-entry-icon';
+    icon.innerHTML = '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" aria-hidden="true"><path d="M5 4v7M8 4v7M5 8h3M6.5 11v9M16 4v16M16 4c2.2 2.2 2.2 5.5 0 7.7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>';
+    var text = document.createElement('div');
+    var title = document.createElement('div');
+    title.className = 'kz-food-entry-title';
+    title.textContent = 'Ernährung';
+    var sub = document.createElement('div');
+    sub.className = 'kz-food-entry-sub';
+    sub.textContent = 'Mahlzeiten, Wochenplan, Vorrat, Einkauf, Rezepte und Verlauf';
+    text.appendChild(title);
+    text.appendChild(sub);
+    var status = document.createElement('div');
+    status.className = 'kz-food-entry-status';
+    status.textContent = state.food && state.food.available ? 'DATEN VERBUNDEN' : 'BEREICH ÖFFNEN';
+    var arrow = document.createElement('div');
+    arrow.className = 'kz-food-entry-arrow';
+    arrow.textContent = '→';
+    card.appendChild(icon);
+    card.appendChild(text);
+    card.appendChild(status);
+    card.appendChild(arrow);
   }
-
   function ensureNav() {
-    if (document.querySelector('[data-kz-food-nav]')) return;
-    var nav = node('button', 'kz-food-nav', 'Ernährung');
-    nav.type = 'button'; nav.setAttribute('data-kz-food-nav', '1');
-    nav.insertBefore(node('i'), nav.firstChild); nav.addEventListener('click', openPanel);
+    if (document.querySelector('[data-kz-food-entry-nav]')) return;
+    var nav = document.createElement('button');
+    nav.type = 'button';
+    nav.className = 'kz-food-entry-nav';
+    nav.setAttribute('data-kz-food-entry-nav', '1');
+    nav.innerHTML = '<i></i><span>Ernährung</span>';
+    nav.addEventListener('click', openFood);
     var screen = document.querySelector('[data-screen-label="Kommandozentrale"]');
     var sticky = screen && screen.querySelector('div[style*="position:sticky"] > div');
-    if (sticky && window.innerWidth > 760) sticky.appendChild(nav);
-    else { nav.classList.add('kz-food-mobile-nav'); document.body.appendChild(nav); }
+    if (sticky && !isMobile()) sticky.appendChild(nav);
+    else if (isMobile()) { nav.className += ' kz-food-entry-mobile-nav'; document.body.appendChild(nav); }
   }
-
-  function closePanel() {
-    if (state.panel && state.panel.parentNode) state.panel.parentNode.removeChild(state.panel);
-    state.panel = null; state.form = null;
-  }
-
-  function openPanel() {
-    if (state.panel) { renderPanel(); return; }
-    state.panel = node('div', 'kz-food-panel');
-    state.panel.addEventListener('click', function (event) { if (event.target === state.panel) closePanel(); });
-    document.body.appendChild(state.panel);
-    renderPanel();
-  }
-
-  function renderPanel() {
-    if (!state.panel) return;
-    state.panel.textContent = '';
-    var shell = node('div', 'kz-food-panel-shell');
-    var head = node('div', 'kz-food-panel-head');
-    var title = node('div');
-    title.appendChild(node('div', 'kz-food-kicker', 'KOMMANDOZENTRALE · DATENBEREICH'));
-    title.appendChild(node('div', 'kz-food-title', 'Ernährung & Vorrat'));
-    title.appendChild(node('div', 'kz-food-meta', 'Aktuelle operative Daten aus dem OPS Sheet')); 
-    head.appendChild(title);
-    var close = node('button', 'kz-food-panel-close', '×'); close.type = 'button'; close.addEventListener('click', closePanel); head.appendChild(close);
-    shell.appendChild(head);
-
-    if (state.error) shell.appendChild(node('div', 'kz-food-error', state.error));
-    if (state.form) renderForm(shell, state.form);
-    else renderOverview(shell);
-    state.panel.appendChild(shell);
-  }
-
-  function renderOverview(shell) {
-    var food = state.food || {};
-    if (!food.available) {
-      var setup = node('section', 'kz-food-section');
-      setup.appendChild(node('div', 'kz-food-section-title', 'Ernährungsbereich einrichten'));
-      setup.appendChild(node('div', 'kz-food-section-sub', 'Es sind noch keine FOOD_*-Tabellen im OPS vorhanden.')); 
-      setup.appendChild(node('p', 'kz-food-card-note', 'Beim Einrichten werden nur vier neue, klar benannte Tabellen mit ihren Überschriften angelegt. Bestehende OPS-Daten werden nicht verändert.'));
-      setup.appendChild(button('OPS-Struktur einrichten', 'is-gold', function () {
-        state.error = '';
-        call('setupFoodTrackingV1').then(function (result) { state.food = result.food; renderCard(); renderPanel(); }).catch(function (error) { state.error = error.message; renderPanel(); });
-      }));
-      shell.appendChild(setup);
-      return;
-    }
-
-    var totals = food.today && food.today.totals ? food.today.totals : {};
-    var kpis = node('div', 'kz-food-stat-grid');
-    [['KALORIEN', shortNumber(totals.calories) + ' ca.'], ['EIWEISS', shortNumber(totals.protein) + ' g'], ['KOHLENHYDRATE', shortNumber(totals.carbs) + ' g'], ['FETT', shortNumber(totals.fat) + ' g']].forEach(function (item) {
-      var stat = node('div', 'kz-food-stat'); stat.appendChild(node('div', 'kz-food-stat-label', item[0])); stat.appendChild(node('div', 'kz-food-stat-value', item[1])); kpis.appendChild(stat);
-    });
-    shell.appendChild(kpis);
-
-    var grid = node('div', 'kz-food-panel-grid');
-    var meals = node('section', 'kz-food-section'); meals.appendChild(node('div', 'kz-food-section-title', 'Heute gegessen')); meals.appendChild(node('div', 'kz-food-section-sub', food.today.date || 'Noch kein Datum'));
-    var mealList = node('div', 'kz-food-list');
-    (food.today.meals || []).forEach(function (meal) {
-      var row = node('div', 'kz-food-row'); var main = node('div', 'kz-food-row-main'); main.appendChild(node('div', 'kz-food-row-title', meal.meal)); main.appendChild(node('div', 'kz-food-row-meta', [meal.meal_type, meal.portion_note].filter(Boolean).join(' · ') || 'Mahlzeit')); row.appendChild(main); row.appendChild(node('div', 'kz-food-row-value', meal.calories_estimate === '' ? 'kcal offen' : Math.round(number(meal.calories_estimate)) + ' kcal')); mealList.appendChild(row);
-    });
-    if (!mealList.children.length) mealList.appendChild(node('div', 'kz-food-empty', 'Heute ist noch keine Mahlzeit eingetragen.'));
-    meals.appendChild(mealList); grid.appendChild(meals);
-
-    var pantry = node('section', 'kz-food-section'); pantry.appendChild(node('div', 'kz-food-section-title', 'Aktueller Vorrat')); pantry.appendChild(node('div', 'kz-food-section-sub', (food.pantry || []).length + ' aktive Einträge'));
-    var pantryList = node('div', 'kz-food-list');
-    (food.pantry || []).slice(0, 12).forEach(function (item) {
-      var row = node('div', 'kz-food-row'); var main = node('div', 'kz-food-row-main'); main.appendChild(node('div', 'kz-food-row-title', item.item_name)); main.appendChild(node('div', 'kz-food-row-meta', [item.storage, item.best_before ? 'bis ' + item.best_before : ''].filter(Boolean).join(' · ') || 'Bestand')); row.appendChild(main); var right = node('div'); right.appendChild(node('div', 'kz-food-row-value', text(item.quantity) + ' ' + text(item.unit))); right.appendChild(button('aufgebraucht', 'is-secondary', function () { call('consumeFoodPantryItemV1', { pantryId: item.pantry_id, amount: '' }).then(refresh).catch(showError); })); row.appendChild(right); pantryList.appendChild(row);
-    });
-    if (!pantryList.children.length) pantryList.appendChild(node('div', 'kz-food-empty', 'Noch kein Vorrat eingetragen.'));
-    pantry.appendChild(pantryList); grid.appendChild(pantry); shell.appendChild(grid);
-
-    var actions = node('div', 'kz-food-actions');
-    actions.appendChild(button('Mahlzeit eintragen', 'is-gold', function () { state.form = 'meal'; renderPanel(); }));
-    actions.appendChild(button('Vorrat hinzufügen', '', function () { state.form = 'pantry'; renderPanel(); }));
-    actions.appendChild(button('Aktualisieren', 'is-secondary', refresh));
-    shell.appendChild(actions);
-  }
-
-  function field(form, label, name, type, wide) {
-    var wrap = node('div', 'kz-food-field' + (wide ? ' is-wide' : '')); var labelNode = node('label', '', label); labelNode.htmlFor = 'kz-food-' + name; wrap.appendChild(labelNode); var input = type === 'textarea' ? node('textarea') : node('input'); input.id = 'kz-food-' + name; input.name = name; if (type !== 'textarea') input.type = type || 'text'; wrap.appendChild(input); form.appendChild(wrap); return input;
-  }
-
-  function renderForm(shell, kind) {
-    var section = node('section', 'kz-food-section'); section.appendChild(node('div', 'kz-food-section-title', kind === 'meal' ? 'Mahlzeit erfassen' : 'Vorrat hinzufügen')); section.appendChild(node('div', 'kz-food-section-sub', 'Grobe Werte reichen völlig aus.')); var form = node('form', 'kz-food-form');
-    if (kind === 'meal') {
-      var meal = field(form, 'Mahlzeit', 'meal', 'text', true); var type = field(form, 'Mahlzeittyp', 'mealType', 'text', false); var portion = field(form, 'Portion / Notiz', 'portionNote', 'text', false); var kcal = field(form, 'Kalorien ungefähr', 'caloriesEstimate', 'number', false); var protein = field(form, 'Eiweiß ungefähr (g)', 'proteinEstimate', 'number', false); var carbs = field(form, 'Kohlenhydrate ungefähr (g)', 'carbsEstimate', 'number', false); var fat = field(form, 'Fett ungefähr (g)', 'fatEstimate', 'number', false); var note = field(form, 'Notiz', 'notes', 'textarea', true);
-      type.placeholder = 'Frühstück / Mittag / Abend / Snack'; portion.placeholder = 'z. B. große Portion';
-      form.addEventListener('submit', function (event) { event.preventDefault(); state.error = ''; call('saveFoodEntryV1', { meal: meal.value, mealType: type.value || 'OTHER', portionNote: portion.value, caloriesEstimate: kcal.value, proteinEstimate: protein.value, carbsEstimate: carbs.value, fatEstimate: fat.value, notes: note.value }).then(refresh).catch(showError); });
-    } else {
-      var name = field(form, 'Produkt', 'itemName', 'text', true); var qty = field(form, 'Menge', 'quantity', 'number', false); var unit = field(form, 'Einheit', 'unit', 'text', false); var storage = field(form, 'Lagerort', 'storage', 'text', false); var best = field(form, 'Mindesthaltbar bis', 'bestBefore', 'date', false); var notes = field(form, 'Notiz', 'notes', 'textarea', true); storage.placeholder = 'Kühlschrank / Vorrat / Tiefkühler';
-      form.addEventListener('submit', function (event) { event.preventDefault(); state.error = ''; call('saveFoodPantryItemV1', { itemName: name.value, quantity: qty.value, unit: unit.value || 'STÜCK', storage: storage.value || 'UNKNOWN', bestBefore: best.value, notes: notes.value }).then(refresh).catch(showError); });
-    }
-    var actions = node('div', 'kz-food-form-actions'); actions.appendChild(button('Abbrechen', 'is-secondary', function () { state.form = null; renderPanel(); })); var save = node('button', 'kz-food-button is-gold', kind === 'meal' ? 'Mahlzeit speichern' : 'Vorrat speichern'); save.type = 'submit'; actions.appendChild(save); form.appendChild(actions); section.appendChild(form); shell.appendChild(section);
-  }
-
-  function showError(error) { state.error = text(error && error.message ? error.message : error); renderPanel(); }
-  function refresh() { state.form = null; state.error = ''; return getFood(true).then(function (food) { state.food = food; renderCard(); renderPanel(); }).catch(showError); }
-  function boot() { ensureNav(); renderCard(); getFood(false).then(function (food) { state.food = food; renderCard(); }).catch(function (error) { state.error = error.message; renderCard(); }); }
-  window.setTimeout(boot, 180);
-  window.setTimeout(boot, 900);
+  render();
+  ensureNav();
+  callFood().then(function (food) { state.food = food; render(); });
 })();
 </script>
