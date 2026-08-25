@@ -1,35 +1,44 @@
 <style id="kz-food-entry-styles">
   .kz-food-entry{font-family:Archivo,system-ui,sans-serif;box-sizing:border-box;color:#17251B}
   .kz-food-entry *{box-sizing:border-box}
-  .kz-food-entry.kz-food-entry-desktop{grid-column:1 / span 12;position:relative;margin-top:0;padding:20px 22px;display:flex;align-items:center;gap:18px;border:1px solid rgba(20,45,32,.14);border-radius:5px;background:linear-gradient(180deg,#F5EFE2 0%,#EEE6D5 100%);box-shadow:0 14px 30px -22px rgba(20,45,32,.5);cursor:pointer;transition:transform 180ms ease,box-shadow 180ms ease}
+  .kz-food-entry.kz-food-entry-desktop{grid-column:1 / span 12;position:relative;z-index:2;margin-top:0;padding:20px 22px;display:flex;align-items:center;gap:18px;border:1px solid rgba(20,45,32,.14);border-radius:5px;background:linear-gradient(180deg,#F5EFE2 0%,#EEE6D5 100%);box-shadow:0 14px 30px -22px rgba(20,45,32,.5);cursor:pointer;pointer-events:auto;transition:transform 180ms ease,box-shadow 180ms ease}
   .kz-food-entry.kz-food-entry-desktop:hover{transform:translateY(-2px);box-shadow:0 18px 34px -22px rgba(20,45,32,.62)}
   .kz-food-entry-icon{width:42px;height:42px;display:grid;place-items:center;flex:0 0 auto;color:#1B4632;border:1px solid rgba(184,145,47,.42);border-radius:50%;background:rgba(184,145,47,.08)}
   .kz-food-entry-title{font-family:'Bodoni Moda',serif;font-size:20px;color:#132A1D;line-height:1.1}
   .kz-food-entry-sub{margin-top:4px;font-size:11.5px;color:#6C7B6E}
   .kz-food-entry-status{margin-left:auto;font:10px 'IBM Plex Mono',monospace;letter-spacing:.06em;color:#8C6B18;white-space:nowrap}
   .kz-food-entry-arrow{font:18px 'IBM Plex Mono',monospace;color:#B8912F}
-  .kz-food-entry.kz-food-entry-mobile{position:fixed;left:12px;right:12px;bottom:84px;z-index:59;padding:13px 15px;display:flex;align-items:center;gap:11px;border:1px solid rgba(184,145,47,.4);border-radius:12px;background:linear-gradient(180deg,#F5EFE2,#EEE6D5);box-shadow:0 18px 38px -20px rgba(10,31,21,.75);cursor:pointer}
+  .kz-food-entry.kz-food-entry-mobile{position:fixed;left:12px;right:12px;bottom:84px;z-index:59;padding:13px 15px;display:flex;align-items:center;gap:11px;border:1px solid rgba(184,145,47,.4);border-radius:12px;background:linear-gradient(180deg,#F5EFE2,#EEE6D5);box-shadow:0 18px 38px -20px rgba(10,31,21,.75);cursor:pointer;pointer-events:auto}
   .kz-food-entry-mobile .kz-food-entry-icon{width:34px;height:34px}
   .kz-food-entry-mobile .kz-food-entry-title{font-size:16px}
   .kz-food-entry-mobile .kz-food-entry-sub{font-size:10.5px}
   .kz-food-entry-mobile .kz-food-entry-status{font-size:8px}
-  .kz-food-entry-nav{appearance:none;display:inline-flex;align-items:center;gap:7px;margin-left:10px;padding:7px 12px;border:1px solid rgba(184,145,47,.4);border-radius:999px;background:rgba(184,145,47,.1);color:#EBD9AC;font:500 11px Archivo,system-ui,sans-serif;cursor:pointer;white-space:nowrap}
-  .kz-food-entry-nav i{width:6px;height:6px;border-radius:50%;background:#DDB65C;box-shadow:0 0 7px rgba(221,182,92,.65)}
-  .kz-food-entry-mobile-nav{position:fixed;top:10px;right:10px;z-index:61}
 </style>
 <script>
 (function () {
   'use strict';
   var state = { food: null };
+  var navigating = false;
   function isMobile() {
     return window.matchMedia ? window.matchMedia('(max-width: 760px)').matches : window.innerWidth <= 760;
   }
-  function openFood() {
+  function openFood(event) {
+    if (event && event.preventDefault) event.preventDefault();
+    if (event && event.stopPropagation) event.stopPropagation();
+    if (navigating) return;
+    navigating = true;
     var url = new URL(window.location.href);
     url.search = '';
     url.searchParams.set('view', isMobile() ? 'food-mobile' : 'food');
     window.location.assign(url.toString());
   }
+  function foodEntryFromEvent(event) {
+    var target = event && event.target;
+    return target && target.closest ? target.closest('[data-kz-food-entry]') : null;
+  }
+  document.addEventListener('click', function (event) {
+    if (foodEntryFromEvent(event)) openFood(event);
+  }, true);
   function callFood() {
     return new Promise(function (resolve) {
       if (!window.google || !google.script || !google.script.run) {
@@ -44,7 +53,13 @@
     var card = document.createElement('section');
     card.className = 'kz-food-entry';
     card.setAttribute('data-kz-food-entry', '1');
+    card.setAttribute('role', 'link');
+    card.setAttribute('tabindex', '0');
+    card.setAttribute('aria-label', 'Ernährungsbereich öffnen');
     card.addEventListener('click', openFood);
+    card.addEventListener('keydown', function (event) {
+      if (event.key === 'Enter' || event.key === ' ') openFood(event);
+    });
     var screen = document.querySelector('[data-screen-label="Kommandozentrale"],[data-screen-label="Kommandozentrale Mobil"]');
     var desktopTile = screen && screen.querySelector('[data-tile="wellbeing"]');
     if (!isMobile() && desktopTile && desktopTile.parentNode) {
@@ -82,21 +97,7 @@
     card.appendChild(status);
     card.appendChild(arrow);
   }
-  function ensureNav() {
-    if (document.querySelector('[data-kz-food-entry-nav]')) return;
-    var nav = document.createElement('button');
-    nav.type = 'button';
-    nav.className = 'kz-food-entry-nav';
-    nav.setAttribute('data-kz-food-entry-nav', '1');
-    nav.innerHTML = '<i></i><span>Ernährung</span>';
-    nav.addEventListener('click', openFood);
-    var screen = document.querySelector('[data-screen-label="Kommandozentrale"]');
-    var sticky = screen && screen.querySelector('div[style*="position:sticky"] > div');
-    if (sticky && !isMobile()) sticky.appendChild(nav);
-    else if (isMobile()) { nav.className += ' kz-food-entry-mobile-nav'; document.body.appendChild(nav); }
-  }
   render();
-  ensureNav();
   callFood().then(function (food) { state.food = food; render(); });
 })();
 </script>
