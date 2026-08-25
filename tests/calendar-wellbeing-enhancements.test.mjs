@@ -26,6 +26,8 @@ test('Code.gs owns the single web entry point and injects the enhancement withou
   assert.match(code, /Heute im Kalender/);
   assert.doesNotMatch(server, /function\s+doGet\s*\(/);
   assert.match(desktop, /Claude Design source SHA-256/);
+  assert.match(desktop, /data-kz-calendar-detail-host/);
+  assert.match(desktop, /showLedger:dk!=='calendar'/);
   assert.match(mobile, /Claude Mobile Design source SHA-256/);
 });
 
@@ -42,6 +44,9 @@ test('calendar endpoint supports day week month and hides Möglichkeiten by defa
 
 test('calendar redesign keeps dense views inside the tile and uses purpose-built day week month layouts', () => {
   assert.match(client, /kz-cal-desktop/);
+  assert.match(client, /kz-cal-detail/);
+  assert.match(client, /renderLargeTimeGrid/);
+  assert.match(client, /largeTimeSegmentsForDay/);
   assert.match(client, /position:absolute/);
   assert.match(client, /kz-week-strip/);
   assert.match(client, /kz-agenda-list/);

@@ -23,6 +23,120 @@
     position:relative; z-index:8; margin-top:12px; min-height:320px;
     display:flex; flex-direction:column;
   }
+
+  .kz-cal-mount.kz-cal-detail {
+    position:relative; z-index:8; margin:0; min-height:760px;
+    display:flex; flex-direction:column; overflow:visible;
+  }
+  .kz-cal-detail-heading {
+    display:flex; align-items:flex-end; justify-content:space-between; gap:18px;
+    flex:0 0 auto; min-height:42px;
+  }
+  .kz-cal-detail-title {
+    font-family:'Bodoni Moda',serif; font-size:25px; line-height:1.1; color:#132A1D;
+  }
+  .kz-cal-detail-sub {
+    margin-top:4px; color:#6C7B6E; font:10px/1.3 'IBM Plex Mono',monospace;
+    letter-spacing:.05em; text-transform:uppercase;
+  }
+  .kz-cal-detail-state {
+    color:#7A8A7C; font:9px/1.3 'IBM Plex Mono',monospace; text-align:right;
+    white-space:nowrap;
+  }
+  .kz-cal-detail .kz-cal-toolbar { margin-top:15px; min-height:36px; }
+  .kz-cal-detail .kz-cal-control,
+  .kz-cal-detail .kz-cal-filter { min-height:34px; font-size:11px; }
+  .kz-cal-detail .kz-cal-popover { top:42px; width:310px; max-width:min(90vw,310px); }
+  .kz-large-calendar {
+    flex:1 1 auto; min-height:0; display:flex; flex-direction:column; margin-top:14px;
+  }
+  .kz-large-header,
+  .kz-large-all-day,
+  .kz-large-grid-body {
+    display:grid; grid-template-columns:68px repeat(7,minmax(0,1fr));
+  }
+  .kz-large-header {
+    flex:0 0 auto; border:1px solid rgba(20,45,32,.14); border-bottom:0;
+    border-radius:8px 8px 0 0; overflow:hidden; background:rgba(255,255,255,.28);
+  }
+  .kz-large-corner { background:rgba(20,45,32,.035); border-right:1px solid rgba(20,45,32,.10); }
+  .kz-large-day-head {
+    min-width:0; padding:9px 8px 8px; border-left:1px solid rgba(20,45,32,.10);
+    background:rgba(255,255,255,.24);
+  }
+  .kz-large-day-head.is-today { background:rgba(184,145,47,.10); box-shadow:inset 0 -2px 0 rgba(184,145,47,.74); }
+  .kz-large-day-label {
+    color:#7A8A7C; font:8px/1 'IBM Plex Mono',monospace; letter-spacing:.10em;
+    text-transform:uppercase;
+  }
+  .kz-large-day-number {
+    margin-top:4px; color:#294332; font:20px/1 'Bodoni Moda',serif;
+  }
+  .kz-large-day-head.is-today .kz-large-day-number { color:#8C6B18; }
+  .kz-large-day-count {
+    float:right; margin-top:6px; color:#7A8A7C; font:8px/1 'IBM Plex Mono',monospace;
+  }
+  .kz-large-all-day {
+    flex:0 0 auto; min-height:48px; border:1px solid rgba(20,45,32,.14); border-top:1px solid rgba(20,45,32,.08);
+    overflow:hidden; background:rgba(247,241,228,.72);
+  }
+  .kz-large-all-day-label {
+    display:flex; align-items:center; justify-content:flex-end; padding:6px 8px;
+    color:#8A9A8C; font:8px/1 'IBM Plex Mono',monospace; letter-spacing:.06em;
+    border-right:1px solid rgba(20,45,32,.10);
+  }
+  .kz-large-all-day-cell {
+    min-width:0; min-height:46px; padding:4px; border-left:1px solid rgba(20,45,32,.10);
+    display:flex; flex-direction:column; gap:3px; overflow:hidden;
+  }
+  .kz-large-chip {
+    min-width:0; padding:4px 6px; border-radius:4px; border-left:3px solid;
+    background:rgba(255,255,255,.72); color:#294332; font-size:9.5px; line-height:1.15;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+  .kz-large-grid-body {
+    flex:1 1 auto; min-height:720px; border:1px solid rgba(20,45,32,.14); border-top:0;
+    border-radius:0 0 8px 8px; overflow:auto; background:rgba(255,255,255,.18);
+  }
+  .kz-large-time-rail { position:relative; min-height:720px; border-right:1px solid rgba(20,45,32,.10); }
+  .kz-large-time-label {
+    position:absolute; left:0; right:8px; transform:translateY(-50%); text-align:right;
+    color:#8A9A8C; font:8px/1 'IBM Plex Mono',monospace;
+  }
+  .kz-large-day-column {
+    position:relative; min-width:0; min-height:720px; border-left:1px solid rgba(20,45,32,.10);
+    background:rgba(255,255,255,.16); overflow:hidden;
+  }
+  .kz-large-day-column.is-today { background:rgba(184,145,47,.035); }
+  .kz-large-hour-line {
+    position:absolute; left:0; right:0; height:0; border-top:1px solid rgba(20,45,32,.065);
+    pointer-events:none;
+  }
+  .kz-large-hour-line.is-half { border-top-color:rgba(20,45,32,.035); border-top-style:dashed; }
+  .kz-large-event {
+    position:absolute; min-width:0; min-height:24px; padding:4px 6px; border-left:3px solid;
+    border-radius:4px; background:rgba(255,255,255,.78); box-shadow:0 5px 12px -10px rgba(20,45,32,.75);
+    overflow:hidden; z-index:2; color:#213326;
+  }
+  .kz-large-event-time {
+    color:#6C7B6E; font:8px/1.05 'IBM Plex Mono',monospace; white-space:nowrap;
+  }
+  .kz-large-event-title {
+    margin-top:3px; font-size:10.5px; line-height:1.18; font-weight:600;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+  .kz-large-event-calendar {
+    margin-top:3px; color:#7A8A7C; font-size:8px; line-height:1.1;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+  .kz-cal-detail .kz-month {
+    min-height:720px; grid-template-rows:22px minmax(0,1fr); gap:6px;
+  }
+  .kz-cal-detail .kz-month-weekdays span { font-size:9px; }
+  .kz-cal-detail .kz-month-day { padding:8px 7px 6px; border-radius:6px; }
+  .kz-cal-detail .kz-month-num { font-size:17px; }
+  .kz-cal-detail .kz-month-dots i { width:6px; height:6px; }
+  .kz-cal-detail .kz-month-count { font-size:8px; }
   .kz-cal-toolbar { display:flex; align-items:center; gap:7px; min-height:32px; flex:0 0 auto; }
   .kz-cal-segment,.kz-cal-nav {
     display:inline-flex; align-items:center; border:1px solid rgba(20,45,32,.13);
@@ -183,6 +297,9 @@
   const MUTED = '#6C7B6E';
   const WEEKDAYS = ['SO','MO','DI','MI','DO','FR','SA'];
   const state = { view:'week',anchorDate:todayKey(),calendarIds:null,calendars:[],events:[],periodLabel:'',menuOpen:false,loading:false,error:'',wellbeingDate:todayKey(),wellbeingSavedDate:'' };
+  const LARGE_GRID_START = 0;
+  const LARGE_GRID_END = 24 * 60;
+  const LARGE_GRID_HOURS = 24;
   let observer = null;
   let refreshTimer = null;
 
@@ -216,7 +333,16 @@
   function calendarDisplayName(value){ const raw=String(value&&value.name!=null?value.name:value||'').trim(); if(!raw)return'Kalender'; if(/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(raw))return'Hauptkalender'; return raw; }
   function eventCalendarName(event){ return calendarDisplayName(event&&event.calendar||''); }
   function eventColor(event){ return String(event&&event.color||GREEN); }
-  function eventsFor(date){ const target=berlinKey(date); return state.events.filter(event=>{const d=new Date(event.start);return Number.isFinite(d.getTime())&&berlinKey(d)===target;}); }
+  function eventOverlapsDay(event,date){
+    const boundsStart=new Date(date); boundsStart.setHours(0,0,0,0);
+    const boundsEnd=new Date(boundsStart); boundsEnd.setDate(boundsEnd.getDate()+1);
+    const start=new Date(event&&event.start);
+    let end=new Date(event&&event.end);
+    if(!Number.isFinite(start.getTime()))return false;
+    if(!Number.isFinite(end.getTime())||end<=start)end=new Date(start.getTime()+60000);
+    return start<boundsEnd&&end>boundsStart;
+  }
+  function eventsFor(date){ return state.events.filter(event=>eventOverlapsDay(event,date)); }
   function rangeStart(){ const d=parseKey(state.anchorDate)||new Date();d.setHours(12,0,0,0);if(state.view==='day')return d;if(state.view==='month')d.setDate(1);const weekday=d.getDay()||7;d.setDate(d.getDate()-weekday+1);return d; }
   function periodText(){ const anchor=parseKey(state.anchorDate)||new Date(); if(state.view==='day')return new Intl.DateTimeFormat('de-DE',{weekday:'short',day:'2-digit',month:'short'}).format(anchor); if(state.view==='month')return new Intl.DateTimeFormat('de-DE',{month:'long',year:'numeric'}).format(anchor); const start=rangeStart(),end=new Date(start);end.setDate(start.getDate()+6); if(start.getMonth()===end.getMonth())return `${String(start.getDate()).padStart(2,'0')}.–${String(end.getDate()).padStart(2,'0')}. ${new Intl.DateTimeFormat('de-DE',{month:'short'}).format(end)}`; return `${new Intl.DateTimeFormat('de-DE',{day:'2-digit',month:'short'}).format(start)}–${new Intl.DateTimeFormat('de-DE',{day:'2-digit',month:'short'}).format(end)}`; }
   function eventCountLabel(count){ return `${count} ${count===1?'TERMIN':'TERMINE'}`; }
@@ -225,18 +351,62 @@
   function control(label,active,action,extraClass){ const b=node('button',`kz-cal-control${active?' is-active':''}${extraClass?' '+extraClass:''}`,label);b.type='button';b.addEventListener('click',event=>{stop(event);action();});return b; }
 
   function findHosts(){
-    const hosts=[];const desktop=document.querySelector('[data-tile="calendar"]');if(desktop)hosts.push({host:desktop,mobile:false,heading:null});
+    const hosts=[];
+    const desktop=document.querySelector('[data-tile="calendar"]');
+    if(desktop)hosts.push({host:desktop,mobile:false,detail:false,heading:null});
+    const detail=document.querySelector('[data-kz-calendar-detail-host]');
+    if(detail)hosts.push({host:detail,mobile:false,detail:true,heading:null});
     const mobileRoot=document.querySelector('[data-screen-label="Kommandozentrale Mobil"]');
-    if(mobileRoot){ const heading=Array.from(mobileRoot.querySelectorAll('div')).find(el=>/^(Kalender|Kalenderwoche|Kalendertag|Kalendermonat)$/.test((el.textContent||'').trim())); if(heading){ let card=heading.parentElement;while(card&&card!==mobileRoot){const style=card.getAttribute&&card.getAttribute('style')||'';if(/border-radius/.test(style)&&/background/.test(style))break;card=card.parentElement;}if(card&&card!==mobileRoot)hosts.push({host:card,mobile:true,heading}); } }
+    if(mobileRoot){
+      const heading=Array.from(mobileRoot.querySelectorAll('div')).find(el=>/^(Kalender|Kalenderwoche|Kalendertag|Kalendermonat)$/.test((el.textContent||'').trim()));
+      if(heading){
+        let card=heading.parentElement;
+        while(card&&card!==mobileRoot){
+          const style=card.getAttribute&&card.getAttribute('style')||'';
+          if(/border-radius/.test(style)&&/background/.test(style))break;
+          card=card.parentElement;
+        }
+        if(card&&card!==mobileRoot)hosts.push({host:card,mobile:true,detail:false,heading:heading});
+      }
+    }
     return hosts;
   }
   function prepareHost(info){
-    const{host,mobile,heading}=info;host.style.overflow='visible';let mount=host.querySelector(':scope > [data-kz-calendar-enhanced]');
-    if(!mount){mount=node('div',`kz-cal-mount ${mobile?'kz-cal-mobile':'kz-cal-desktop'}`);mount.dataset.kzCalendarEnhanced='1';mount.addEventListener('click',event=>event.stopPropagation());host.appendChild(mount);}else mount.className=`kz-cal-mount ${mobile?'kz-cal-mobile':'kz-cal-desktop'}`;
+    const{host,mobile,detail,heading}=info;
+    host.style.overflow='visible';
+    if(detail){
+      host.style.position='relative';
+      host.style.minHeight='760px';
+    }
+    let mount=host.querySelector(':scope > [data-kz-calendar-enhanced]');
+    if(!mount){
+      mount=node('div','kz-cal-mount '+(detail?'kz-cal-detail':mobile?'kz-cal-mobile':'kz-cal-desktop'));
+      mount.dataset.kzCalendarEnhanced='1';
+      mount.addEventListener('click',event=>event.stopPropagation());
+      host.appendChild(mount);
+    }else{
+      mount.className='kz-cal-mount '+(detail?'kz-cal-detail':mobile?'kz-cal-mobile':'kz-cal-desktop');
+    }
+    if(detail){
+      Array.from(host.children).forEach(child=>{
+        if(child===mount)return;
+        if(!child.dataset.kzOriginalDisplay)child.dataset.kzOriginalDisplay=child.style.display||'__empty__';
+        child.style.display='none';
+      });
+      return mount;
+    }
     const title=mobile&&heading?heading:host.querySelector(':scope > div:first-child > div:first-child');
     const meta=mobile?(heading&&heading.parentElement?heading.parentElement.querySelector(':scope > div:last-child'):null):host.querySelector(':scope > div:first-child > div:last-child');
-    if(title)title.textContent='Kalender';if(meta)meta.textContent=`${periodText().toUpperCase()} · ${eventCountLabel(state.events.length)}`;
-    Array.from(host.children).forEach(child=>{if(child===mount)return;if(!mobile&&child===host.firstElementChild)return;if(mobile&&heading&&child.contains(heading))return;if(!child.dataset.kzOriginalDisplay)child.dataset.kzOriginalDisplay=child.style.display||'__empty__';child.style.display='none';});return mount;
+    if(title)title.textContent='Kalender';
+    if(meta)meta.textContent=periodText().toUpperCase()+' · '+eventCountLabel(state.events.length);
+    Array.from(host.children).forEach(child=>{
+      if(child===mount)return;
+      if(!mobile&&child===host.firstElementChild)return;
+      if(mobile&&heading&&child.contains(heading))return;
+      if(!child.dataset.kzOriginalDisplay)child.dataset.kzOriginalDisplay=child.style.display||'__empty__';
+      child.style.display='none';
+    });
+    return mount;
   }
   function renderToolbar(){
     const toolbar=node('div','kz-cal-toolbar');const segment=node('div','kz-cal-segment');segment.setAttribute('role','group');segment.setAttribute('aria-label','Kalenderansicht');
@@ -267,8 +437,148 @@
     const body=node('div','kz-cal-body'),month=node('div','kz-month'),weekdays=node('div','kz-month-weekdays');['MO','DI','MI','DO','FR','SA','SO'].forEach(day=>weekdays.appendChild(node('span',null,day)));const grid=node('div','kz-month-grid'),start=rangeStart(),anchor=parseKey(state.anchorDate)||new Date(),anchorMonth=anchor.getMonth();
     for(let i=0;i<42;i++){const day=new Date(start);day.setDate(start.getDate()+i);const events=eventsFor(day),outside=day.getMonth()!==anchorMonth,today=berlinKey(day)===todayKey(),selected=dateKey(day)===dateKey(anchor),cell=node('button',`kz-month-day${outside?' is-outside':''}${today?' is-today':''}${selected?' is-selected':''}`);cell.type='button';cell.setAttribute('aria-label',new Intl.DateTimeFormat('de-DE',{weekday:'long',day:'2-digit',month:'long'}).format(day));cell.appendChild(node('span','kz-month-num',String(day.getDate())));const foot=node('span','kz-month-events'),dots=node('span','kz-month-dots');events.slice(0,3).forEach(event=>{const dot=node('i');dot.style.background=eventColor(event);dots.appendChild(dot);});foot.appendChild(dots);if(events.length)foot.appendChild(node('span','kz-month-count',String(events.length)));cell.appendChild(foot);cell.addEventListener('click',event=>{stop(event);openDay(day);});grid.appendChild(cell);}month.append(weekdays,grid);body.appendChild(month);return body;
   }
+
+  function renderDetailHeading(){
+    const box=node('div','kz-cal-detail-heading');
+    const left=node('div');
+    left.append(node('div','kz-cal-detail-title','Kalender'),node('div','kz-cal-detail-sub',periodText()+' · Google Calendar'));
+    const right=node('div','kz-cal-detail-state',state.calendars.length?selectedCalendarCount()+' von '+state.calendars.length+' Kalendern aktiv':(state.loading?'Kalender werden geladen …':'Keine Kalender geladen'));
+    box.append(left,right);
+    return box;
+  }
+
+  function largeDays(){
+    const anchor=parseKey(state.anchorDate)||new Date();
+    if(state.view==='day')return [anchor];
+    const start=rangeStart(),days=[];
+    for(let i=0;i<7;i++){const day=new Date(start);day.setDate(start.getDate()+i);days.push(day);}
+    return days;
+  }
+
+  function largeDayBounds(day){
+    const start=new Date(day); start.setHours(0,0,0,0);
+    const end=new Date(start); end.setDate(end.getDate()+1);
+    return {start:start,end:end};
+  }
+
+  function largeTimeSegmentsForDay(day){
+    const bounds=largeDayBounds(day),items=[];
+    state.events.filter(event=>!event.allDay&&eventOverlapsDay(event,day)).forEach(event=>{
+      const rawStart=new Date(event.start),rawEnd=new Date(event.end);
+      const startMs=Math.max(rawStart.getTime(),bounds.start.getTime());
+      const endMs=Math.min((Number.isFinite(rawEnd.getTime())?rawEnd.getTime():startMs+60000),bounds.end.getTime());
+      let startMinute=startMs<=bounds.start.getTime()?0:(new Date(startMs)).getHours()*60+(new Date(startMs)).getMinutes();
+      let endMinute=endMs>=bounds.end.getTime()?1440:(new Date(endMs)).getHours()*60+(new Date(endMs)).getMinutes();
+      startMinute=Math.max(LARGE_GRID_START,startMinute);
+      endMinute=Math.min(LARGE_GRID_END,endMinute);
+      if(endMinute<=startMinute)return;
+      items.push({event:event,startMinute:startMinute,endMinute:endMinute});
+    });
+    items.sort((a,b)=>a.startMinute-b.startMinute||a.endMinute-b.endMinute);
+    const lanes=[];
+    items.forEach(item=>{
+      let lane=lanes.findIndex(end=>end<=item.startMinute);
+      if(lane<0){lane=lanes.length;lanes.push(0);}
+      item.lane=lane;lanes[lane]=item.endMinute;
+    });
+    items.forEach(item=>{item.laneCount=lanes.length;});
+    return items;
+  }
+
+  function largeAllDayEventsForDay(day){
+    return state.events.filter(event=>!!event.allDay&&eventOverlapsDay(event,day));
+  }
+
+  function renderLargeDayHeader(day){
+    const header=node('div','kz-large-day-head');
+    if(berlinKey(day)===todayKey())header.classList.add('is-today');
+    const wd=new Intl.DateTimeFormat('de-DE',{weekday:'short'}).format(day).toUpperCase();
+    const number=new Intl.DateTimeFormat('de-DE',{day:'2-digit'}).format(day);
+    const count=eventsFor(day).length;
+    header.append(node('span','kz-large-day-label',wd),node('span','kz-large-day-count',count+' '+(count===1?'Termin':'Termine')),node('div','kz-large-day-number',number));
+    return header;
+  }
+
+  function renderLargeAllDayCell(day){
+    const cell=node('div','kz-large-all-day-cell');
+    largeAllDayEventsForDay(day).slice(0,4).forEach(event=>{
+      const chip=node('div','kz-large-chip',String(event.title||'(ohne Titel)'));
+      chip.title=String(event.title||'');
+      chip.style.borderLeftColor=eventColor(event);
+      cell.appendChild(chip);
+    });
+    return cell;
+  }
+
+  function renderLargeTimeRail(){
+    const rail=node('div','kz-large-time-rail');
+    for(let hour=0;hour<=LARGE_GRID_HOURS;hour+=2){
+      const label=node('div','kz-large-time-label',String(hour).padStart(2,'0')+':00');
+      label.style.top=(hour/LARGE_GRID_HOURS*100)+'%';
+      rail.appendChild(label);
+    }
+    return rail;
+  }
+
+  function renderLargeDayColumn(day){
+    const column=node('div','kz-large-day-column');
+    if(berlinKey(day)===todayKey())column.classList.add('is-today');
+    for(let hour=0;hour<=LARGE_GRID_HOURS;hour++){
+      const line=node('div','kz-large-hour-line'+(hour%2?' is-half':''));
+      line.style.top=(hour/LARGE_GRID_HOURS*100)+'%';
+      column.appendChild(line);
+    }
+    largeTimeSegmentsForDay(day).forEach(item=>{
+      const event=item.event,start=new Date(event.start),end=new Date(event.end);
+      const block=node('div','kz-large-event');
+      block.style.top=((item.startMinute-LARGE_GRID_START)/(LARGE_GRID_END-LARGE_GRID_START)*100)+'%';
+      block.style.height=Math.max(24,(item.endMinute-item.startMinute)/(LARGE_GRID_END-LARGE_GRID_START)*100)+'%';
+      block.style.left=(item.lane*100/item.laneCount)+'%';
+      block.style.width='calc('+(100/item.laneCount)+'% - 5px)';
+      block.style.borderLeftColor=eventColor(event);
+      block.title=String(event.title||'');
+      const time=new Intl.DateTimeFormat('de-DE',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Berlin'}).format(start)+'–'+new Intl.DateTimeFormat('de-DE',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Berlin'}).format(end);
+      block.append(node('div','kz-large-event-time',time),node('div','kz-large-event-title',String(event.title||'(ohne Titel)')),node('div','kz-large-event-calendar',eventCalendarName(event)));
+      column.appendChild(block);
+    });
+    return column;
+  }
+
+  function renderLargeTimeGrid(){
+    const wrap=node('div','kz-large-calendar'),days=largeDays(),columns='68px repeat('+days.length+',minmax(0,1fr))';
+    const header=node('div','kz-large-header');header.style.gridTemplateColumns=columns;
+    header.appendChild(node('div','kz-large-corner'));
+    days.forEach(day=>header.appendChild(renderLargeDayHeader(day)));
+    const allDay=node('div','kz-large-all-day');allDay.style.gridTemplateColumns=columns;
+    allDay.appendChild(node('div','kz-large-all-day-label','GANZTÄGIG'));
+    days.forEach(day=>allDay.appendChild(renderLargeAllDayCell(day)));
+    const body=node('div','kz-large-grid-body');body.style.gridTemplateColumns=columns;
+    body.appendChild(renderLargeTimeRail());
+    days.forEach(day=>body.appendChild(renderLargeDayColumn(day)));
+    wrap.append(header,allDay,body);
+    return wrap;
+  }
+
+  function renderLargeCalendarContent(){
+    if(state.loading){
+      const loading=node('div','kz-cal-body'),box=node('div','kz-cal-loading'),inner=node('div');
+      inner.append(node('div','kz-cal-spinner'),node('div',null,'Kalender wird aktualisiert …'));box.appendChild(inner);loading.appendChild(box);return loading;
+    }
+    if(state.error){
+      const body=node('div','kz-cal-body'),box=node('div','kz-cal-empty'),inner=node('div');
+      inner.append(node('div',null,'Kalender konnte nicht geladen werden'),node('div','kz-cal-error',state.error));box.appendChild(inner);body.appendChild(box);return body;
+    }
+    if(state.view==='month')return renderMonth();
+    return renderLargeTimeGrid();
+  }
+
   function renderCalendarContent(){if(state.loading){const loading=node('div','kz-cal-body'),box=node('div','kz-cal-loading'),inner=node('div');inner.append(node('div','kz-cal-spinner'),node('div',null,'Kalender wird aktualisiert …'));box.appendChild(inner);loading.appendChild(box);return loading;}if(state.error){const body=node('div','kz-cal-body'),box=node('div','kz-cal-empty'),inner=node('div');inner.append(node('div',null,'Kalender konnte nicht geladen werden'),node('div','kz-cal-error',state.error));box.appendChild(inner);body.appendChild(box);return body;}if(state.view==='day')return renderDay();if(state.view==='month')return renderMonth();return renderWeek();}
-  function renderHost(info){const mount=prepareHost(info);mount.replaceChildren();mount.append(renderToolbar(),renderCalendarContent());}
+  function renderHost(info){
+    const mount=prepareHost(info);
+    mount.replaceChildren();
+    if(info.detail)mount.append(renderDetailHeading(),renderToolbar(),renderLargeCalendarContent());
+    else mount.append(renderToolbar(),renderCalendarContent());
+  }
 
   function setWellbeingDate(value){const candidate=String(value||'');state.wellbeingDate=parseKey(candidate)&&candidate<=todayKey()?candidate:todayKey();state.wellbeingSavedDate='';updateWellbeingBoxes();}
   function selectedWellbeingDate(){const visible=Array.from(document.querySelectorAll('[data-kz-wellbeing-date] input[type="date"]')).find(input=>input.offsetParent!==null&&parseKey(input.value)&&input.value<=todayKey());if(visible)return visible.value;return parseKey(state.wellbeingDate)&&state.wellbeingDate<=todayKey()?state.wellbeingDate:todayKey();}
