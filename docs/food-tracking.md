@@ -48,3 +48,15 @@ Schätzwerte und werden nicht als exakte Messwerte ausgegeben.
 - Langfristige Präferenzen und Muster werden erst nach ausreichender Evidenz bzw.
   Bestätigung in den langfristigen Kontext übernommen.
 - Echte persönliche Inhalte gehören weder in Fixtures noch in GitHub.
+
+
+## Separater Design-Tab
+
+Die von Claude Design erstellte Oberfläche liegt getrennt in:
+
+- `src/FoodIndex.html` für Desktop
+- `src/FoodMobileIndex.html` für Mobile
+
+Die Hauptseite besitzt nur einen kompakten Einstieg über `FoodTrackingEnhancements.html`. Die Route `?view=food` beziehungsweise `?view=food-mobile` öffnet den eigenständigen Bereich.
+
+Die statischen Beispielwerte der Designvorschau werden standardmäßig nicht angezeigt. Für die reine visuelle Prüfung kann vorübergehend `?view=food&preview=1` beziehungsweise `?view=food-mobile&preview=1` verwendet werden. Die echte OPS-Anbindung und die Erfassungsfunktionen werden in einem separaten Integrationsschritt angeschlossen.
