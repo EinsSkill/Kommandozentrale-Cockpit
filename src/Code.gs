@@ -54,7 +54,7 @@ function doGet(e) {
   const enhancement = [
     HtmlService.createHtmlOutputFromFile('CalendarWellbeingEnhancements').getContent(),
     HtmlService.createHtmlOutputFromFile('FoodTrackingEnhancements').getContent()
-  ].join('\\n');
+  ].join('\n');
   // Mobile currently labels the card "Heute im Kalender"; normalize it so the
   // shared enhancement layer can address the same calendar surface on both views.
   const rendered = evaluated.getContent().replace('Heute im Kalender', 'Kalenderwoche');
