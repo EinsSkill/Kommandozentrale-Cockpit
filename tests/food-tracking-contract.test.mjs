@@ -45,7 +45,7 @@ test('Hauptseite enthält nur einen kompakten Einstieg ohne erfundene Live-Werte
   assert.match(entry, /data-kz-food-entry/);
   assert.match(entry, /openFood/);
   assert.match(entry, /getFoodV1/);
-  assert.match(entry, /FoodMobileIndex/);
+  assert.match(entry, /food-mobile/);
   assert.doesNotMatch(entry, /FIXTURE|mock|fake|demo/i);
 });
 
