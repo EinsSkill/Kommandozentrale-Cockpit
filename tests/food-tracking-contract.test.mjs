@@ -47,6 +47,9 @@ test('Hauptseite enthält nur einen kompakten Einstieg ohne erfundene Live-Werte
   assert.match(entry, /getFoodV1/);
   assert.match(entry, /food-mobile/);
   assert.doesNotMatch(entry, /FIXTURE|mock|fake|demo/i);
+  assert.doesNotMatch(entry, /data-kz-food-entry-nav|ensureNav/);
+  assert.match(entry, /document\.addEventListener\('click'/);
+  assert.match(entry, /aria-label', 'Ernährungsbereich öffnen'/);
 });
 
 test('Backend, Routen und eingebettete Scripts sind syntaktisch parsebar', () => {
