@@ -81,8 +81,9 @@ Vor einer Änderung:
 1. `CLAUDE.md` lesen.
 2. `AGENTS.md` lesen.
 3. dieses Dokument lesen.
-4. passenden fachlichen Vertrag unter `docs/` und die betroffenen Tests/Dateien lesen.
-5. Branch, Basis-Commit und aktuellen Git-/Testzustand verifizieren.
+4. `docs/multi-ai-workflow.md` lesen.
+5. passenden fachlichen Vertrag unter `docs/` und die betroffenen Tests/Dateien lesen.
+6. Branch, Basis-Commit und aktuellen Git-/Testzustand verifizieren.
 
 Externer Kontext wird **nur** geladen oder angefordert, wenn die freigegebene Spezifikation ihn benötigt:
 
@@ -98,9 +99,9 @@ Für Second Brain gilt derselbe Pfad wie für andere Agenten:
 
 Kein Vollscan und keine pauschale Kopie des Vaults in den Prompt.
 
-## Minimaler Context Pack bei KI-Übergaben
+## Minimaler Context Pack im Kernteam
 
-Wenn Kontext zwischen ChatGPT, Claude oder Gemini übertragen werden muss, reicht normalerweise:
+Zwischen ChatGPT und Claude reicht normalerweise:
 
 ```text
 Change-ID / Thema:
@@ -115,6 +116,34 @@ Erwarteter nächster Schritt:
 ```
 
 Keine Vollkopie von OPS, Second Brain oder Chatverläufen anhängen, wenn konkrete Referenzen oder relevante Ausschnitte genügen.
+
+## Gemini als externer Bewerter
+
+Gemini gehört **nicht** zum normalen Kontextpfad von ChatGPT und Claude.
+
+Wenn ein unabhängiger Gegencheck sinnvoll ist, erstellt ChatGPT ein separates, kleines Bewertungs-Paket. Default ist dabei **kein persönlicher und kein operativer Vollkontext**.
+
+Gemini erhält nur das, was zur konkreten Prüffrage notwendig ist, typischerweise:
+
+- Prüffrage,
+- vorgeschlagene Lösung oder Entscheidung,
+- technische Randbedingungen,
+- ausgeschlossene Optionen,
+- kleine relevante Code-/Doku-Ausschnitte,
+- gewünschte Kritik: Gegenargument, Fehlerfälle, fehlende Belege, Widerlegungstest.
+
+Gemini erhält standardmäßig **nicht**:
+
+- vollständiges Second Brain,
+- USER_PROFILE oder persönliche Langzeitprofile,
+- vollständiges OPS Sheet,
+- komplette Chatverläufe,
+- Gmail-/Kalender-/Finanz-Rohdaten,
+- produktive Geheimnisse oder Zugangsdaten.
+
+Geminis Ergebnis ist eine externe Bewertung. ChatGPT prüft es gegen die echten Sources of Truth. Es wird weder automatisch gespeichert noch automatisch umgesetzt.
+
+Der vollständige Rollen- und Handoffvertrag steht in `docs/multi-ai-workflow.md`.
 
 ## Freshness und Provenienz
 
@@ -144,6 +173,7 @@ Widersprüche werden sichtbar benannt; sie werden nicht durch stilles Zusammenf�
 - keine unsichtbare gemeinsame Erinnerung zwischen KIs
 - keine automatische Speicherung normaler Gespräche
 - keine zweite operative Task-/Projekt-Datenbank
+- keine permanente Gemini-Kontextkopie
 
 ## Erfolgskriterien für KZ 1.0
 
@@ -155,3 +185,4 @@ Der Bootstrap gilt als erfolgreich, wenn:
 4. aktuelle Zustände nicht aus alten Briefings oder Vault-Seiten abgeleitet werden.
 5. technische Aussagen gegen Git/Code/Tests verifiziert werden.
 6. Übergaben ohne vollständige Chat- oder Vault-Kopien anschlussfähig bleiben.
+7. Gemini als Außenprüfer ohne vollständigen persönlichen oder operativen Kontext nutzbar bleibt.

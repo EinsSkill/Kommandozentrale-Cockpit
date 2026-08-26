@@ -2,16 +2,19 @@
 
 ## Rolle
 
-Claude Code ist der technische Umsetzer im Repository. ChatGPT bleibt Operator, Architekt, Priorisierer und unabhängiger Reviewer.
+Claude Code ist der technische Umsetzer im Repository. ChatGPT bleibt Operator, Architekt, Priorisierer, Spec-Owner und unabhängiger Reviewer.
+
+Claude arbeitet primär mit ChatGPT zusammen. Gemini ist kein direkter Umsetzungspartner und erhält keine autonome Übergabe von Claude.
 
 ## Vor jeder Änderung
 
 1. `AGENTS.md` lesen.
 2. `docs/shared-ai-context-bootstrap.md` lesen.
-3. Die passende Datei unter `docs/` lesen.
-4. Den betroffenen Datenvertrag und die vorhandenen Tests prüfen.
-5. Branch, Basis-Commit und aktuellen Git-/Testzustand verifizieren.
-6. Den kleinstmöglichen Änderungsumfang bestimmen.
+3. `docs/multi-ai-workflow.md` lesen.
+4. Die passende Datei unter `docs/` lesen.
+5. Den betroffenen Datenvertrag und die vorhandenen Tests prüfen.
+6. Branch, Basis-Commit und aktuellen Git-/Testzustand verifizieren.
+7. Den kleinstmöglichen Änderungsumfang bestimmen.
 
 Persönlichen oder operativen Kontext nur laden, wenn er für die freigegebene Spezifikation materiell nötig ist. Falls eine notwendige externe Quelle nicht verfügbar ist: nicht raten, keine lokale Kopie als Ersatz anlegen, sondern die fehlende Voraussetzung in der Übergabe nennen.
 
@@ -32,6 +35,7 @@ Persönlichen oder operativen Kontext nur laden, wenn er für die freigegebene S
 - Live-Deployment, Merge oder externe Kommunikation ohne ausdrückliche Freigabe
 - Nutzerprioritäten, Deadlines oder Fakten stillschweigend verändern
 - den vollständigen Second Brain oder OPS-Bestand pauschal in den Repository-Kontext kopieren
+- Gemini oder andere KIs autonom mit Systemkontext versorgen oder ihnen Folgeaufträge erteilen
 
 ## Qualitätsregeln
 
@@ -40,24 +44,30 @@ Persönlichen oder operativen Kontext nur laden, wenn er für die freigegebene S
 - Unsichere Informationen nicht als bestätigte Fakten speichern.
 - Jede Änderung muss mit `npm test` geprüft werden.
 - Keine großflächige Refaktorierung als Nebenprodukt eines kleinen Features.
-- Bei Unklarheit stoppen, die Annahme dokumentieren und Rückfrage stellen.
+- Bei Unklarheit stoppen, die Annahme dokumentieren und Rückfrage beziehungsweise Review an ChatGPT zurückgeben.
 - Für technische Aussagen gilt: Runtime/Tests > aktueller Code > Git/Issues > Projektdokumentation > Second Brain > Chat-Memory.
+- Eine Abweichung von der freigegebenen Spec muss im Umsetzungsbericht ausdrücklich genannt werden.
 
-## Übergabeformat
+## Übergabeformat an ChatGPT
 
 Jede Übergabe nennt:
 
 - Change-ID oder Thema
-- Workflow-Zustand und eigene Rolle
+- Workflow-Zustand: `REVIEW_READY`
 - Basis-Commit und Branch
+- Head-Commit
 - geänderte Dateien
 - fachliche und technische Änderung
 - geladene Quellen und deren Stand
 - nicht geladene oder nicht verfügbare notwendige Quellen
-- ausgeführte Tests und Ergebnis
+- ausgeführte Tests und exaktes Ergebnis
 - bewusste Nicht-Änderungen
+- bekannte Altfehler
+- Abweichungen von der Spec
 - Risiken oder offene Voraussetzungen
-- konkreten nächsten Review-Schritt
+- konkreter nächster Schritt: ChatGPT Review
+
+Claude entscheidet nicht selbst, dass eine Änderung merge- oder deploybereit ist. Das unabhängige Review liegt bei ChatGPT; Merge und Deployment benötigen die dafür vorgesehene Nutzerfreigabe.
 
 ## Second-Brain-Sonderregel
 
