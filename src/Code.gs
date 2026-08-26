@@ -58,15 +58,10 @@ function doGet(e) {
   const evaluated = template.evaluate();
   let enhancement = '';
   if (!isFoodView) {
-    try {
-      enhancement = [
-        HtmlService.createHtmlOutputFromFile('CalendarWellbeingEnhancements').getContent(),
-        HtmlService.createHtmlOutputFromFile('FoodTrackingEnhancements').getContent()
-      ].join('\n');
-    } catch (error) {
-      // Optional enhancement layers must never blank the core cockpit.
-      console.error('Enhancement layer unavailable: ' + String(error && error.message ? error.message : error));
-    }
+    enhancement = [
+      safeIncludeHtml_('CalendarWellbeingEnhancements'),
+      safeIncludeHtml_('FoodTrackingEnhancements')
+    ].filter(Boolean).join('\n');
   }
   // Mobile currently labels the card "Heute im Kalender"; normalize it so the
   // shared enhancement layer can address the same calendar surface on both views.
@@ -75,6 +70,19 @@ function doGet(e) {
   return HtmlService.createHtmlOutput(content)
     .setTitle(isFoodView ? 'Ernährung · Lukes Kommandozentrale' : 'Lukes Kommandozentrale')
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+}
+
+/**
+ * Reads an optional UI fragment without allowing one missing file to break doGet().
+ * The core cockpit must remain available even during partial Apps-Script syncs.
+ */
+function safeIncludeHtml_(fileName) {
+  try {
+    return HtmlService.createHtmlOutputFromFile(fileName).getContent();
+  } catch (error) {
+    Logger.log('Optional enhancement unavailable [' + fileName + ']: ' + String(error && error.message ? error.message : error));
+    return '';
+  }
 }
 
 /** Includes repository-owned HTML fragments into the evaluated Apps-Script template. */
