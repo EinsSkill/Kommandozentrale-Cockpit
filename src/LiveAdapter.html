@@ -75,7 +75,7 @@
       mails: [],
       fin: {
         available: false, meta: currentMonthLabel(), in: 0, out: 0,
-        months: [], income: [], expense: [], budgets: [], cats: [], tx: []
+        months: [], income: [], expense: [], budgets: [], cashEnvelopes: [], cats: [], tx: []
       },
       hea: {
         available: false, steps: 0, stepGoal: 0, sleep: null, sleepGoal: 0,
@@ -144,7 +144,7 @@
           if (!value || value.ok === false) throw new Error(value && value.message ? value.message : 'Personal Operator nicht verfügbar.');
           this.applyPersonal(value);
         }],
-        ['finance', 'getFinanceV33', value => {
+        ['finance', 'getFinanceDashboardV1', value => {
           if (!value || value.ok === false) throw new Error(value && value.error ? value.error : 'Finanzdaten nicht verfügbar.');
           this.applyFinance(value.finance);
         }],
@@ -263,8 +263,6 @@
       const status = statusUpper(weather && weather.status);
       const stale = !!(weather && (weather.stale || !backendAvailable || (status && status !== 'OK')));
       return {
-        // Freshness and usability are deliberately separate: a failed refresh
-        // does not blank a still-useful last successful weather snapshot.
         available: hasSnapshot, stale, status,
         place: text(weather && weather.location) || (hasSnapshot ? 'Standort aus OPS' : 'Wetterquelle nicht verfügbar'),
         temp: hasSnapshot && current.temperatureC != null ? number(current.temperatureC) : null,
@@ -282,19 +280,26 @@
     applyFinance(finance) {
       this.raw.finance = finance || {};
       const series = asArray(finance && finance.monthSeries);
+      const current = finance && (finance.currentPeriod || finance.current) || {};
       this.component.D.fin = {
         available: true,
         meta: series.length && series[series.length - 1].key
           ? new Intl.DateTimeFormat('de-DE', { month: 'short', year: 'numeric' }).format(new Date(series[series.length - 1].key + '-01')).toUpperCase()
           : currentMonthLabel(),
-        in: number(finance && finance.current && finance.current.income),
-        out: number(finance && finance.current && finance.current.expense),
+        in: number(current.income),
+        out: number(current.expense),
         months: series.map(item => text(item.label || item.key)),
         income: series.map(item => number(item.income)),
         expense: series.map(item => number(item.expense)),
         budgets: asArray(finance && finance.budgets).map(budget => ({
           id: text(budget.id), label: text(budget.category), spent: number(budget.actual),
           limit: number(budget.planned), remaining: number(budget.remaining), status: text(budget.status)
+        })),
+        cashEnvelopes: asArray(finance && finance.cashEnvelopes).map(envelope => ({
+          id: text(envelope.id), label: text(envelope.category), spent: number(envelope.actual),
+          limit: number(envelope.planned), remaining: number(envelope.remaining), status: text(envelope.status),
+          targetBalance: number(envelope.targetBalance), currentBalance: number(envelope.currentBalance),
+          fundingMode: text(envelope.fundingMode)
         })),
         cats: asArray(finance && finance.categorySpend).map(category => ({ label: text(category.category), v: number(category.amount) })),
         tx: asArray(finance && finance.recent).map(item => ({
@@ -454,8 +459,6 @@
         ? (task.reason || [task.due !== '–' ? task.due : '', task.blockedBy].filter(Boolean).join(' · ') || 'Die Aufgabe steht im OPS aktuell an erster Stelle.')
         : '';
       data.operator = {
-        // The generated briefing belongs above the fold. When there is a task,
-        // it provides context; without a task, it becomes the operator's main statement.
         step: taskStep || briefingCore || 'Keine offene Aufgabe im OPS.',
         why: task ? (briefingCore || taskWhy) : (briefingRec || (briefingCore ? 'Aktueller Briefing-Stand aus dem OPS.' : 'Der aktuelle OPS-Stand enthält keine offene Aufgabe.')),
         notNow: tasks.slice(1, 4).map(item => item.title),

@@ -39,15 +39,13 @@ test('mobile Claude source is retained and routed without external support.js', 
   assert.match(index, /setTimeout\(function \(\)/);
   assert.match(index, /mobileAgent/);
   assert.match(index, /screenWidth <= 720/);
-  // The new original Claude desktop source intentionally uses a fixed 1600px design canvas.
-  // Mobile safety comes from the routing script above plus the dedicated MobileIndex surface.
   assert.match(index, /<meta name="viewport" content="width=device-width, initial-scale=1">/);
   assert.match(index, /<meta name="viewport" content="width=1600">/);
 });
 
 test('mobile live surface exposes the existing read and write contracts', () => {
   for (const endpoint of [
-    'getDashboardBaseV31', 'getPersonalOperatorContextV1', 'getFinanceV33',
+    'getDashboardBaseV31', 'getPersonalOperatorContextV1', 'getFinanceDashboardV1',
     'getHealthV31', 'getWellbeingV1', 'getCalendarWeekV3', 'getMailV3',
     'setTaskDone', 'acknowledgeAlert', 'reviewAiInbox', 'saveWellbeingEntryV1',
     'searchSecondBrainV1'
@@ -115,13 +113,16 @@ test('mobile live values receive real endpoint-shaped data and keep details call
     syncState: [], errors: {}
   });
   adapter.applyFinance({
+    period: { id: 'PERIOD_ACTIVE', status: 'ACTIVE', startDate: '2026-08-01', endDate: '2026-08-31' },
     monthSeries: [{ key: '2026-08', label: 'Aug', income: 2000, expense: 1200 }],
-    current: { income: 2000, expense: 1200 },
+    currentPeriod: { income: 2000, expense: 1200 },
     budgets: [{ id: 'B_1', category: 'Betrieb', actual: 300, planned: 500, remaining: 200 }],
+    cashEnvelopes: [{ id: 'E_1', category: 'Tanken', actual: 50, planned: 150, remaining: 100, targetBalance: 150, currentBalance: 100, fundingMode: 'TOP_UP_TO_TARGET' }],
     categorySpend: [{ category: 'Betrieb', amount: 300 }],
     recent: [{ date: '2026-08-21', merchant: 'Live-Händler', category: 'Betrieb', amount: 30, direction: 'EXPENSE' }],
     transactionCount: 1
   });
+  assert.equal(adapter.component.D.fin.cashEnvelopes[0].currentBalance, 100);
   adapter.applyHealth({
     latestSteps: 7000, latestWeight: 78.4,
     last7: [{ date: '2026-08-22', day: 'SA', steps: 7000, activeMinutes: 30, sleepMinutes: 420 }],

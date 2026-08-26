@@ -29,11 +29,13 @@ Die mobile Oberfläche verwendet dieselben Live-Endpunkte, Schreibpfade, Script 
 | Aufgaben, Projekte, KI-Inbox, Alerts, Ziele, Briefing, Wetter, Sync | `getDashboardBaseV31(force)` |
 | Personal Operator | `getPersonalOperatorContextV1(force)` |
 | Second-Brain-Suche | `searchSecondBrainV1(query, false)`; read-only, sensible Dateien standardmäßig ausgeblendet |
-| Finanzen | `getFinanceV33(force)` |
-| Gesundheit | `getHealthV31(force)` |
+| Finanzen | `getFinanceDashboardV1(force)`; kanonischer periodengebundener OPS-v1.1-Pfad |
+| Gesundheit | `getHealthV31(force)`; `HealthSync.gs` pflegt zusätzlich die `HEALTH_TRENDS`-Coverage-Felder |
 | Wohlbefinden | `getWellbeingV1(force)` |
 | Kalender | `getCalendarWeekV3(force)` |
 | Mail | `getMailV3(force)` aus `OPS.EMAIL_REFS`; Gmail bleibt Source of Truth |
+
+Der historische `getFinanceV33(force)`-Pfad bleibt in `Code.gs` ausschließlich als temporärer Compatibility-Pfad bestehen; der LiveAdapter verwendet ihn nicht mehr.
 
 Direkte Nutzeraktionen verwenden ausschließlich die vorhandenen auditierten Schreibpfade:
 
@@ -49,11 +51,13 @@ Fehlende Quellen bleiben leer oder werden als Fehler angezeigt. Es werden keine 
 Im bestehenden Apps-Script-Projekt **Kommandozentrale**:
 
 1. `src/Code.gs` vollständig in die vorhandene Datei `Code.gs` kopieren.
-2. `src/Index.html` vollständig in die vorhandene Datei `Index.html` kopieren.
-3. Eine neue HTML-Datei `MobileIndex` anlegen und den vollständigen Inhalt von `src/MobileIndex.html` hineinkopieren.
-4. Eine neue HTML-Datei `ClaudeRuntime` anlegen bzw. die vorhandene Datei aus dem Desktop-Merge unverändert beibehalten; Inhalt von `src/ClaudeRuntime.html` verwenden.
-5. Eine neue HTML-Datei `LiveAdapter` anlegen bzw. die vorhandene Datei aus dem Desktop-Merge unverändert beibehalten; Inhalt von `src/LiveAdapter.html` verwenden.
-6. Die vorhandenen Dateien `HealthSync.gs`, `PersonalOperator.gs`, `SecondBrain.gs` und `Weather.gs` unverändert im Projekt belassen.
+2. `src/FinanceDashboard.gs` als neue Apps-Script-Datei `FinanceDashboard.gs` anlegen bzw. aktualisieren.
+3. `src/HealthSync.gs` vollständig in die vorhandene Datei `HealthSync.gs` kopieren.
+4. `src/Index.html` vollständig in die vorhandene Datei `Index.html` kopieren.
+5. Eine neue HTML-Datei `MobileIndex` anlegen und den vollständigen Inhalt von `src/MobileIndex.html` hineinkopieren.
+6. Eine neue HTML-Datei `ClaudeRuntime` anlegen bzw. die vorhandene Datei aus dem Desktop-Merge unverändert beibehalten; Inhalt von `src/ClaudeRuntime.html` verwenden.
+7. Eine neue HTML-Datei `LiveAdapter` anlegen bzw. aktualisieren; Inhalt von `src/LiveAdapter.html` verwenden.
+8. Die vorhandenen Dateien `PersonalOperator.gs`, `SecondBrain.gs` und `Weather.gs` unverändert im Projekt belassen.
 
 `support.js` muss nicht als eigene Datei angelegt werden. Sein unveränderter Inhalt steckt bereits in `ClaudeRuntime.html`.
 
@@ -82,8 +86,10 @@ Falls die zugehörigen Bereiche noch nicht eingerichtet sind, einmal manuell in 
 4. Web-App neu laden und die Bootsequenz abwarten oder überspringen.
 5. Prüfen, dass der Quellen-Chip den echten Ladezustand zeigt und Fehler nicht als erfolgreiche Daten erscheinen.
 6. Je einen Leseweg prüfen: Aufgabe, Kalendertermin, `OPS.EMAIL_REFS`, Finanzwert, Health-Wert und Wellbeing-Verlauf.
-7. Die Second-Brain-Suche im Detail **Personal Operator** bzw. im mobilen Tab **Mehr** testen; sie muss `read-only` melden.
-8. Nur mit einem bewusst gewählten Testeintrag je einen Schreibweg prüfen und danach den zugehörigen OPS-/Audit-Eintrag kontrollieren.
+7. Beim Finance-Smoke-Test prüfen, dass der aktive `FINANCE_PERIODS`-Zyklus geladen wird und Cash-Envelopes aus dem periodengebundenen v1.1-Modell stammen.
+8. Nach einem Health-Sync prüfen, dass `HEALTH_TRENDS.data_through`, `coverage_days` und `period_complete` erhalten bzw. neu gesetzt sind.
+9. Die Second-Brain-Suche im Detail **Personal Operator** bzw. im mobilen Tab **Mehr** testen; sie muss `read-only` melden.
+10. Nur mit einem bewusst gewählten Testeintrag je einen Schreibweg prüfen und danach den zugehörigen OPS-/Audit-Eintrag kontrollieren.
 
 Merge und Live-Bereitstellung bleiben getrennte, ausdrücklich freizugebende Schritte.
 
