@@ -639,33 +639,60 @@ function healthSyncTrendDirectionV1_(current, previous) {
   return delta > 0 ? 'UP' : 'DOWN';
 }
 
-function healthSyncRebuildTrendsV1_(ss) {
+function healthSyncRebuildTrendsV1_(ss, now) {
   var healthSheet = ss.getSheetByName('HEALTH_DAILY');
   var trendSheet = ss.getSheetByName('HEALTH_TRENDS');
   if (!healthSheet || !trendSheet) return {rows:0, status:'NOT_CONFIGURED'};
   var health = table_(healthSheet);
+  var output = healthSyncBuildTrendsV1_(health.rows, now || new Date());
+  var headers = table_(trendSheet).headers;
+  if (trendSheet.getLastRow() > 1) {
+    trendSheet.getRange(2, 1, trendSheet.getLastRow() - 1, headers.length).clearContent();
+  }
+  output.forEach(function(record) {
+    trendSheet.appendRow(headers.map(function(header) {
+      return record[header] == null ? '' : record[header];
+    }));
+  });
+  return {rows:output.length, status:'OK'};
+}
+
+function healthSyncWeekBoundsV1_(date) {
+  var dateKey = Utilities.formatDate(date, TZ, 'yyyy-MM-dd');
+  var parts = dateKey.split('-').map(Number);
+  var anchor = new Date(Date.UTC(parts[0], parts[1] - 1, parts[2]));
+  var weekday = anchor.getUTCDay() || 7;
+  var monday = new Date(anchor.getTime());
+  monday.setUTCDate(monday.getUTCDate() - weekday + 1);
+  var sunday = new Date(monday.getTime());
+  sunday.setUTCDate(sunday.getUTCDate() + 6);
+  function key(value) {
+    return value.getUTCFullYear() + '-' + String(value.getUTCMonth() + 1).padStart(2, '0') + '-' + String(value.getUTCDate()).padStart(2, '0');
+  }
+  return {start:key(monday), end:key(sunday)};
+}
+
+function healthSyncBuildTrendsV1_(healthRows, now) {
   var buckets = {};
-  health.rows.filter(function(row) { return row.health_id; }).forEach(function(row) {
+  (healthRows || []).filter(function(row) { return row.health_id; }).forEach(function(row) {
     var date = asDate_(row.date);
     if (!date) return;
-    var monday = new Date(date.getTime());
-    monday.setHours(0, 0, 0, 0);
-    var weekday = monday.getDay() || 7;
-    monday.setDate(monday.getDate() - weekday + 1);
-    var start = dateText_(monday);
-    var bucket = buckets[start] || {
-      start:start,
-      end:'',
+    var bounds = healthSyncWeekBoundsV1_(date);
+    var bucket = buckets[bounds.start] || {
+      start:bounds.start,
+      end:bounds.end,
       steps:0, stepDays:0,
       sleep:0, sleepDays:0,
       restingHr:0, restingHrDays:0,
       hrv:0, hrvDays:0,
       weight:0, weightDays:0,
-      workouts:0
+      workouts:0,
+      dayKeys:{},
+      latestDateKey:''
     };
-    var end = new Date(monday.getTime());
-    end.setDate(end.getDate() + 6);
-    bucket.end = dateText_(end);
+    var dayKey = Utilities.formatDate(date, TZ, 'yyyy-MM-dd');
+    bucket.dayKeys[dayKey] = true;
+    if (!bucket.latestDateKey || dayKey > bucket.latestDateKey) bucket.latestDateKey = dayKey;
     if (row.steps !== '' && row.steps != null) {
       bucket.steps += num_(row.steps);
       bucket.stepDays++;
@@ -687,8 +714,10 @@ function healthSyncRebuildTrendsV1_(ss) {
       bucket.weightDays++;
     }
     bucket.workouts += num_(row.workout_count);
-    buckets[start] = bucket;
+    buckets[bounds.start] = bucket;
   });
+
+  var todayKey = Utilities.formatDate(now || new Date(), TZ, 'yyyy-MM-dd');
   var periods = Object.keys(buckets).sort().slice(-12);
   var output = [];
   var previous = null;
@@ -712,20 +741,14 @@ function healthSyncRebuildTrendsV1_(ss) {
       trend_activity:healthSyncTrendDirectionV1_(avgSteps, previous && previous.avgSteps),
       trend_recovery:'NO_DATA',
       trend_weight:healthSyncTrendDirectionV1_(avgWeight, previous && previous.avgWeight),
-      ai_summary:'Berechnet aus HEALTH_DAILY; fehlende Messfelder bleiben leer.'
+      ai_summary:'Berechnet aus HEALTH_DAILY; fehlende Messfelder bleiben leer.',
+      data_through:b.latestDateKey,
+      coverage_days:Object.keys(b.dayKeys).length,
+      period_complete:b.end < todayKey
     });
     previous = {avgSleep:avgSleep, avgSteps:avgSteps, avgWeight:avgWeight};
   });
-  var headers = table_(trendSheet).headers;
-  if (trendSheet.getLastRow() > 1) {
-    trendSheet.getRange(2, 1, trendSheet.getLastRow() - 1, headers.length).clearContent();
-  }
-  output.forEach(function(record) {
-    trendSheet.appendRow(headers.map(function(header) {
-      return record[header] == null ? '' : record[header];
-    }));
-  });
-  return {rows:output.length, status:'OK'};
+  return output;
 }
 
 function healthSyncUpdateStateV1_(ss, summary, errorMessage) {
