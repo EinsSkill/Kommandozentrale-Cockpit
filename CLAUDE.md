@@ -7,9 +7,13 @@ Claude Code ist der technische Umsetzer im Repository. ChatGPT bleibt Operator, 
 ## Vor jeder Änderung
 
 1. `AGENTS.md` lesen.
-2. Die passende Datei unter `docs/` lesen.
-3. Den betroffenen Datenvertrag und die vorhandenen Tests prüfen.
-4. Den kleinstmöglichen Änderungsumfang bestimmen.
+2. `docs/shared-ai-context-bootstrap.md` lesen.
+3. Die passende Datei unter `docs/` lesen.
+4. Den betroffenen Datenvertrag und die vorhandenen Tests prüfen.
+5. Branch, Basis-Commit und aktuellen Git-/Testzustand verifizieren.
+6. Den kleinstmöglichen Änderungsumfang bestimmen.
+
+Persönlichen oder operativen Kontext nur laden, wenn er für die freigegebene Spezifikation materiell nötig ist. Falls eine notwendige externe Quelle nicht verfügbar ist: nicht raten, keine lokale Kopie als Ersatz anlegen, sondern die fehlende Voraussetzung in der Übergabe nennen.
 
 ## Erlaubt
 
@@ -27,6 +31,7 @@ Claude Code ist der technische Umsetzer im Repository. ChatGPT bleibt Operator, 
 - Source-of-Truth-Regeln erfinden oder überschreiben
 - Live-Deployment, Merge oder externe Kommunikation ohne ausdrückliche Freigabe
 - Nutzerprioritäten, Deadlines oder Fakten stillschweigend verändern
+- den vollständigen Second Brain oder OPS-Bestand pauschal in den Repository-Kontext kopieren
 
 ## Qualitätsregeln
 
@@ -36,18 +41,24 @@ Claude Code ist der technische Umsetzer im Repository. ChatGPT bleibt Operator, 
 - Jede Änderung muss mit `npm test` geprüft werden.
 - Keine großflächige Refaktorierung als Nebenprodukt eines kleinen Features.
 - Bei Unklarheit stoppen, die Annahme dokumentieren und Rückfrage stellen.
+- Für technische Aussagen gilt: Runtime/Tests > aktueller Code > Git/Issues > Projektdokumentation > Second Brain > Chat-Memory.
 
 ## Übergabeformat
 
 Jede Übergabe nennt:
 
+- Change-ID oder Thema
+- Workflow-Zustand und eigene Rolle
+- Basis-Commit und Branch
 - geänderte Dateien
 - fachliche und technische Änderung
+- geladene Quellen und deren Stand
+- nicht geladene oder nicht verfügbare notwendige Quellen
 - ausgeführte Tests und Ergebnis
 - bewusste Nicht-Änderungen
 - Risiken oder offene Voraussetzungen
 - konkreten nächsten Review-Schritt
 
-## Phase-4-Sonderregel
+## Second-Brain-Sonderregel
 
-Wenn `src/SecondBrain.gs`, `src/PersonalOperator.gs` oder die persönliche Kontextanzeige geändert wird, zuerst `docs/phase4-personal-context.md` und `docs/phase4b-personal-operator.md` lesen. Der Vault bleibt außerhalb des Repositories; Tests und Fixtures dürfen keine echten persönlichen Inhalte enthalten.
+Wenn `src/SecondBrain.gs`, `src/PersonalOperator.gs` oder die persönliche Kontextanzeige geändert wird, zuerst `docs/phase4-personal-context.md` und `docs/phase4b-personal-operator.md` lesen. Der Vault bleibt außerhalb des Repositories; Tests und Fixtures dürfen keine echten persönlichen Inhalte enthalten. Für einen notwendigen Second-Brain-Abgleich gilt immer: `_System/SCHEMA.md` → `_System/index.md` → nur relevante Seiten.
