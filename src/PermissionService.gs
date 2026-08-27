@@ -1,7 +1,7 @@
 /**
  * KZ 1.0 canonical runtime permission evaluator.
  *
- * Source of Truth: OPS.PERMMISSIONS / PERMISSIONS.md
+ * Source of Truth: OPS.PERMISSIONS / PERMISSIONS.md
  * Runtime classes are strictly limited to:
  * AUTO | AUTO_IF_REVERSIBLE | APPROVAL | FORBIDDEN
  *
@@ -19,10 +19,10 @@ function permissionBoolV1_(value) {
 
 function readPermissionRulesV1_(ss) {
   var sheet = ss && ss.getSheetByName ? ss.getSheetByName('PERMISSIONS') : null;
-  if (!sheet) throw permissionErrorV1_('KZ_PERMISSION_TABLE_MISSING', 'OPS.PERMMISSIONS fehlt. Schreibaktion wird fail-closed blockiert.');
+  if (!sheet) throw permissionErrorV1_('KZ_PERMISSION_TABLE_MISSING', 'OPS.PERMISSIONS fehlt. Schreibaktion wird fail-closed blockiert.');
   var lastRow = sheet.getLastRow();
   var lastColumn = sheet.getLastColumn();
-  if (lastRow < 2 || lastColumn < 1) throw permissionErrorV1_('KZ_PERMISSION_TABLE_EMPTY', 'OPS.PERMMISSIONS enthält keine aktiven Regeln.');
+  if (lastRow < 2 || lastColumn < 1) throw permissionErrorV1_('KZ_PERMISSION_TABLE_EMPTY', 'OPS.PERMISSIONS enthält keine aktiven Regeln.');
   var values = sheet.getRange(1, 1, lastRow, lastColumn).getValues();
   var headers = values[0].map(function(value) { return String(value || '').trim(); });
   var index = {};
