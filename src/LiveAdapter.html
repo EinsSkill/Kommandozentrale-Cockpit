@@ -512,6 +512,50 @@
       return { label: `Alle ${SOURCE_KEYS.length} Datenpfade bereit`, color: '#5FBF8A', glow: 'rgba(95,191,138,.8)', ok, errors, loading };
     },
 
+    systemTruthState() {
+      const frontend = this.sourceState();
+      const backend = asArray(this.raw.syncRows);
+      const backendErrors = backend.filter(row => statusUpper(row.status) === 'ERROR').length;
+      const backendWarnings = backend.filter(row => {
+        const status = statusUpper(row.status || 'UNKNOWN');
+        return status !== 'OK' && status !== 'ERROR';
+      }).length;
+      const backendOk = backend.filter(row => statusUpper(row.status) === 'OK').length;
+      const backendState = { ok: backendOk, warnings: backendWarnings, errors: backendErrors, total: backend.length };
+
+      if (frontend.errors || backendErrors) {
+        const errors = Number(frontend.errors || 0) + backendErrors;
+        return {
+          level: 'error',
+          label: errors === 1 ? '1 Systemfehler' : `${errors} Systemfehler`,
+          color: '#C56E3A', glow: 'rgba(197,110,58,.75)', frontend, backend: backendState
+        };
+      }
+      if (frontend.loading || frontend.waiting) {
+        return {
+          level: 'loading', label: `${frontend.ok}/${SOURCE_KEYS.length} Datenpfade bereit`,
+          color: '#DDB65C', glow: 'rgba(221,182,92,.75)', frontend, backend: backendState
+        };
+      }
+      if (!backend.length) {
+        return {
+          level: 'warn', label: 'Sync-Status nicht verfügbar',
+          color: '#DDB65C', glow: 'rgba(221,182,92,.75)', frontend, backend: backendState
+        };
+      }
+      if (backendWarnings) {
+        return {
+          level: 'warn',
+          label: backendWarnings === 1 ? '1 System eingeschränkt' : `${backendWarnings} Systeme eingeschränkt`,
+          color: '#DDB65C', glow: 'rgba(221,182,92,.75)', frontend, backend: backendState
+        };
+      }
+      return {
+        level: 'ok', label: 'Alle Quellen aktuell',
+        color: '#5FBF8A', glow: 'rgba(95,191,138,.8)', frontend, backend: backendState
+      };
+    },
+
     bootLog() {
       const lines = SOURCE_KEYS.map(key => {
         const load = this.loads[key];
