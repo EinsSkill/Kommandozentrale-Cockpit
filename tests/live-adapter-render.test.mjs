@@ -94,8 +94,10 @@ test('real endpoint-shaped payloads flow through the adapter into Claude Design 
   assert.equal(values.brief.core, 'Live-Briefing');
   assert.equal(component.D.weather.available, true);
   assert.equal(component.D.weather.stale, true);
-  assert.match(values.op.why, /Live-Briefing/);
-  assert.match(values.op.mode, /Live-Empfehlung/);
+  assert.doesNotMatch(values.op.why, /Live-Briefing/);
+  assert.doesNotMatch(values.op.mode, /Live-Empfehlung/);
+  assert.equal(values.op.mode, 'Live-Fokusregel');
+  assert.equal(component.D.operator.sourceMode, 'LIVE_DERIVED');
   assert.equal(values.weather.place, 'Live-Ort · gefühlt 19 °C');
   assert.equal(values.hea.steps, '7.000');
   assert.equal(values.wb.mood, 'ruhig / ausgeglichen');

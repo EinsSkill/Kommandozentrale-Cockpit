@@ -141,7 +141,7 @@
           if (partialErrors.length) throw new Error(partialErrors.map(entry => `${entry[0]}: ${entry[1]}`).join(' · '));
         }],
         ['personal', 'getPersonalOperatorContextV1', value => {
-          if (!value || value.ok === false) throw new Error(value && value.message ? value.message : 'Personal Operator nicht verfügbar.');
+          if (!value || value.ok === false) throw new Error(value && value.message ? value.message : 'Persönlicher Kontext nicht verfügbar.');
           this.applyPersonal(value);
         }],
         ['finance', 'getFinanceDashboardV1', value => {
@@ -448,23 +448,31 @@
       const data = this.component.D;
       const tasks = asArray(data.tasks);
       const task = tasks[0];
+      const alerts = asArray(data.alerts)
+        .filter(item => !['ACKNOWLEDGED', 'RESOLVED', 'CLOSED'].includes(statusUpper(item.status)))
+        .slice()
+        .sort((a, b) => number(b.sev) - number(a.sev));
+      const alert = alerts[0];
       const personal = this.raw.personal && this.raw.personal.ok !== false ? (this.raw.personal.personal || {}) : {};
       const wellbeing = data.wb || {};
       const guidance = wellbeing.guidance || {};
-      const briefing = data.briefing || {};
-      const briefingCore = briefing.available ? excerpt(briefing.core, 180) : '';
-      const briefingRec = briefing.available ? excerpt(briefing.rec, 155) : '';
       const taskStep = task ? (task.next && !/^Kein nächster Schritt/.test(task.next) ? task.next : task.title) : '';
       const taskWhy = task
         ? (task.reason || [task.due !== '–' ? task.due : '', task.blockedBy].filter(Boolean).join(' · ') || 'Die Aufgabe steht im OPS aktuell an erster Stelle.')
         : '';
+      const alertStep = alert ? (alert.action || alert.title) : '';
+      const alertWhy = alert
+        ? (alert.message || `Offener ${alert.severity || 'Alert'} aus dem aktuellen OPS-Stand.`)
+        : '';
       data.operator = {
-        step: taskStep || briefingCore || 'Keine offene Aufgabe im OPS.',
-        why: task ? (briefingCore || taskWhy) : (briefingRec || (briefingCore ? 'Aktueller Briefing-Stand aus dem OPS.' : 'Der aktuelle OPS-Stand enthält keine offene Aufgabe.')),
+        step: taskStep || alertStep || 'Keine offene Aufgabe im OPS.',
+        why: task ? taskWhy : (alertWhy || 'Der aktuelle OPS-Stand enthält keine offene Aufgabe oder unbehandelte Warnung.'),
         notNow: tasks.slice(1, 4).map(item => item.title),
         mode: guidance.active
           ? text(guidance.message)
-          : text(briefingRec || asArray(personal.dayStructure)[0] || asArray(personal.focusRules)[0] || 'Einen sichtbaren Schritt abschließen und Puffer lassen.')
+          : text(asArray(personal.dayStructure)[0] || asArray(personal.focusRules)[0] || 'Einen sichtbaren Schritt abschließen und Puffer lassen.'),
+        sourceMode: 'LIVE_DERIVED',
+        sources: ['OPS_TASKS', 'OPS_ALERTS', 'WELLBEING', 'PERSONAL_CONTEXT']
       };
     },
 
@@ -544,6 +552,7 @@
         await this.call('acknowledgeAlert', id);
         const alert = this.component.D.alerts.find(item => item.id === id);
         if (alert) alert.status = 'ACKNOWLEDGED';
+        this.applyOperator();
         this.touch();
       } catch (error) {
         this.recordActionError(error);
