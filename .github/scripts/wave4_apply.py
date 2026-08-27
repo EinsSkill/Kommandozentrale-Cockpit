@@ -93,13 +93,13 @@ def patch_template(path_name, desktop=False):
         'const sourceState=window.KZLive.sourceState();\n    const systemTruth=window.KZLive.systemTruthState();',
         f'{path_name} systemTruth declaration'
     )
-    text = replace_once(
-        text,
-        "showApp:S.phase!=='boot',sourceState,",
-        "showApp:S.phase!=='boot',sourceState,systemTruth,",
-        f'{path_name} systemTruth return binding'
-    )
     if desktop:
+        text = replace_once(
+            text,
+            "showApp:S.phase!=='boot',sourceState,",
+            "showApp:S.phase!=='boot',sourceState,systemTruth,",
+            f'{path_name} systemTruth return binding'
+        )
         old_dot = '<span style="width:6px;height:6px;border-radius:50%;background:#5FBF8A;box-shadow:0 0 8px #5FBF8A;animation:kBreathe 2.6s ease-in-out infinite"></span>'
         new_dot = '<span style="width:6px;height:6px;border-radius:50%;background:{{ systemTruth.color }};box-shadow:0 0 8px {{ systemTruth.glow }};animation:kBreathe 2.6s ease-in-out infinite"></span>'
         text = replace_once(text, old_dot, new_dot, f'{path_name} desktop status dot')
@@ -112,6 +112,12 @@ def patch_template(path_name, desktop=False):
         if 'Alle Quellen synchron' in text:
             raise SystemExit('desktop template still contains false static sync label')
     else:
+        text = replace_once(
+            text,
+            "showApp:S.phase!=='boot',ambient:amb,",
+            "showApp:S.phase!=='boot',ambient:amb,systemTruth,",
+            f'{path_name} systemTruth return binding'
+        )
         old_dot = '<span style="width:6px;height:6px;border-radius:50%;background:#5FBF8A;box-shadow:0 0 8px #5FBF8A;animation:kBreathe 2.6s ease-in-out infinite;flex:0 0 auto"></span>'
         new_dot = '<span title="{{ systemTruth.label }}" aria-label="{{ systemTruth.label }}" style="width:6px;height:6px;border-radius:50%;background:{{ systemTruth.color }};box-shadow:0 0 8px {{ systemTruth.glow }};animation:kBreathe 2.6s ease-in-out infinite;flex:0 0 auto"></span>'
         text = replace_once(text, old_dot, new_dot, f'{path_name} mobile status dot')
