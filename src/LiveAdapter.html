@@ -156,7 +156,7 @@
           if (!value || value.ok === false) throw new Error(value && (value.error || value.message) ? (value.error || value.message) : 'Wohlbefinden nicht verfügbar.');
           this.applyWellbeing(value);
         }],
-        ['calendar', 'getCalendarWeekV3', value => this.applyCalendar(value)],
+        ['calendar', 'getCalendarViewV4', value => this.applyCalendar(value)],
         ['mail', 'getMailV3', value => {
           if (!value || value.available === false) throw new Error(value && value.error ? value.error : 'E-Mail-Referenzen nicht verfügbar.');
           this.applyMail(value);
@@ -392,7 +392,7 @@
 
     applyCalendar(value) {
       this.raw.calendar = value || {};
-      const start = date(value && value.weekStart) || mondayOfCurrentWeek();
+      const start = date(value && (value.rangeStart || value.weekStart)) || mondayOfCurrentWeek();
       const events = asArray(value && value.events);
       const week = Array.from({ length: 7 }, (_, index) => {
         const current = new Date(start);

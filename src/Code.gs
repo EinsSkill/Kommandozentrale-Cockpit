@@ -12,7 +12,6 @@
 const OPS_SPREADSHEET_ID = PropertiesService.getScriptProperties().getProperty('OPS_SPREADSHEET_ID') || 'REPLACE_WITH_SCRIPT_PROPERTY';
 const TZ = 'Europe/Berlin';
 const CACHE_CORE = 'KZ_V3_CORE';
-const CACHE_CAL = 'KZ_V3_CAL';
 const CACHE_MAIL = 'KZ_V34_EMAIL_REFS';
 const CACHE_BASE_V31 = 'KZ_V31_BASE';
 const CACHE_FIN_V31 = 'KZ_V31_FIN';
@@ -670,11 +669,21 @@ function getDashboardCoreV3(force) {
   });
 }
 
-/** Calendar loads separately so it can never block the OPS cockpit. */
+/**
+ * @deprecated Compatibility wrapper for older callers.
+ * The canonical Calendar runtime is getCalendarViewV4 in CalendarService.gs.
+ */
 function getCalendarWeekV3(force) {
-  return cachedJson_(CACHE_CAL, 60, !!force, function () {
-    return getCalendarWeek_(new Date());
-  });
+  const calendar = getCalendarViewV4({ view: 'week' }, !!force);
+  return {
+    generatedAt: calendar.generatedAt,
+    weekStart: calendar.rangeStart,
+    weekEnd: calendar.rangeEnd,
+    events: calendar.events || [],
+    calendars: calendar.calendars || [],
+    selectedCalendarIds: calendar.selectedCalendarIds || [],
+    compatibilitySource: 'getCalendarViewV4'
+  };
 }
 
 /** Operative mail references load separately from OPS.EMAIL_REFS. */
@@ -850,14 +859,6 @@ function healthSyncDashboard_(rd) {
     warningLevel:row.warning_level || '',
     note:row.note || ''
   };
-}
-
-function getCalendarWeek_(now) {
-  const day=now.getDay()||7, start=new Date(now);start.setHours(0,0,0,0);start.setDate(start.getDate()-day+1);const end=new Date(start);end.setDate(end.getDate()+7);
-  const events=[];
-  CalendarApp.getAllCalendars().forEach(cal=>{try{cal.getEvents(start,end).forEach(ev=>events.push({id:ev.getId(),title:ev.getTitle()||'(ohne Titel)',start:ev.getStartTime().toISOString(),end:ev.getEndTime().toISOString(),allDay:ev.isAllDayEvent(),calendar:cal.getName(),color:cal.getColor()||'#1B4332',location:ev.getLocation()||''}));}catch(e){}});
-  events.sort((a,b)=>new Date(a.start)-new Date(b.start));
-  return {generatedAt:new Date().toISOString(),weekStart:start.toISOString(),weekEnd:end.toISOString(),events:events};
 }
 
 function getMailFromRefs_() {

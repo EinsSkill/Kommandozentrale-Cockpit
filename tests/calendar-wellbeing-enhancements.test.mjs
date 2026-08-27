@@ -7,7 +7,8 @@ import test from 'node:test';
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const src = join(root, 'src');
 const code = await readFile(join(src, 'Code.gs'), 'utf8');
-const server = await readFile(join(src, 'ZZ_CalendarWellbeingEnhancements.gs'), 'utf8');
+const calendarServer = await readFile(join(src, 'CalendarService.gs'), 'utf8');
+const wellbeingServer = await readFile(join(src, 'ZZ_CalendarWellbeingEnhancements.gs'), 'utf8');
 const client = await readFile(join(src, 'CalendarWellbeingEnhancements.html'), 'utf8');
 const desktop = await readFile(join(src, 'Index.html'), 'utf8');
 const mobile = await readFile(join(src, 'MobileIndex.html'), 'utf8');
@@ -24,7 +25,8 @@ test('Code.gs owns the single web entry point and injects the enhancement withou
   assert.match(code, /CalendarWellbeingEnhancements/);
   assert.match(code, /rendered\.replace/);
   assert.match(code, /Heute im Kalender/);
-  assert.doesNotMatch(server, /function\s+doGet\s*\(/);
+  assert.doesNotMatch(calendarServer, /function\s+doGet\s*\(/);
+  assert.doesNotMatch(wellbeingServer, /function\s+doGet\s*\(/);
   assert.match(desktop, /Claude Design source SHA-256/);
   assert.match(desktop, /data-kz-calendar-detail-host/);
   assert.match(desktop, /showLedger:dk!=='calendar'/);
@@ -32,10 +34,10 @@ test('Code.gs owns the single web entry point and injects the enhancement withou
 });
 
 test('calendar endpoint supports day week month and hides Möglichkeiten by default', () => {
-  assert.match(server, /getCalendarViewV4/);
-  assert.match(server, /\['day', 'week', 'month'\]/);
-  assert.match(server, /defaultVisible: !\/möglichkeit\/i/);
-  assert.match(server, /CalendarApp\.getAllCalendars\(\)/);
+  assert.match(calendarServer, /getCalendarViewV4/);
+  assert.match(calendarServer, /\['day', 'week', 'month'\]/);
+  assert.match(calendarServer, /defaultVisible: !\/möglichkeit\/i/);
+  assert.match(calendarServer, /CalendarApp\.getAllCalendars\(\)/);
   assert.match(client, /kz\.calendar\.v2/);
   for (const label of ['Tag', 'Woche', 'Monat', 'Heute', 'Kalender']) {
     assert.match(client, new RegExp(label));
@@ -67,17 +69,17 @@ test('calendar redesign keeps dense views inside the tile and uses purpose-built
 });
 
 test('calendar selection remains presentation state and does not write Google Calendar', () => {
-  assert.doesNotMatch(server, /cal\.createEvent|ev\.deleteEvent|CalendarApp\.createEvent/);
-  assert.match(server, /cal\.getEvents\(range\.start, range\.end\)/);
+  assert.doesNotMatch(calendarServer, /cal\.createEvent|ev\.deleteEvent|CalendarApp\.createEvent/);
+  assert.match(calendarServer, /cal\.getEvents\(range\.start, range\.end\)/);
   assert.match(client, /localStorage\.setItem\(PREF_KEY/);
   assert.match(client, /selectStandardCalendars/);
   assert.match(client, /selectAllCalendars/);
 });
 
 test('wellbeing backfill reads the visible selected date and verifies the server saved the same logical date', () => {
-  assert.match(server, /saveWellbeingEntryV2/);
-  assert.match(server, /entryDate > today/);
-  assert.match(server, /saveWellbeingEntryV1\(p\)/);
+  assert.match(wellbeingServer, /saveWellbeingEntryV2/);
+  assert.match(wellbeingServer, /entryDate > today/);
+  assert.match(wellbeingServer, /saveWellbeingEntryV1\(p\)/);
   assert.match(client, /input\.type='date'/);
   assert.match(client, /input\.max=todayKey\(\)/);
   assert.match(client, /selectedWellbeingDate/);

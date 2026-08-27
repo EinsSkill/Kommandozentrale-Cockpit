@@ -46,7 +46,7 @@ test('mobile Claude source is retained and routed without external support.js', 
 test('mobile live surface exposes the existing read and write contracts', () => {
   for (const endpoint of [
     'getDashboardBaseV31', 'getPersonalOperatorContextV1', 'getFinanceDashboardV1',
-    'getHealthV31', 'getWellbeingV1', 'getCalendarWeekV3', 'getMailV3',
+    'getHealthV31', 'getWellbeingV1', 'getCalendarViewV4', 'getMailV3',
     'setTaskDone', 'acknowledgeAlert', 'reviewAiInbox', 'saveWellbeingEntryV1',
     'searchSecondBrainV1'
   ]) assert.match(mobile + adapterFile, new RegExp(endpoint));
