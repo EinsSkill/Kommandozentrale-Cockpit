@@ -1,0 +1,37 @@
+name: Apply Phase 7 finalization
+
+on:
+  push:
+    branches:
+      - refactor/kz-1-0-phase7-finalization
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Apply current Phase 7 finalization step
+        run: python3 .github/scripts/phase7_finalize.py
+
+      - name: Run repository tests
+        run: npm test
+
+      - name: Commit scoped runtime changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- src docs tests
+          git diff --cached --quiet && exit 0
+          git commit -m "refactor: enforce canonical runtime permissions (#46)"
+          git push
