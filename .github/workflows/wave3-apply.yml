@@ -24,25 +24,10 @@ jobs:
         run: |
           python3 - <<'PY'
           from pathlib import Path
+          import re
 
           adapter_path = Path('src/LiveAdapter.html')
           adapter = adapter_path.read_text()
-
-          old_empty = """      operator: {
-                step: 'Der aktuelle OPS-Stand wird geladen.',
-                why: 'Die verbundenen Quellen werden gerade geprüft.',
-                notNow: [], mode: 'Datenverbindung wird aufgebaut'
-              },"""
-          new_empty = """      operator: {
-                step: 'Der aktuelle OPS-Stand wird geladen.',
-                why: 'Die verbundenen Quellen werden gerade geprüft.',
-                notNow: [], mode: 'Datenverbindung wird aufgebaut',
-                sourceMode: 'LIVE_DERIVED',
-                sources: ['OPS_TASKS', 'OPS_ALERTS', 'WELLBEING', 'PERSONAL_CONTEXT']
-              },"""
-          if old_empty not in adapter:
-              raise SystemExit('empty operator block not found')
-          adapter = adapter.replace(old_empty, new_empty, 1)
 
           adapter = adapter.replace(
               "throw new Error(value && value.message ? value.message : 'Personal Operator nicht verfügbar.');",
@@ -50,31 +35,7 @@ jobs:
               1
           )
 
-          old_operator = """    applyOperator() {
-                if (!this.component) return;
-                const data = this.component.D;
-                const tasks = asArray(data.tasks);
-                const task = tasks[0];
-                const personal = this.raw.personal && this.raw.personal.ok !== false ? (this.raw.personal.personal || {}) : {};
-                const wellbeing = data.wb || {};
-                const guidance = wellbeing.guidance || {};
-                const briefing = data.briefing || {};
-                const briefingCore = briefing.available ? excerpt(briefing.core, 180) : '';
-                const briefingRec = briefing.available ? excerpt(briefing.rec, 155) : '';
-                const taskStep = task ? (task.next && !/^Kein nächster Schritt/.test(task.next) ? task.next : task.title) : '';
-                const taskWhy = task
-                  ? (task.reason || [task.due !== '–' ? task.due : '', task.blockedBy].filter(Boolean).join(' · ') || 'Die Aufgabe steht im OPS aktuell an erster Stelle.')
-                  : '';
-                data.operator = {
-                  step: taskStep || briefingCore || 'Keine offene Aufgabe im OPS.',
-                  why: task ? (briefingCore || taskWhy) : (briefingRec || (briefingCore ? 'Aktueller Briefing-Stand aus dem OPS.' : 'Der aktuelle OPS-Stand enthält keine offene Aufgabe.')),
-                  notNow: tasks.slice(1, 4).map(item => item.title),
-                  mode: guidance.active
-                    ? text(guidance.message)
-                    : text(briefingRec || asArray(personal.dayStructure)[0] || asArray(personal.focusRules)[0] || 'Einen sichtbaren Schritt abschließen und Puffer lassen.')
-                };
-              },"""
-          new_operator = """    applyOperator() {
+          new_operator = r'''    applyOperator() {
                 if (!this.component) return;
                 const data = this.component.D;
                 const tasks = asArray(data.tasks);
@@ -105,32 +66,36 @@ jobs:
                   sourceMode: 'LIVE_DERIVED',
                   sources: ['OPS_TASKS', 'OPS_ALERTS', 'WELLBEING', 'PERSONAL_CONTEXT']
                 };
-              },"""
-          if old_operator not in adapter:
-              raise SystemExit('applyOperator block not found')
-          adapter = adapter.replace(old_operator, new_operator, 1)
+              },
+
+              applySyncRows'''
+
+          pattern = r"    applyOperator\(\) \{[\s\S]*?\n    \},\n\n    applySyncRows"
+          adapter, count = re.subn(pattern, new_operator, adapter, count=1)
+          if count != 1:
+              raise SystemExit(f'applyOperator replacement count={count}')
 
           old_ack = """        if (alert) alert.status = 'ACKNOWLEDGED';
                 this.touch();"""
-          new_ack = """        if (alert) alert.status = 'ACKNOWLEDGED';
+          if old_ack in adapter:
+              adapter = adapter.replace(old_ack, """        if (alert) alert.status = 'ACKNOWLEDGED';
                 this.applyOperator();
-                this.touch();"""
-          if old_ack not in adapter:
+                this.touch();""", 1)
+          elif "if (alert) alert.status = 'ACKNOWLEDGED';\n        this.applyOperator();" not in adapter:
               raise SystemExit('acknowledge block not found')
-          adapter = adapter.replace(old_ack, new_ack, 1)
+
           adapter_path.write_text(adapter)
 
           render_path = Path('tests/live-adapter-render.test.mjs')
           render = render_path.read_text()
           old_asserts = """  assert.match(values.op.why, /Live-Briefing/);
             assert.match(values.op.mode, /Live-Empfehlung/);"""
-          new_asserts = """  assert.doesNotMatch(values.op.why, /Live-Briefing/);
+          if old_asserts in render:
+              render = render.replace(old_asserts, """  assert.doesNotMatch(values.op.why, /Live-Briefing/);
             assert.doesNotMatch(values.op.mode, /Live-Empfehlung/);
             assert.equal(values.op.mode, 'Live-Fokusregel');
-            assert.equal(component.D.operator.sourceMode, 'LIVE_DERIVED');"""
-          if old_asserts not in render:
-              raise SystemExit('render assertions not found')
-          render_path.write_text(render.replace(old_asserts, new_asserts, 1))
+            assert.equal(component.D.operator.sourceMode, 'LIVE_DERIVED');""", 1)
+          render_path.write_text(render)
 
           Path('tests/operator-briefing-separation.test.mjs').write_text(r'''import assert from 'node:assert/strict';
           import { readFile } from 'node:fs/promises';
@@ -255,7 +220,7 @@ jobs:
 
       - name: Commit scoped changes
         run: |
-          if git diff --quiet && git status --porcelain | grep -q '^$'; then
+          if git diff --quiet && [ -z "$(git status --porcelain)" ]; then
             echo "No changes to commit"
             exit 0
           fi
