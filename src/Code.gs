@@ -379,6 +379,10 @@ function getWellbeingV1(force) {
 
 function ensureWellbeingLogV1() {
   const ss = SpreadsheetApp.openById(OPS_SPREADSHEET_ID);
+  const wellbeingSetupPermission = authorizeActionV1_(ss, 'unknown_action', {
+    triggerType: 'USER_RUN_FUNCTION', directUserAction: true, approvalSatisfied: true,
+    conditionSatisfied: true, reversible: true
+  });
   let sh = ss.getSheetByName(WELLBEING_SHEET);
   const created = !sh;
   if (!sh) sh = ss.insertSheet(WELLBEING_SHEET);
@@ -387,8 +391,8 @@ function ensureWellbeingLogV1() {
     action_type: 'WELLBEING_LOG_SETUP',
     target_system: 'OPS Sheet',
     target_id: WELLBEING_SHEET,
-    trigger_type: 'USER_RUN_FUNCTION',
-    permission_class: 'USER_APPROVED',
+    trigger_type: wellbeingSetupPermission.triggerType,
+    permission_class: wellbeingSetupPermission.permissionClass,
     status: 'SUCCESS',
     previous_value: created ? 'missing' : 'existing',
     new_value: 'headers_ready',
@@ -409,6 +413,10 @@ function saveWellbeingEntryV1(payload) {
   if (!entry.hasData) throw new Error('Mindestens eine Wohlbefindensangabe ist erforderlich.');
 
   const ss = SpreadsheetApp.openById(OPS_SPREADSHEET_ID);
+  const wellbeingSavePermission = authorizeActionV1_(ss, 'wellbeing_save', {
+    triggerType: 'DASHBOARD_USER_ACTION', directUserAction: true, approvalSatisfied: true,
+    conditionSatisfied: true, reversible: true
+  });
   const sh = ss.getSheetByName(WELLBEING_SHEET);
   if (!sh) throw new Error('Tab WELLBEING_LOG fehlt. Einmal ensureWellbeingLogV1() ausführen.');
 
@@ -452,8 +460,8 @@ function saveWellbeingEntryV1(payload) {
     action_type: 'WELLBEING_ENTRY_' + action,
     target_system: 'OPS Sheet',
     target_id: record.entry_id,
-    trigger_type: 'DASHBOARD_USER_ACTION',
-    permission_class: 'USER_APPROVED',
+    trigger_type: wellbeingSavePermission.triggerType,
+    permission_class: wellbeingSavePermission.permissionClass,
     status: 'SUCCESS',
     previous_value: existing ? 'same-day entry' : '',
     new_value: entry.routineStatus,
@@ -704,6 +712,10 @@ function getDashboardData() {
 function setTaskDone(taskId, done) {
   if (!taskId) throw new Error('taskId fehlt.');
   const ss = SpreadsheetApp.openById(OPS_SPREADSHEET_ID);
+  const taskPermission = authorizeActionV1_(ss, 'task_complete_cancel', {
+    triggerType: 'DASHBOARD_USER_ACTION', directUserAction: true, approvalSatisfied: true,
+    conditionSatisfied: true, reversible: true
+  });
   const sh = ss.getSheetByName('TASKS');
   const table = table_(sh);
   const row = table.rows.find(r => String(r.task_id) === String(taskId));
@@ -717,7 +729,7 @@ function setTaskDone(taskId, done) {
   setByHeader_(sh, table, row.__row, 'completed_at', done ? stamp : '');
   appendAudit_(ss, {
     action_type: 'TASK_STATUS_CHANGE', target_system: 'OPS Sheet', target_id: taskId,
-    trigger_type: 'DASHBOARD_USER_ACTION', permission_class: 'USER_APPROVED', status: 'SUCCESS',
+    trigger_type: taskPermission.triggerType, permission_class: taskPermission.permissionClass, status: 'SUCCESS',
     previous_value: previousStatus, new_value: nextStatus, rollback_available: true,
     note: 'Direkte Nutzeraktion im HTML-Cockpit.'
   });
@@ -729,6 +741,10 @@ function reviewAiInbox(inboxId, decision, reviewerNote) {
   const normalized = String(decision || '').toUpperCase();
   if (!['ACCEPTED', 'REJECTED', 'DEFERRED'].includes(normalized)) throw new Error('Ungültige Entscheidung.');
   const ss = SpreadsheetApp.openById(OPS_SPREADSHEET_ID);
+  const inboxPermission = authorizeActionV1_(ss, 'ai_inbox_review', {
+    triggerType: 'DASHBOARD_USER_ACTION', directUserAction: true, approvalSatisfied: true,
+    conditionSatisfied: true, reversible: true
+  });
   const sh = ss.getSheetByName('AI_INBOX');
   const table = table_(sh);
   const row = table.rows.find(r => String(r.inbox_id) === String(inboxId));
@@ -742,7 +758,7 @@ function reviewAiInbox(inboxId, decision, reviewerNote) {
   setByHeader_(sh, table, row.__row, 'reviewer_note', reviewerNote || 'Entscheidung im HTML-Cockpit. Externe Folgeaktion noch nicht automatisch ausgeführt.');
   appendAudit_(ss, {
     action_type: 'AI_INBOX_REVIEW', target_system: 'OPS Sheet', target_id: inboxId,
-    trigger_type: 'DASHBOARD_USER_ACTION', permission_class: 'USER_APPROVED', status: 'SUCCESS',
+    trigger_type: inboxPermission.triggerType, permission_class: inboxPermission.permissionClass, status: 'SUCCESS',
     previous_value: before, new_value: normalized, rollback_available: true,
     note: 'Entscheidung protokolliert; proposed_action wird nicht automatisch extern ausgeführt.'
   });
@@ -752,6 +768,10 @@ function reviewAiInbox(inboxId, decision, reviewerNote) {
 
 function acknowledgeAlert(alertId) {
   const ss = SpreadsheetApp.openById(OPS_SPREADSHEET_ID);
+  const alertPermission = authorizeActionV1_(ss, 'alert_user_ack_dismiss', {
+    triggerType: 'DASHBOARD_USER_ACTION', directUserAction: true, approvalSatisfied: true,
+    conditionSatisfied: true, reversible: true
+  });
   const sh = ss.getSheetByName('ALERTS');
   const table = table_(sh);
   const row = table.rows.find(r => String(r.alert_id) === String(alertId));
@@ -761,7 +781,7 @@ function acknowledgeAlert(alertId) {
   setByHeader_(sh, table, row.__row, 'acknowledged_at', stamp);
   appendAudit_(ss, {
     action_type: 'ALERT_ACKNOWLEDGED', target_system: 'OPS Sheet', target_id: alertId,
-    trigger_type: 'DASHBOARD_USER_ACTION', permission_class: 'USER_APPROVED', status: 'SUCCESS',
+    trigger_type: alertPermission.triggerType, permission_class: alertPermission.permissionClass, status: 'SUCCESS',
     previous_value: String(row.status || ''), new_value: 'ACKNOWLEDGED', rollback_available: true,
     note: 'Alert im Cockpit bestätigt.'
   });
@@ -934,7 +954,7 @@ function table_(sh){
 }
 
 function setByHeader_(sh,table,rowIndex,header,value){if(table.index[header]==null)return;sh.getRange(rowIndex,table.index[header]+1).setValue(value);}
-function appendAudit_(ss,data){const sh=ss.getSheetByName('AUDIT_LOG');if(!sh)return;const t=table_(sh),headers=t.headers,stamp=isoLocal_(new Date()),id='AUDIT_'+Utilities.formatDate(new Date(),TZ,'yyyyMMdd_HHmmss_SSS'),record=Object.assign({audit_id:id,timestamp:stamp,actor:'USER',error_message:'',rollback_reference:''},data);sh.appendRow(headers.map(h=>record[h]!=null?record[h]:''));}
+function appendAudit_(ss,data){const sh=ss.getSheetByName('AUDIT_LOG');if(!sh)return;const input=Object.assign({},data||{});input.permission_class=assertAuditPermissionClassV1_(input.permission_class);const t=table_(sh),headers=t.headers,stamp=isoLocal_(new Date()),id='AUDIT_'+Utilities.formatDate(new Date(),TZ,'yyyyMMdd_HHmmss_SSS'),record=Object.assign({audit_id:id,timestamp:stamp,actor:'USER',error_message:'',rollback_reference:''},input);sh.appendRow(headers.map(h=>record[h]!=null?record[h]:''));}
 
 function cachedJson_(key,seconds,force,producer){const c=CacheService.getScriptCache();if(!force){const raw=c.get(key);if(raw){try{return JSON.parse(raw);}catch(e){}}}const value=producer();try{const raw=JSON.stringify(value);if(raw.length<95000)c.put(key,raw,seconds);}catch(e){}return value;}
 function invalidateWellbeing_(){

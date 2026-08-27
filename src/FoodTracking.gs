@@ -119,6 +119,10 @@ function getFoodV1(force) {
 /** Explicit user-triggered setup. It creates only missing tabs and headers. */
 function setupFoodTrackingV1() {
   const ss = SpreadsheetApp.openById(OPS_SPREADSHEET_ID);
+  const foodSetupPermission = authorizeActionV1_(ss, 'unknown_action', {
+    triggerType: 'USER_RUN_FUNCTION', directUserAction: true, approvalSatisfied: true,
+    conditionSatisfied: true, reversible: true
+  });
   const created = [];
   const existing = [];
 
@@ -139,8 +143,8 @@ function setupFoodTrackingV1() {
       action_type: 'FOOD_TRACKING_SETUP',
       target_system: 'OPS',
       target_id: 'FOOD_*',
-      trigger_type: 'USER_ACTION',
-      permission_class: 'APPROVAL',
+      trigger_type: foodSetupPermission.triggerType,
+      permission_class: foodSetupPermission.permissionClass,
       status: 'SUCCESS',
       note: 'Ernährungs- und Vorratstabellen eingerichtet.'
     });
@@ -157,6 +161,10 @@ function saveFoodEntryV1(payload) {
   if (!meal) throw new Error('Für den Ernährungseintrag fehlt die Mahlzeit.');
 
   const ss = SpreadsheetApp.openById(OPS_SPREADSHEET_ID);
+  const foodLogPermission = authorizeActionV1_(ss, 'food_log_consumption', {
+    triggerType: 'DASHBOARD_USER_ACTION', directUserAction: true, approvalSatisfied: true,
+    conditionSatisfied: true, reversible: true
+  });
   const sheet = foodEnsureSheetV1_(ss, 'LOG');
   const now = new Date();
   const record = {
@@ -175,6 +183,12 @@ function saveFoodEntryV1(payload) {
     notes: String(item.notes || '').trim()
   };
   foodAppendRecordV1_(sheet, FOOD_HEADERS_V1.LOG, record);
+  appendAudit_(ss, {
+    action_type: 'FOOD_LOG_CONSUMPTION', target_system: 'OPS Sheet', target_id: record.food_log_id,
+    trigger_type: foodLogPermission.triggerType, permission_class: foodLogPermission.permissionClass,
+    status: 'SUCCESS', previous_value: '', new_value: record.meal, rollback_available: true,
+    note: 'Tatsächlicher Konsum durch konkrete Nutzeraktion gespeichert.'
+  });
   invalidateFoodV1_();
   return { ok: true, entry: record, food: getFoodV1(true) };
 }
@@ -186,6 +200,10 @@ function saveFoodPantryItemV1(payload) {
   if (!name) throw new Error('Für den Vorratseintrag fehlt der Produktname.');
 
   const ss = SpreadsheetApp.openById(OPS_SPREADSHEET_ID);
+  const pantryPermission = authorizeActionV1_(ss, 'food_ingest_tracking', {
+    triggerType: 'DASHBOARD_USER_ACTION', directUserAction: true, approvalSatisfied: false,
+    conditionSatisfied: true, reversible: true
+  });
   const sheet = foodEnsureSheetV1_(ss, 'PANTRY');
   const table = foodReadTableV1_(sheet);
   const id = String(item.pantryId || ('PANTRY_' + new Date().getTime()));
@@ -208,6 +226,12 @@ function saveFoodPantryItemV1(payload) {
   } else {
     foodAppendRecordV1_(sheet, FOOD_HEADERS_V1.PANTRY, record);
   }
+  appendAudit_(ss, {
+    action_type: 'FOOD_PANTRY_UPDATE', target_system: 'OPS Sheet', target_id: record.pantry_id,
+    trigger_type: pantryPermission.triggerType, permission_class: pantryPermission.permissionClass,
+    status: 'SUCCESS', previous_value: existingRow ? 'existing' : '', new_value: record.quantity,
+    rollback_available: true, note: 'Bestätigter Vorratsstand im Tracking-Workflow gespeichert.'
+  });
   invalidateFoodV1_();
   return { ok: true, pantryItem: record, food: getFoodV1(true) };
 }
@@ -219,6 +243,10 @@ function consumeFoodPantryItemV1(payload) {
   if (!pantryId) throw new Error('Für den Verbrauch fehlt die pantry_id.');
 
   const ss = SpreadsheetApp.openById(OPS_SPREADSHEET_ID);
+  const consumePermission = authorizeActionV1_(ss, 'food_ingest_tracking', {
+    triggerType: 'DASHBOARD_USER_ACTION', directUserAction: true, approvalSatisfied: false,
+    conditionSatisfied: true, reversible: true
+  });
   const sheet = foodEnsureSheetV1_(ss, 'PANTRY');
   const table = foodReadTableV1_(sheet);
   const found = foodFindRowV1_(table, 'pantry_id', pantryId);
@@ -234,6 +262,12 @@ function consumeFoodPantryItemV1(payload) {
     notes: String(item.note || found.record.notes || '').trim()
   });
 
+  appendAudit_(ss, {
+    action_type: 'FOOD_PANTRY_CONSUME', target_system: 'OPS Sheet', target_id: pantryId,
+    trigger_type: consumePermission.triggerType, permission_class: consumePermission.permissionClass,
+    status: 'SUCCESS', previous_value: current, new_value: remaining, rollback_available: true,
+    note: 'Vorratsverbrauch im ausdrücklich gestarteten Tracking-Workflow verbucht.'
+  });
   invalidateFoodV1_();
   return { ok: true, pantryId: pantryId, remaining: remaining, food: getFoodV1(true) };
 }
@@ -245,6 +279,10 @@ function saveFoodShoppingItemV1(payload) {
   if (!name) throw new Error('Für den Einkaufseintrag fehlt der Produktname.');
 
   const ss = SpreadsheetApp.openById(OPS_SPREADSHEET_ID);
+  const shoppingPermission = authorizeActionV1_(ss, 'food_ingest_tracking', {
+    triggerType: 'DASHBOARD_USER_ACTION', directUserAction: true, approvalSatisfied: false,
+    conditionSatisfied: true, reversible: true
+  });
   const sheet = foodEnsureSheetV1_(ss, 'SHOPPING');
   const now = new Date();
   const record = {
@@ -260,6 +298,12 @@ function saveFoodShoppingItemV1(payload) {
     notes: String(item.notes || '').trim()
   };
   foodAppendRecordV1_(sheet, FOOD_HEADERS_V1.SHOPPING, record);
+  appendAudit_(ss, {
+    action_type: 'FOOD_SHOPPING_INGEST', target_system: 'OPS Sheet', target_id: record.shopping_id,
+    trigger_type: shoppingPermission.triggerType, permission_class: shoppingPermission.permissionClass,
+    status: 'SUCCESS', previous_value: '', new_value: record.item_name, rollback_available: true,
+    note: 'Bestätigte Einkaufsposition im Tracking-Workflow gespeichert.'
+  });
   invalidateFoodV1_();
   return { ok: true, shoppingItem: record, food: getFoodV1(true) };
 }
@@ -271,6 +315,10 @@ function saveFoodRecipeV1(payload) {
   if (!title) throw new Error('Für das Rezept fehlt der Titel.');
 
   const ss = SpreadsheetApp.openById(OPS_SPREADSHEET_ID);
+  const recipePermission = authorizeActionV1_(ss, 'food_recipe_feedback', {
+    triggerType: 'DASHBOARD_USER_ACTION', directUserAction: true, approvalSatisfied: true,
+    conditionSatisfied: true, reversible: true
+  });
   const sheet = foodEnsureSheetV1_(ss, 'RECIPES');
   const table = foodReadTableV1_(sheet);
   const id = String(item.recipeId || ('RECIPE_' + new Date().getTime()));
@@ -291,6 +339,12 @@ function saveFoodRecipeV1(payload) {
   const existingRow = foodFindRowV1_(table, 'recipe_id', id);
   if (existingRow) foodWriteRecordV1_(sheet, table, existingRow.rowNumber, record);
   else foodAppendRecordV1_(sheet, FOOD_HEADERS_V1.RECIPES, record);
+  appendAudit_(ss, {
+    action_type: 'FOOD_RECIPE_FEEDBACK', target_system: 'OPS Sheet', target_id: record.recipe_id,
+    trigger_type: recipePermission.triggerType, permission_class: recipePermission.permissionClass,
+    status: 'SUCCESS', previous_value: existingRow ? 'existing' : '', new_value: record.rating,
+    rollback_available: true, note: 'Rezept-/Feedbackänderung durch konkrete Nutzeraktion gespeichert.'
+  });
   invalidateFoodV1_();
   return { ok: true, recipe: record, food: getFoodV1(true) };
 }
