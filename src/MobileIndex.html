@@ -61,7 +61,7 @@
           <div style="font-family:'IBM Plex Mono',monospace;font-size:12.2px;color:#C9AE6C;letter-spacing:.06em;overflow-wrap:anywhere">{{ ui.todLine }}</div>
         </div>
         <div style="flex:1"></div>
-        <span style="width:6px;height:6px;border-radius:50%;background:#5FBF8A;box-shadow:0 0 8px #5FBF8A;animation:kBreathe 2.6s ease-in-out infinite;flex:0 0 auto"></span>
+        <span title="{{ systemTruth.label }}" aria-label="{{ systemTruth.label }}" style="width:6px;height:6px;border-radius:50%;background:{{ systemTruth.color }};box-shadow:0 0 8px {{ systemTruth.glow }};animation:kBreathe 2.6s ease-in-out infinite;flex:0 0 auto"></span>
         <div onClick="{{ replayBoot }}" style="width:44px;height:44px;flex:0 0 auto;display:grid;place-items:center;border-radius:50%;border:1px solid rgba(184,145,47,.35);color:#C9AE6C;transition:transform 140ms ease-out,background 160ms ease-out" style-active="transform:scale(.9);background:rgba(184,145,47,.16)">
           <svg viewBox="0 0 24 24" width="19" height="19" fill="none"><path d="M4 12a8 8 0 0 1 13.3-5.9M20 12a8 8 0 0 1-13.3 5.9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"></path><path d="M17 3v4h-4M7 21v-4h4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path></svg>
         </div>
@@ -1305,6 +1305,7 @@ class Component extends DCLogic {
     const openTasks=D.tasks.length;
     const due=D.tasks.filter(t=>t.deadline===todayIso||/heute|überfällig/i.test(t.due||'')).length;
     const sourceState=window.KZLive.sourceState();
+    const systemTruth=window.KZLive.systemTruthState();
     const sub={morgen:openTasks?openTasks+' offene Aufgaben. Der Operator hat den ersten sichtbaren Schritt vorbereitet.':'Keine offene Aufgabe im OPS. Die Quellenlage bleibt sichtbar.',
       mittag:openTasks?'Aktueller Stand: '+openTasks+' offene Aufgaben, davon '+due+' heute.':'Der aktuelle OPS-Stand enthält keine offene Aufgabe.',
       abend:D.wb.available?'Der Abendcheck ist freiwillig und kann mit einzelnen Angaben gespeichert werden.':'Der operative Stand ist geladen; der Abendcheck ist noch nicht eingerichtet.',
@@ -1509,7 +1510,7 @@ class Component extends DCLogic {
       :{open:false};
 
     return {
-      showApp:S.phase!=='boot',ambient:amb,
+      showApp:S.phase!=='boot',ambient:amb,systemTruth,
       ui:{greeting:greet,subline:sub,todLine:todLine,
         openCount:String(Math.round(this.n(openTasks))),dueCount:String(Math.round(this.n(due))),
         focus:nf(1).format(this.n(3.5))+' h'},

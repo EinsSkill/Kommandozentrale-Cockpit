@@ -107,7 +107,6 @@ function getDashboardBaseV31(force) {
     const now = new Date();
     const out = { generatedAt: now.toISOString(), errors: {} };
     safeAssign_(out, 'system', function(){ return readConfig_(rd); }, {});
-    safeAssign_(out, 'dashboardState', function(){ return rd.rows('DASHBOARD_STATE'); }, []);
     safeAssign_(out, 'tasks', function(){ return getTasks_(rd, now); }, []);
     safeAssign_(out, 'projects', function(){ return getProjects_(rd); }, []);
     safeAssign_(out, 'aiInbox', function(){ return getAiInbox_(rd); }, []);

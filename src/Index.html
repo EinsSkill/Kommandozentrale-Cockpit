@@ -96,8 +96,8 @@
 
         <div style="display:flex;align-items:center;gap:10px">
           <div style="display:flex;align-items:center;gap:8px;padding:7px 13px;border:1px solid rgba(184,145,47,.4);border-radius:999px;background:rgba(184,145,47,.09)">
-            <span style="width:6px;height:6px;border-radius:50%;background:#5FBF8A;box-shadow:0 0 8px #5FBF8A;animation:kBreathe 2.6s ease-in-out infinite"></span>
-            <span style="font-size:11.5px;color:#DFD5BE;letter-spacing:.02em">Alle Quellen synchron</span>
+            <span style="width:6px;height:6px;border-radius:50%;background:{{ systemTruth.color }};box-shadow:0 0 8px {{ systemTruth.glow }};animation:kBreathe 2.6s ease-in-out infinite"></span>
+            <span style="font-size:11.5px;color:#DFD5BE;letter-spacing:.02em">{{ systemTruth.label }}</span>
           </div>
           <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#9FB0A3;letter-spacing:.06em">{{ ui.dateLine }}</div>
           <div data-magnet onClick="{{ replayBoot }}" style="font-size:11.5px;color:#C9AE6C;padding:7px 12px;border-radius:999px;border:1px solid rgba(184,145,47,.28);cursor:pointer;transform:translate(var(--tx,0px),var(--ty,0px));transition:transform 200ms cubic-bezier(.16,1,.3,1),background-color 200ms ease-out" style-hover="background:rgba(184,145,47,.16)" style-active="transform:translate(var(--tx,0px),var(--ty,0px)) scale(.96)">Sequenz erneut</div>
@@ -1865,6 +1865,7 @@ class Component extends DCLogic {
     const todayIso=new Intl.DateTimeFormat('sv-SE',{timeZone:'Europe/Berlin'}).format(now);
     const dateLine=new Intl.DateTimeFormat('de-DE',{weekday:'short',day:'2-digit',month:'2-digit',year:'numeric',timeZone:'Europe/Berlin'}).format(now).toUpperCase();
     const sourceState=window.KZLive.sourceState();
+    const systemTruth=window.KZLive.systemTruthState();
     const openTasks=(D.tasks||[]).length;
     const due=(D.tasks||[]).filter(t=>t.deadline===todayIso||/heute|überfällig/i.test(t.due||'')).length;
     const focusMinutes=(D.tasks||[]).slice(0,3).reduce((sum,t)=>sum+(Number(t.estimatedMinutes)||0),0);
@@ -1999,7 +2000,7 @@ class Component extends DCLogic {
 
     const wbCount=Object.keys(S.wbForm||{}).length,wbHasData=wbCount>0||!!S.wbMood||!!S.wbFactor,wbCanSave=WB.available&&wbHasData;
     const bootOn=S.phase==='boot'||!S.bootDone,cursorOn=this.props.customCursor!==false,bootLog=window.KZLive.bootLog();
-    return {cursorMode:cursorOn?'none':'default',cursorDisplay:cursorOn?'block':'none',cursorRef:(el)=>{this.cursorEl=el;},ambient:amb,showApp:S.phase!=='boot',sourceState,
+    return {cursorMode:cursorOn?'none':'default',cursorDisplay:cursorOn?'block':'none',cursorRef:(el)=>{this.cursorEl=el;},ambient:amb,showApp:S.phase!=='boot',sourceState,systemTruth,
       ui:{greeting:greet,subline:sub,todLine,dateLine,footer:'DATENSTAND '+this.dateStr(),openCount:String(Math.round(this.n(openTasks))),dueCount:String(Math.round(this.n(due))),focus:focusMinutes?nf(1).format(this.n(focusMinutes/60))+' h':'–'},
       op:{...D.operator,cta:S.focusOn?'Fokus läuft':'Fokus starten'},startFocus:(e)=>{e.stopPropagation();this.setState(s=>({focusOn:!s.focusOn}));},tasks:tasks.slice(0,5),tasksMeta:openTasks+' OFFEN · '+due+' HEUTE/ÜBERFÄLLIG',alerts:alerts.slice(0,3),alertsMeta:openAlerts.length+' OFFEN'+(openAlerts.filter(a=>a.sev===3).length?' · '+openAlerts.filter(a=>a.sev===3).length+' KRITISCH':''),inbox:inbox.slice(0,3),inboxMeta:D.inbox.length+' ZUR PRÜFUNG',projects:projects.slice(0,4),projMeta:D.projects.length+' AKTIV',mails:D.mails.slice(0,3),mailMeta:D.mails.length+' RELEVANT',cal,fin,hea,weather,goals:goals.slice(0,3),goalsMeta:D.goals.length+' AKTIV',system:system.slice(0,5),sysMeta:D.system.filter(s=>s.state==='warn'||s.state==='error').length+' ZU PRÜFEN',wb,brief:D.briefing,open,
       weatherEgg:(e)=>{e.stopPropagation();this.weatherEgg();},crestClick:this.crest,replayBoot:(e)=>{e.stopPropagation();window.KZLive.reload(this);this.boot();},
