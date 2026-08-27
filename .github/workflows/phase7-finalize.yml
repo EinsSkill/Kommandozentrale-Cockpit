@@ -33,5 +33,5 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -- src docs tests
           git diff --cached --quiet && exit 0
-          git commit -m "refactor: enforce canonical runtime permissions (#46)"
+          git commit -m "refactor: apply Phase 7 finalization step (#46)"
           git push
