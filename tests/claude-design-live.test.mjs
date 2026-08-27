@@ -39,7 +39,7 @@ test('Apps Script evaluates the design template and includes both repository-own
 test('live adapter covers every visible source and every authorized cockpit write', () => {
   for (const endpoint of [
     'getDashboardBaseV31', 'getPersonalOperatorContextV1', 'getFinanceDashboardV1',
-    'getHealthV31', 'getWellbeingV1', 'getCalendarWeekV3', 'getMailV3',
+    'getHealthV31', 'getWellbeingV1', 'getCalendarViewV4', 'getMailV3',
     'setTaskDone', 'acknowledgeAlert', 'reviewAiInbox', 'saveWellbeingEntryV1',
     'searchSecondBrainV1'
   ]) assert.match(adapter, new RegExp(endpoint));
