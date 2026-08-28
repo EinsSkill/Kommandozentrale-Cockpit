@@ -107,6 +107,7 @@ new_route_test = r'''test('Ernährung ist in die kanonische Desktop-/Mobile-Rout
 });'''
 food_test = food_test[:old_start] + new_route_test + '\n\n' + food_test[next_start:]
 food_test = food_test.replace("assert.match(entry, /document\\.addEventListener\\('click'/);", "assert.match(entry, /card\\.addEventListener\\('click',openFood\\)/);")
+food_test = food_test.replace("assert.match(entry, /aria-label', 'Ernährungsbereich öffnen'/);", "assert.match(entry, /aria-label'\\s*,\\s*'Ernährungsbereich öffnen'/);")
 write(food_test_path, food_test)
 
 cal_test_path = 'tests/calendar-wellbeing-enhancements.test.mjs'
@@ -164,6 +165,16 @@ new_template_test = r'''test('Apps Script evaluates one canonical desktop/mobile
 });'''
 claude_test = claude_test[:old_start] + new_template_test + '\n\n' + claude_test[next_start:]
 write(claude_test_path, claude_test)
+
+# Existing harnesses used to require the x-dc script to be the final element before </body>.
+# Shared template includes now follow it, so target the canonical data-dc-script marker instead.
+old_logic_regex = '/<script type="text\\/x-dc"[\\s\\S]*?>([\\s\\S]*?)<\\/script>\\s*<\\/body>/i'
+new_logic_regex = '/<script(?:\\s[^>]*)?data-dc-script[^>]*>([\\s\\S]*?)<\\/script>/i'
+for harness_path in ['tests/live-adapter-render.test.mjs', 'tests/mobile-design-live.test.mjs', 'tests/wellbeing.test.mjs']:
+    harness = read(harness_path)
+    require(old_logic_regex in harness, f'{harness_path}: legacy x-dc parser marker missing')
+    harness = harness.replace(old_logic_regex, new_logic_regex)
+    write(harness_path, harness)
 
 # Dedicated regression guard for Wave 7.
 write('tests/frontend-template-dedup.test.mjs', r'''import assert from 'node:assert/strict';
