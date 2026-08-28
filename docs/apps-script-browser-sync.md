@@ -88,4 +88,4 @@ Nach erfolgreichem `push` entspricht Apps Script HEAD dem GitHub-`src/`-Stand. E
 
 ## Technische Version
 
-Der Workflow nutzt Node 20 und pinnt `@google/clasp@3.4.0`. Für `.gs`-Dateien wird die aktuelle `scriptExtensions`-Konfiguration verwendet; HTML bleibt `.html`.
+Der Workflow nutzt Node 24 und pinnt `@google/clasp@3.4.0`. Für `.gs`-Dateien wird die aktuelle `scriptExtensions`-Konfiguration verwendet; HTML bleibt `.html`.
