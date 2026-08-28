@@ -15,7 +15,18 @@ Ziel: `src/` im GitHub-Repository ist die technische Source of Truth. Der Sync �
 
 Google weist darauf hin, dass `projects.updateContent` den gesamten Projektinhalt ersetzt. Deshalb wird der vollständige Runtime-Dateisatz geprüft und das bestehende Manifest erhalten.
 
-## Einmalige Browser-Einrichtung
+## Voraussetzungen
+
+Im Repository müssen diese GitHub Actions Secrets vorhanden sein:
+
+- `APPS_SCRIPT_ID` = Script-ID des produktiven Kommandozentrale-Apps-Script-Projekts
+- `CLASPRC_JSON` = kompletter Inhalt einer gültigen clasp-OAuth-Datei (`~/.clasprc.json`)
+
+Außerdem muss im Google-Konto unter Apps Script die **Google Apps Script API** aktiviert sein.
+
+Die Secrets werden ausschließlich innerhalb des GitHub-Actions-Runners gelesen und nicht in Repository-Dateien geschrieben.
+
+## Einmalige Browser-Einrichtung, falls die Secrets noch nicht existieren
 
 ### 1. Apps Script API aktivieren
 
@@ -34,7 +45,7 @@ Die Script-ID ist nicht die Web-App-Deployment-ID.
 Google Cloud Shell im Browser öffnen und ausführen:
 
 ```bash
-npx --yes @google/clasp@3.1.3 login --no-localhost
+npx --yes @google/clasp@3.4.0 login --no-localhost
 ```
 
 Den angezeigten Google-Link öffnen, mit dem Google-Konto des Apps-Script-Projekts autorisieren und den von `clasp` verlangten Rückgabe-Schritt abschließen.
@@ -75,6 +86,6 @@ Nur wenn der Check ausdrücklich live-only Dateien meldet und diese nach Prüfun
 
 Nach erfolgreichem `push` entspricht Apps Script HEAD dem GitHub-`src/`-Stand. Erst danach wird eine Web-App-Version manuell über Apps Script erstellt/deployed.
 
-## Warum Node 20
+## Technische Version
 
-Der Workflow pinnt Node 20 und `@google/clasp@3.1.3`. Damit umgehen wir bekannte Token-Refresh-Probleme neuerer Node-Linien mit dieser clasp-Version.
+Der Workflow nutzt Node 24 und pinnt `@google/clasp@3.4.0`. Für `.gs`-Dateien wird die aktuelle `scriptExtensions`-Konfiguration verwendet; HTML bleibt `.html`.

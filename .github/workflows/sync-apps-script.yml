@@ -42,7 +42,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
 
       - name: Validate required secrets
         env:
@@ -69,17 +69,17 @@ jobs:
           {
             "scriptId": "$APPS_SCRIPT_ID",
             "rootDir": ".apps-script-current",
-            "fileExtension": "gs"
+            "scriptExtensions": [".gs"],
+            "htmlExtensions": [".html"]
           }
           JSON
-          npx --yes @google/clasp@3.1.3 pull
+          npx --yes @google/clasp@3.4.0 pull
           test -f .apps-script-current/appsscript.json || {
             echo "Aktuelles Apps-Script-Manifest konnte nicht gelesen werden." >&2
             exit 1
           }
 
       - name: Check for live-only runtime files
-        id: live_only
         env:
           ALLOW_DELETE: ${{ inputs.allow_live_only_deletions }}
         shell: bash
@@ -134,17 +134,18 @@ jobs:
           {
             "scriptId": "$APPS_SCRIPT_ID",
             "rootDir": "src",
-            "fileExtension": "gs"
+            "scriptExtensions": [".gs"],
+            "htmlExtensions": [".html"]
           }
           JSON
-          npx --yes @google/clasp@3.1.3 status
+          npx --yes @google/clasp@3.4.0 show-file-status
 
       - name: Push GitHub src to Apps Script HEAD
         if: ${{ inputs.mode == 'push' }}
         shell: bash
         run: |
           set -euo pipefail
-          npx --yes @google/clasp@3.1.3 push --force
+          npx --yes @google/clasp@3.4.0 push --force
 
       - name: Verify Apps Script HEAD after push
         if: ${{ inputs.mode == 'push' }}
@@ -157,10 +158,11 @@ jobs:
           {
             "scriptId": "$APPS_SCRIPT_ID",
             "rootDir": ".apps-script-verify",
-            "fileExtension": "gs"
+            "scriptExtensions": [".gs"],
+            "htmlExtensions": [".html"]
           }
           JSON
-          npx --yes @google/clasp@3.1.3 pull
+          npx --yes @google/clasp@3.4.0 pull
           python - <<'PY'
           from pathlib import Path
           import hashlib
