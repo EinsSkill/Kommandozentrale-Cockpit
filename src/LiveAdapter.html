@@ -145,7 +145,7 @@
     },
 
     baseIntegrityProblem(value) {
-      if (!value || value.runtimeVersion !== 'PHASE7_LIVE_HOTFIX_1') return 'OPS-Backend ist nicht auf dem aktuellen Hotfix-Stand.';
+      if (!value || value.runtimeVersion !== 'PHASE7_LIVE_HOTFIX_2') return 'OPS-Backend-Stand ' + text(value && value.runtimeVersion || 'UNBEKANNT') + ' passt nicht zu PHASE7_LIVE_HOTFIX_2.';
       const integrity = value.integrity || {};
       const problems = [];
       if (number(integrity.openTaskCandidates) > 0 && asArray(value.tasks).length === 0) problems.push('offene Tasks fehlen im Payload');
