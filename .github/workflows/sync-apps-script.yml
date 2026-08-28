@@ -186,11 +186,11 @@ jobs:
           import hashlib
 
           def runtime_map(root):
-              root = Path(root)
+              root = Path(root).resolve()
               result = {}
               for p in root.rglob('*'):
                   if p.is_file() and p.suffix.lower() in {'.gs', '.html'}:
-                      rel = str(p.relative_to(root)).replace('\\', '/')
+                      rel = p.resolve().relative_to(root).as_posix()
                       result[rel] = hashlib.sha256(p.read_bytes()).hexdigest()
               return result
 
