@@ -24,6 +24,19 @@ jobs:
       - name: Apply scoped Wave 6-7 patch
         run: python3 .github/scripts/phase7_wave7_once.py
 
+      - name: Align remaining legacy mobile routing assertion
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('tests/mobile-design-live.test.mjs')
+          s = p.read_text(encoding='utf-8')
+          old = "  assert.match(code, /requestedView === 'mobile' \\? 'MobileIndex'/);\n  assert.match(code, /: 'Index';/);"
+          new = "  assert.match(code, /requestedView === 'mobile' \\|\\| requestedView === 'food-mobile'/);\n  assert.match(code, /'MobileIndex' : 'Index'/);"
+          if old not in s:
+              raise SystemExit('legacy mobile routing assertion not found')
+          p.write_text(s.replace(old, new, 1), encoding='utf-8')
+          PY
+
       - name: Run full repository regression
         run: npm test
 
