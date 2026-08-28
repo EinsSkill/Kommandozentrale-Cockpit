@@ -93,9 +93,10 @@ jobs:
           import os
 
           def runtime_files(root):
-              root = Path(root).resolve()
+              root = Path(root)
+              # Apps Script projects are flat; compare logical file names only.
               return {
-                  p.resolve().relative_to(root).as_posix()
+                  p.name
                   for p in root.rglob('*')
                   if p.is_file() and p.suffix.lower() in {'.gs', '.html'}
               }
@@ -186,12 +187,12 @@ jobs:
           import hashlib
 
           def runtime_map(root):
-              root = Path(root).resolve()
+              root = Path(root)
               result = {}
+              # Apps Script projects are flat; compare logical file names only.
               for p in root.rglob('*'):
                   if p.is_file() and p.suffix.lower() in {'.gs', '.html'}:
-                      rel = p.resolve().relative_to(root).as_posix()
-                      result[rel] = hashlib.sha256(p.read_bytes()).hexdigest()
+                      result[p.name] = hashlib.sha256(p.read_bytes()).hexdigest()
               return result
 
           expected = runtime_map('src')
