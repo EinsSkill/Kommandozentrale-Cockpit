@@ -1,4 +1,5 @@
 from pathlib import Path
+import re
 
 
 def replace_once(text, old, new, label):
@@ -9,35 +10,10 @@ def replace_once(text, old, new, label):
     return text.replace(old, new, 1)
 
 
-# Wave 6 — Food is a canonical in-cockpit surface, not a parallel demo application.
+# Wave 6 — Food is a canonical in-cockpit surface, not a parallel application.
 code_path = Path('src/Code.gs')
 code = code_path.read_text()
-old = """function doGet(e) {
-  const requestedView = e && e.parameter ? String(e.parameter.view || '') : '';
-  const view = requestedView === 'food' ? 'FoodIndex'
-    : requestedView === 'food-mobile' ? 'FoodMobileIndex'
-    : requestedView === 'mobile' ? 'MobileIndex'
-    : 'Index';
-  const isFoodView = view === 'FoodIndex' || view === 'FoodMobileIndex';
-  const template = HtmlService.createTemplateFromFile(view);
-  template.webAppUrl = ScriptApp.getService().getUrl() || '';
-  const evaluated = template.evaluate();
-  let enhancement = '';
-  if (!isFoodView) {
-    enhancement = [
-      safeIncludeHtml_('CalendarWellbeingEnhancements'),
-      safeIncludeHtml_('FoodTrackingEnhancements')
-    ].filter(Boolean).join('\\n');
-  }
-  // Mobile currently labels the card \"Heute im Kalender\"; normalize it so the
-  // shared enhancement layer can address the same calendar surface on both views.
-  const rendered = evaluated.getContent().replace('Heute im Kalender', 'Kalenderwoche');
-  const content = rendered.replace(/<\\/body>\\s*<\\/html>\\s*$/i, enhancement + '\\n</body>\\n</html>');
-  return HtmlService.createHtmlOutput(content)
-    .setTitle(isFoodView ? 'Ernährung · Lukes Kommandozentrale' : 'Lukes Kommandozentrale')
-    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
-}"""
-new = """function doGet(e) {
+new_do_get = """function doGet(e) {
   const requestedView = e && e.parameter ? String(e.parameter.view || '') : '';
   // Legacy food URLs remain compatible but resolve into the canonical cockpit.
   // Food itself is rendered by FoodTrackingEnhancements from OPS.FOOD_*.
@@ -57,10 +33,40 @@ new = """function doGet(e) {
     .setTitle('Lukes Kommandozentrale')
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }"""
-code = replace_once(code, old, new, 'canonical food routing')
-if "createTemplateFromFile('FoodIndex')" in code or "createTemplateFromFile('FoodMobileIndex')" in code:
+if "requestedView === 'food' ? 'FoodIndex'" in code:
+    pattern = re.compile(r"function doGet\(e\) \{[\s\S]*?\n\}\n\n/\*\*", re.M)
+    match = pattern.search(code)
+    if not match:
+        raise SystemExit('canonical food routing: doGet block not found')
+    code = code[:match.start()] + new_do_get + '\n\n/**' + code[match.end():]
+elif new_do_get not in code:
+    raise SystemExit('canonical food routing: unexpected doGet state')
+
+# Productive routing must not use the legacy standalone Food templates.
+do_get_match = re.search(r"function doGet\(e\) \{[\s\S]*?\n\}", code)
+if not do_get_match:
+    raise SystemExit('doGet missing after rewrite')
+if 'FoodIndex' in do_get_match.group(0) or 'FoodMobileIndex' in do_get_match.group(0):
     raise SystemExit('parallel Food template routing remains')
 code_path.write_text(code)
+
+entry_path = Path('src/FoodTrackingEnhancements.html')
+entry = entry_path.read_text()
+entry = entry.replace(
+    'Es werden keine Ersatz- oder Demodaten angezeigt.',
+    'Es werden keine Ersatz- oder Beispieldaten angezeigt.'
+)
+if re.search(r'FIXTURE|mock|fake|demo', entry, re.I):
+    raise SystemExit('Food enhancement still contains demo/mock/fake runtime markers')
+entry_path.write_text(entry)
+
+contract_path = Path('tests/food-tracking-contract.test.mjs')
+contract = contract_path.read_text()
+contract = contract.replace(
+    "  assert.match(entry, /document\\.addEventListener\\('click'/);",
+    "  assert.match(entry, /card\\.addEventListener\\('click',openFood\\)/);"
+)
+contract_path.write_text(contract)
 
 Path('tests/food-cockpit-integration.test.mjs').write_text(r'''import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
@@ -92,7 +98,7 @@ test('Food integration reads only canonical getFoodV1 runtime data and does not 
   assert.match(enhancement, /OPS\.FOOD_\*/);
   assert.doesNotMatch(enhancement, /window\.location\.assign/);
   assert.doesNotMatch(enhancement, /FoodIndex|FoodMobileIndex/);
-  assert.doesNotMatch(enhancement, /MEALS_DEMO|PANTRY_DEMO|RECIPES_DEMO|HISTORY_WEEK/);
+  assert.doesNotMatch(enhancement, /FIXTURE|mock|fake|demo/i);
 });
 
 test('Food panel is shared and can open from canonical or legacy URL state', () => {
@@ -102,8 +108,8 @@ test('Food panel is shared and can open from canonical or legacy URL state', () 
   assert.match(enhancement, /params\.get\('view'\)==='food-mobile'/);
 });
 
-test('Food empty/error states never substitute demo data', () => {
-  assert.match(enhancement, /Es werden keine Ersatz- oder Demodaten angezeigt/);
+test('Food empty/error states never substitute invented runtime data', () => {
+  assert.match(enhancement, /Es werden keine Ersatz- oder Beispieldaten angezeigt/);
   assert.match(enhancement, /bewusst leer statt Beispieldaten zu erfinden/);
 });
 ''')
@@ -122,11 +128,11 @@ Food is part of the normal Kommandozentrale runtime:
 
 - `?view=food` resolves to the canonical desktop cockpit and opens the Food surface.
 - `?view=food-mobile` resolves to the canonical mobile cockpit and opens the Food surface.
-- new in-cockpit navigation uses `?section=food` only as optional URL state; it does not perform a page navigation.
+- New in-cockpit navigation uses `?section=food` only as optional URL state; it does not perform a page navigation.
 
 ## Truth behavior
 
-The integrated surface uses only `getFoodV1()` / `OPS.FOOD_*` data. Missing or failed data remains visibly missing/failed. Demo meals, pantry items, recipes, calorie history and inferred preferences from the former design pages are not used as runtime truth.
+The integrated surface uses only `getFoodV1()` / `OPS.FOOD_*` data. Missing or failed data remains visibly missing/failed. No invented meals, pantry items, recipes, calorie history or inferred preferences are used as runtime truth.
 
 ## Scope
 
