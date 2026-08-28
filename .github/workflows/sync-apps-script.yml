@@ -74,10 +74,13 @@ jobs:
           }
           JSON
           npx --yes @google/clasp@3.4.0 pull
-          test -f .apps-script-current/appsscript.json || {
-            echo "Aktuelles Apps-Script-Manifest konnte nicht gelesen werden." >&2
+          MANIFEST_PATH="$(find .apps-script-current -type f -iname 'appsscript.json' -print -quit)"
+          if [[ -z "$MANIFEST_PATH" ]]; then
+            echo "Aktuelles Apps-Script-Manifest konnte nicht gefunden werden." >&2
+            find .apps-script-current -maxdepth 3 -type f -print >&2
             exit 1
-          }
+          fi
+          echo "Manifest gefunden: " "$MANIFEST_PATH"
 
       - name: Check for live-only runtime files
         env:
@@ -129,7 +132,12 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          cp .apps-script-current/appsscript.json src/appsscript.json
+          MANIFEST_PATH="$(find .apps-script-current -type f -iname 'appsscript.json' -print -quit)"
+          test -n "$MANIFEST_PATH" || {
+            echo "Apps-Script-Manifest fehlt; Payload kann nicht vorbereitet werden." >&2
+            exit 1
+          }
+          cp "$MANIFEST_PATH" src/appsscript.json
           cat > .clasp.json <<JSON
           {
             "scriptId": "$APPS_SCRIPT_ID",
