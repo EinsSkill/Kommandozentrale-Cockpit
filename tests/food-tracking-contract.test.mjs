@@ -56,6 +56,20 @@ test('Hauptseite enthält nur einen kompakten Einstieg ohne erfundene Live-Werte
   assert.match(entry, /aria-label'\s*,\s*'Ernährungsbereich öffnen'/);
 });
 
+
+
+test('Food-Einstieg hat genau einen stabilen In-Flow-Mount pro kanonischer View', () => {
+  assert.equal((cockpitDesktop.match(/data-kz-food-host="desktop"/g) || []).length, 1);
+  assert.equal((cockpitMobile.match(/data-kz-food-host="mobile"/g) || []).length, 1);
+  assert.match(entry, /__KZ_FOOD_ENHANCEMENT_V2__/);
+  assert.match(entry, /getElementById\('dc-root'\)/);
+  assert.match(entry, /querySelector\('\[data-kz-food-host\]'\)/);
+  assert.match(entry, /host\.replaceChildren\(card\)/);
+  assert.doesNotMatch(entry, /document\.body\.appendChild\(card\)/);
+  assert.doesNotMatch(entry, /\.kz-food-entry\.kz-food-entry-mobile\{position:fixed/);
+  assert.match(entry, /\.kz-food-panel\{position:fixed/);
+});
+
 test('Backend, Routen und eingebettete Scripts sind syntaktisch parsebar', () => {
   assert.doesNotThrow(() => new Function(code));
   assert.doesNotThrow(() => new Function(backend));

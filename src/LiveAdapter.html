@@ -104,6 +104,7 @@
 
   const adapter = {
     component: null,
+    generation: 0,
     raw: {},
     loads: Object.fromEntries(SOURCE_KEYS.map(key => [key, { state: 'idle', ms: 0, error: '' }])),
     emptyData,
@@ -114,11 +115,44 @@
 
     connect(component) {
       this.component = component;
-      this.load(false);
+      this.generation += 1;
+      const generation = this.generation;
+      this.replayRaw();
+      this.load(false, generation, component);
     },
 
     disconnect(component) {
-      if (this.component === component) this.component = null;
+      if (this.component === component) {
+        this.component = null;
+        this.generation += 1;
+      }
+    },
+
+    isCurrent(generation, component) {
+      return this.component === component && this.generation === generation;
+    },
+
+    replayRaw() {
+      if (!this.component) return;
+      if (this.raw.base) this.applyBase(this.raw.base);
+      if (this.raw.finance) this.applyFinance(this.raw.finance);
+      if (this.raw.health) this.applyHealth(this.raw.health);
+      if (this.raw.wellbeing) this.applyWellbeing(this.raw.wellbeing);
+      if (this.raw.calendar) this.applyCalendar(this.raw.calendar);
+      if (this.raw.mail) this.applyMail(this.raw.mail);
+      if (this.raw.personal) this.applyPersonal(this.raw.personal);
+      this.refreshSystem();
+    },
+
+    baseIntegrityProblem(value) {
+      if (!value || value.runtimeVersion !== 'PHASE7_LIVE_HOTFIX_1') return 'OPS-Backend ist nicht auf dem aktuellen Hotfix-Stand.';
+      const integrity = value.integrity || {};
+      const problems = [];
+      if (number(integrity.openTaskCandidates) > 0 && asArray(value.tasks).length === 0) problems.push('offene Tasks fehlen im Payload');
+      if (number(integrity.activeProjectCandidates) > 0 && asArray(value.projects).length === 0) problems.push('aktive Projekte fehlen im Payload');
+      if (number(integrity.successfulBriefings) > 0 && !value.briefing) problems.push('erfolgreiches Briefing fehlt im Payload');
+      if (number(integrity.weatherSnapshots) > 0 && !(value.weather && value.weather.current)) problems.push('Wetter-Snapshot fehlt im Payload');
+      return problems.join(' · ');
     },
 
     call(name, ...args) {
@@ -133,7 +167,9 @@
       });
     },
 
-    async load(force) {
+    async load(force, expectedGeneration, expectedComponent) {
+      const generation = expectedGeneration == null ? this.generation : expectedGeneration;
+      const component = expectedComponent || this.component;
       const jobs = [
         ['base', 'getDashboardBaseV31', value => {
           this.applyBase(value);
@@ -169,10 +205,21 @@
       await Promise.all(jobs.map(async ([key, endpoint, apply]) => {
         const started = performance.now();
         try {
-          const value = await this.call(endpoint, !!force);
+          let value = await this.call(endpoint, !!force);
+          if (!this.isCurrent(generation, component)) return;
+          if (key === 'base') {
+            let integrityProblem = this.baseIntegrityProblem(value);
+            if (integrityProblem && !force) {
+              value = await this.call(endpoint, true);
+              if (!this.isCurrent(generation, component)) return;
+              integrityProblem = this.baseIntegrityProblem(value);
+            }
+            if (integrityProblem) throw new Error('OPS Integritätsprüfung: ' + integrityProblem);
+          }
           apply(value || {});
           this.loads[key] = { state: 'ok', ms: Math.round(performance.now() - started), error: '' };
         } catch (error) {
+          if (!this.isCurrent(generation, component)) return;
           this.loads[key] = {
             state: 'error', ms: Math.round(performance.now() - started),
             error: compact(error && error.message ? error.message : error)
@@ -182,14 +229,15 @@
         this.touch();
       }));
 
+      if (!this.isCurrent(generation, component)) return;
       this.applyOperator();
       this.refreshSystem();
       this.touch();
     },
 
     reload(component) {
-      if (component) this.component = component;
-      return this.load(true);
+      if (component && component !== this.component) { this.component = component; this.generation += 1; }
+      return this.load(true, this.generation, this.component);
     },
 
     touch(extra) {
