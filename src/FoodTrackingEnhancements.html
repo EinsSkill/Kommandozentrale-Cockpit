@@ -1,6 +1,6 @@
 <style id="kz-food-entry-styles">
   .kz-food-entry{font-family:Archivo,system-ui,sans-serif;box-sizing:border-box;color:#17251B}
-  .kz-food-entry *{box-sizing:border-box}
+  .kz-food-entry *,.kz-food-panel *{box-sizing:border-box}
   .kz-food-entry.kz-food-entry-desktop{grid-column:1 / span 12;position:relative;z-index:2;margin-top:0;padding:20px 22px;display:flex;align-items:center;gap:18px;border:1px solid rgba(20,45,32,.14);border-radius:5px;background:linear-gradient(180deg,#F5EFE2 0%,#EEE6D5 100%);box-shadow:0 14px 30px -22px rgba(20,45,32,.5);cursor:pointer;pointer-events:auto;transition:transform 180ms ease,box-shadow 180ms ease}
   .kz-food-entry.kz-food-entry-desktop:hover{transform:translateY(-2px);box-shadow:0 18px 34px -22px rgba(20,45,32,.62)}
   .kz-food-entry-icon{width:42px;height:42px;display:grid;place-items:center;flex:0 0 auto;color:#1B4632;border:1px solid rgba(184,145,47,.42);border-radius:50%;background:rgba(184,145,47,.08)}
@@ -9,99 +9,67 @@
   .kz-food-entry-status{margin-left:auto;font:10px 'IBM Plex Mono',monospace;letter-spacing:.06em;color:#8C6B18;white-space:nowrap}
   .kz-food-entry-arrow{font:18px 'IBM Plex Mono',monospace;color:#B8912F}
   .kz-food-entry.kz-food-entry-mobile{position:fixed;left:12px;right:12px;bottom:84px;z-index:59;padding:13px 15px;display:flex;align-items:center;gap:11px;border:1px solid rgba(184,145,47,.4);border-radius:12px;background:linear-gradient(180deg,#F5EFE2,#EEE6D5);box-shadow:0 18px 38px -20px rgba(10,31,21,.75);cursor:pointer;pointer-events:auto}
-  .kz-food-entry-mobile .kz-food-entry-icon{width:34px;height:34px}
-  .kz-food-entry-mobile .kz-food-entry-title{font-size:16px}
-  .kz-food-entry-mobile .kz-food-entry-sub{font-size:10.5px}
-  .kz-food-entry-mobile .kz-food-entry-status{font-size:8px}
+  .kz-food-entry-mobile .kz-food-entry-icon{width:34px;height:34px}.kz-food-entry-mobile .kz-food-entry-title{font-size:16px}.kz-food-entry-mobile .kz-food-entry-sub{font-size:10.5px}.kz-food-entry-mobile .kz-food-entry-status{font-size:8px}
+  .kz-food-panel{position:fixed;inset:0;z-index:120;background:linear-gradient(180deg,#E9E1D0 0%,#E1D8C5 100%);color:#17251B;font-family:Archivo,system-ui,sans-serif;overflow:auto;display:none}
+  .kz-food-panel[data-open="1"]{display:block}
+  .kz-food-head{position:sticky;top:0;z-index:2;background:linear-gradient(180deg,#0A1F15,#102C1E);border-bottom:1px solid rgba(184,145,47,.45);color:#F4EDDC}
+  .kz-food-head-inner{max-width:1180px;margin:auto;min-height:68px;padding:12px 20px;display:flex;align-items:center;gap:14px}
+  .kz-food-close{border:1px solid rgba(184,145,47,.35);background:transparent;color:#DDB65C;border-radius:999px;padding:8px 12px;cursor:pointer;font:12px Archivo,sans-serif}
+  .kz-food-heading{font-family:'Bodoni Moda',serif;font-size:22px}.kz-food-source{font:10px 'IBM Plex Mono',monospace;color:#C9AE6C;letter-spacing:.07em;margin-top:2px}
+  .kz-food-body{max-width:1180px;margin:auto;padding:22px 20px 48px}
+  .kz-food-tabs{display:flex;gap:8px;overflow:auto;padding-bottom:14px;margin-bottom:6px}.kz-food-tab{border:1px solid rgba(20,45,32,.16);background:rgba(255,255,255,.35);color:#536256;border-radius:999px;padding:8px 12px;white-space:nowrap;cursor:pointer;font-size:12px}.kz-food-tab[data-active="1"]{border-color:rgba(184,145,47,.5);background:rgba(184,145,47,.13);color:#765A17}
+  .kz-food-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.kz-food-card{background:rgba(255,255,255,.42);border:1px solid rgba(20,45,32,.11);border-radius:8px;padding:16px}.kz-food-kicker{font:10px 'IBM Plex Mono',monospace;letter-spacing:.08em;color:#7A8A7C}.kz-food-value{font-family:'Bodoni Moda',serif;font-size:26px;color:#1B4632;margin-top:3px}.kz-food-section{margin-top:16px;background:rgba(255,255,255,.38);border:1px solid rgba(20,45,32,.1);border-radius:8px;overflow:hidden}.kz-food-section-title{padding:14px 16px;border-bottom:1px solid rgba(20,45,32,.08);font-family:'Bodoni Moda',serif;font-size:18px;color:#132A1D}.kz-food-row{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,.7fr) minmax(0,.7fr);gap:12px;padding:11px 16px;border-bottom:1px solid rgba(20,45,32,.07);font-size:12px;align-items:center}.kz-food-row:last-child{border-bottom:0}.kz-food-muted{color:#7A8A7C}.kz-food-empty{padding:22px 16px;color:#6C7B6E;font-size:12px}.kz-food-warning{padding:12px 14px;border:1px solid rgba(184,145,47,.3);background:rgba(184,145,47,.08);border-radius:7px;color:#6D571E;font-size:12px;margin-bottom:14px}
+  @media(max-width:760px){.kz-food-head-inner{min-height:62px;padding:10px 14px}.kz-food-body{padding:16px 14px 120px}.kz-food-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.kz-food-row{grid-template-columns:minmax(0,1fr);gap:3px;padding:12px 14px}.kz-food-heading{font-size:19px}.kz-food-value{font-size:23px}}
 </style>
 <script>
 (function () {
   'use strict';
   try {
-  var state = { food: null };
-  var navigating = false;
-  function isMobile() {
-    return window.matchMedia ? window.matchMedia('(max-width: 760px)').matches : window.innerWidth <= 760;
-  }
-  function openFood(event) {
-    if (event && event.preventDefault) event.preventDefault();
-    if (event && event.stopPropagation) event.stopPropagation();
-    if (navigating) return;
-    navigating = true;
-    var url = new URL(window.location.href);
-    url.search = '';
-    url.searchParams.set('view', isMobile() ? 'food-mobile' : 'food');
-    window.location.assign(url.toString());
-  }
-  function foodEntryFromEvent(event) {
-    var target = event && event.target;
-    return target && target.closest ? target.closest('[data-kz-food-entry]') : null;
-  }
-  document.addEventListener('click', function (event) {
-    if (foodEntryFromEvent(event)) openFood(event);
-  }, true);
-  function callFood() {
-    return new Promise(function (resolve) {
-      if (!window.google || !google.script || !google.script.run) {
-        resolve(null);
-        return;
-      }
-      google.script.run.withSuccessHandler(resolve).withFailureHandler(function () { resolve(null); }).getFoodV1(false);
-    });
-  }
-  function entryCard() {
-    if (document.querySelector('[data-kz-food-entry]')) return document.querySelector('[data-kz-food-entry]');
-    var card = document.createElement('section');
-    card.className = 'kz-food-entry';
-    card.setAttribute('data-kz-food-entry', '1');
-    card.setAttribute('role', 'link');
-    card.setAttribute('tabindex', '0');
-    card.setAttribute('aria-label', 'Ernährungsbereich öffnen');
-    card.addEventListener('click', openFood);
-    card.addEventListener('keydown', function (event) {
-      if (event.key === 'Enter' || event.key === ' ') openFood(event);
-    });
-    var screen = document.querySelector('[data-screen-label="Kommandozentrale"],[data-screen-label="Kommandozentrale Mobil"]');
-    var desktopTile = screen && screen.querySelector('[data-tile="wellbeing"]');
-    if (!isMobile() && desktopTile && desktopTile.parentNode) {
-      card.classList.add('kz-food-entry-desktop');
-      desktopTile.parentNode.insertBefore(card, desktopTile);
-    } else {
-      card.classList.add('kz-food-entry-mobile');
-      document.body.appendChild(card);
+    var state = { food:null, tab:'today', loading:false };
+    function isMobile(){return window.matchMedia?window.matchMedia('(max-width:760px)').matches:window.innerWidth<=760;}
+    function esc(value){return String(value==null?'':value).replace(/[&<>"']/g,function(ch){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch];});}
+    function num(value){var n=Number(value);return Number.isFinite(n)?n:0;}
+    function fmtAmount(value,unit){var n=num(value);return n?esc(n+(unit?' '+unit:'')):'–';}
+    function fmtDate(value){if(!value)return '–';var d=new Date(value);return isNaN(d.getTime())?esc(String(value).slice(0,10)):d.toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit',year:'numeric'});}
+    function callFood(force){
+      return new Promise(function(resolve){
+        if(!window.google||!google.script||!google.script.run){resolve(null);return;}
+        google.script.run.withSuccessHandler(resolve).withFailureHandler(function(){resolve(null);}).getFoodV1(!!force);
+      });
     }
-    return card;
-  }
-  function render() {
-    var card = entryCard();
-    card.innerHTML = '';
-    var icon = document.createElement('div');
-    icon.className = 'kz-food-entry-icon';
-    icon.innerHTML = '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" aria-hidden="true"><path d="M5 4v7M8 4v7M5 8h3M6.5 11v9M16 4v16M16 4c2.2 2.2 2.2 5.5 0 7.7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>';
-    var text = document.createElement('div');
-    var title = document.createElement('div');
-    title.className = 'kz-food-entry-title';
-    title.textContent = 'Ernährung';
-    var sub = document.createElement('div');
-    sub.className = 'kz-food-entry-sub';
-    sub.textContent = 'Mahlzeiten, Wochenplan, Vorrat, Einkauf, Rezepte und Verlauf';
-    text.appendChild(title);
-    text.appendChild(sub);
-    var status = document.createElement('div');
-    status.className = 'kz-food-entry-status';
-    status.textContent = state.food && state.food.available ? 'DATEN VERBUNDEN' : 'BEREICH ÖFFNEN';
-    var arrow = document.createElement('div');
-    arrow.className = 'kz-food-entry-arrow';
-    arrow.textContent = '→';
-    card.appendChild(icon);
-    card.appendChild(text);
-    card.appendChild(status);
-    card.appendChild(arrow);
-  }
-  render();
-  callFood().then(function (food) { state.food = food; render(); });
-  } catch (error) {
-    if (window.console && console.error) console.error('Food entry unavailable: ' + String(error && error.message ? error.message : error));
-  }
+    function setUrlOpen(open){
+      try{var url=new URL(window.location.href);url.searchParams.delete('view');if(open)url.searchParams.set('section','food');else url.searchParams.delete('section');history.replaceState({},'',url.toString());}catch(ignore){}
+    }
+    function ensurePanel(){
+      var panel=document.querySelector('[data-kz-food-panel]');if(panel)return panel;
+      panel=document.createElement('div');panel.className='kz-food-panel';panel.setAttribute('data-kz-food-panel','1');panel.innerHTML='<div class="kz-food-head"><div class="kz-food-head-inner"><button class="kz-food-close" data-kz-food-close>← Übersicht</button><div><div class="kz-food-heading">Ernährung</div><div class="kz-food-source">OPS.FOOD_* · LIVE</div></div></div></div><main class="kz-food-body"><div class="kz-food-tabs" data-kz-food-tabs></div><div data-kz-food-content></div></main>';
+      document.body.appendChild(panel);
+      panel.querySelector('[data-kz-food-close]').addEventListener('click',closeFood);
+      panel.addEventListener('click',function(event){var tab=event.target&&event.target.closest?event.target.closest('[data-food-tab]'):null;if(tab){state.tab=tab.getAttribute('data-food-tab');renderPanel();}});
+      return panel;
+    }
+    function entryCard(){
+      var existing=document.querySelector('[data-kz-food-entry]');if(existing)return existing;
+      var card=document.createElement('section');card.className='kz-food-entry';card.setAttribute('data-kz-food-entry','1');card.setAttribute('role','button');card.setAttribute('tabindex','0');card.setAttribute('aria-label','Ernährungsbereich öffnen');
+      card.addEventListener('click',openFood);card.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();openFood();}});
+      var screen=document.querySelector('[data-screen-label="Kommandozentrale"],[data-screen-label="Kommandozentrale Mobil"]');var desktopTile=screen&&screen.querySelector('[data-tile="wellbeing"]');
+      if(!isMobile()&&desktopTile&&desktopTile.parentNode){card.classList.add('kz-food-entry-desktop');desktopTile.parentNode.insertBefore(card,desktopTile);}else{card.classList.add('kz-food-entry-mobile');document.body.appendChild(card);}return card;
+    }
+    function renderEntry(){var card=entryCard();var connected=state.food&&state.food.ok&&state.food.available;card.innerHTML='<div class="kz-food-entry-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" aria-hidden="true"><path d="M5 4v7M8 4v7M5 8h3M6.5 11v9M16 4v16M16 4c2.2 2.2 2.2 5.5 0 7.7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg></div><div><div class="kz-food-entry-title">Ernährung</div><div class="kz-food-entry-sub">Mahlzeiten, Vorrat, Einkauf, Rezepte und Verlauf</div></div><div class="kz-food-entry-status">'+(connected?'DATEN VERBUNDEN':state.loading?'LÄDT':'BEREICH ÖFFNEN')+'</div><div class="kz-food-entry-arrow">→</div>';}
+    function tabsHtml(){return [['today','Heute'],['pantry','Vorrat'],['shopping','Einkauf'],['recipes','Rezepte'],['history','Verlauf']].map(function(item){return '<button class="kz-food-tab" data-food-tab="'+item[0]+'" data-active="'+(state.tab===item[0]?'1':'0')+'">'+item[1]+'</button>';}).join('');}
+    function empty(text){return '<div class="kz-food-empty">'+esc(text)+'</div>';}
+    function todayHtml(food){var t=food.today||{totals:{},meals:[]},x=t.totals||{};var cards=[['KALORIEN',Math.round(num(x.calories))+' kcal'],['PROTEIN',Math.round(num(x.protein))+' g'],['KOHLENHYDRATE',Math.round(num(x.carbs))+' g'],['FETT',Math.round(num(x.fat))+' g']].map(function(c){return '<div class="kz-food-card"><div class="kz-food-kicker">'+c[0]+'</div><div class="kz-food-value">'+esc(c[1])+'</div></div>';}).join('');var meals=(t.meals||[]).map(function(m){return '<div class="kz-food-row"><strong>'+esc(m.meal||'Mahlzeit')+'</strong><span class="kz-food-muted">'+esc(m.meal_type||'')+'</span><span>'+fmtAmount(m.calories_estimate,'kcal')+'</span></div>';}).join('');return '<div class="kz-food-grid">'+cards+'</div><section class="kz-food-section"><div class="kz-food-section-title">Heute erfasst</div>'+(meals||empty('Heute sind noch keine Mahlzeiten im OPS erfasst.'))+'</section>';}
+    function pantryHtml(food){var rows=(food.pantry||[]).map(function(p){return '<div class="kz-food-row"><strong>'+esc(p.item_name||'Artikel')+'</strong><span>'+fmtAmount(p.quantity,p.unit)+'</span><span class="kz-food-muted">'+esc(p.storage||p.status||'')+'</span></div>';}).join('');return '<section class="kz-food-section"><div class="kz-food-section-title">Aktueller Vorrat</div>'+(rows||empty('Kein verfügbarer Vorrat im OPS erfasst.'))+'</section>';}
+    function shoppingHtml(food){var rows=(food.recentShopping||[]).map(function(p){return '<div class="kz-food-row"><strong>'+esc(p.item_name||'Artikel')+'</strong><span>'+esc(p.store||'')+'</span><span>'+((p.price!==''&&p.price!=null)?esc(Number(p.price).toLocaleString('de-DE',{style:'currency',currency:'EUR'})):'–')+'</span></div>';}).join('');return '<section class="kz-food-section"><div class="kz-food-section-title">Letzte Einkäufe</div>'+(rows||empty('Noch keine Einkaufspositionen im OPS erfasst.'))+'</section>';}
+    function recipesHtml(food){var rows=(food.recipes||[]).map(function(r){return '<div class="kz-food-row"><strong>'+esc(r.title||'Rezept')+'</strong><span>'+((r.rating!==''&&r.rating!=null)?esc(r.rating)+' / 5':'unbewertet')+'</span><span class="kz-food-muted">'+esc(r.tags||'')+'</span></div>';}).join('');return '<section class="kz-food-section"><div class="kz-food-section-title">Rezepte</div>'+(rows||empty('Noch keine Rezepte im OPS erfasst.'))+'</section>';}
+    function historyHtml(food){var rows=(food.recentMeals||[]).map(function(m){return '<div class="kz-food-row"><strong>'+esc(m.meal||'Mahlzeit')+'</strong><span>'+fmtDate(m.entry_date||m.recorded_at)+'</span><span>'+fmtAmount(m.calories_estimate,'kcal')+'</span></div>';}).join('');return '<section class="kz-food-section"><div class="kz-food-section-title">Letzte Mahlzeiten</div>'+(rows||empty('Noch kein Ernährungsverlauf im OPS erfasst.'))+'</section>';}
+    function renderPanel(){var panel=ensurePanel();panel.querySelector('[data-kz-food-tabs]').innerHTML=tabsHtml();var target=panel.querySelector('[data-kz-food-content]');var food=state.food;if(state.loading&&!food){target.innerHTML=empty('Ernährungsdaten werden geladen …');return;}if(!food||food.ok===false){target.innerHTML='<div class="kz-food-warning">Ernährungsdaten sind gerade nicht verfügbar. Es werden keine Ersatz- oder Beispieldaten angezeigt.</div>';return;}if(!food.available){target.innerHTML='<div class="kz-food-warning">OPS.FOOD_* ist noch nicht eingerichtet. Die Ansicht bleibt bewusst leer statt Beispieldaten zu erfinden.</div>';return;}target.innerHTML=state.tab==='pantry'?pantryHtml(food):state.tab==='shopping'?shoppingHtml(food):state.tab==='recipes'?recipesHtml(food):state.tab==='history'?historyHtml(food):todayHtml(food);}
+    function loadFood(force){state.loading=true;renderEntry();renderPanel();return callFood(force).then(function(food){state.food=food;state.loading=false;renderEntry();renderPanel();return food;});}
+    function openFood(event){if(event&&event.preventDefault)event.preventDefault();if(event&&event.stopPropagation)event.stopPropagation();var panel=ensurePanel();panel.setAttribute('data-open','1');document.documentElement.style.overflow='hidden';setUrlOpen(true);renderPanel();loadFood(false);}
+    function closeFood(){var panel=ensurePanel();panel.setAttribute('data-open','0');document.documentElement.style.overflow='';setUrlOpen(false);}
+    renderEntry();
+    loadFood(false);
+    var params=new URLSearchParams(window.location.search);if(params.get('section')==='food'||params.get('view')==='food'||params.get('view')==='food-mobile'){setTimeout(openFood,0);}
+  } catch(error){if(window.console&&console.error)console.error('Food integration unavailable: '+String(error&&error.message?error.message:error));}
 })();
 </script>

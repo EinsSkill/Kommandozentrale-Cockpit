@@ -15,11 +15,20 @@ function previewHealthSyncV1() {
 }
 
 function runHealthSyncV1() {
+  var ss = SpreadsheetApp.openById(OPS_SPREADSHEET_ID);
+  authorizeActionV1_(ss, 'health_weather_sync_run', {
+    triggerType: 'SYSTEM_SYNC', directUserAction: false, approvalSatisfied: false,
+    conditionSatisfied: true, reversible: true
+  });
   return healthSyncRunV1_(false);
 }
 
 function setupHealthSyncV1() {
   var ss = SpreadsheetApp.openById(OPS_SPREADSHEET_ID);
+  authorizeActionV1_(ss, 'health_weather_sync_config', {
+    triggerType: 'USER_RUN_FUNCTION', directUserAction: true, approvalSatisfied: true,
+    conditionSatisfied: true, reversible: true
+  });
   var cfg = healthSyncConfigV1_(ss);
   if (!cfg.enabled) {
     return {ok:false, status:'DISABLED', message:'health_sync_enabled ist nicht TRUE.'};

@@ -44,6 +44,11 @@ function previewWeatherSyncV1() {
 }
 
 function runWeatherSyncV1() {
+  var permissionSs = SpreadsheetApp.openById(OPS_SPREADSHEET_ID);
+  authorizeActionV1_(permissionSs, 'health_weather_sync_run', {
+    triggerType: 'SYSTEM_SYNC', directUserAction: false, approvalSatisfied: false,
+    conditionSatisfied: true, reversible: true
+  });
   var lock = LockService.getScriptLock();
   if (!lock.tryLock(5000)) return {ok:false, status:'BUSY', message:'Ein anderer Live-Daten-Lauf ist noch aktiv.'};
   var ss = null;
@@ -112,6 +117,10 @@ function runWeatherSyncV1() {
 
 function setupWeatherSyncV1() {
   var ss = SpreadsheetApp.openById(OPS_SPREADSHEET_ID);
+  authorizeActionV1_(ss, 'health_weather_sync_config', {
+    triggerType: 'USER_RUN_FUNCTION', directUserAction: true, approvalSatisfied: true,
+    conditionSatisfied: true, reversible: true
+  });
   var cfg = weatherConfigV1_(ss);
   if (!cfg.enabled) return {ok:false, status:'DISABLED'};
   if (cfg.latitude == null || cfg.longitude == null) {

@@ -13,7 +13,7 @@ const client = await readFile(join(src, 'CalendarWellbeingEnhancements.html'), '
 const desktop = await readFile(join(src, 'Index.html'), 'utf8');
 const mobile = await readFile(join(src, 'MobileIndex.html'), 'utf8');
 
-test('Code.gs owns the single web entry point and injects the enhancement without modifying design sources', async () => {
+test('Code.gs owns the single web entry point while canonical templates own shared enhancement includes', async () => {
   const gsFiles = (await readdir(src)).filter(name => name.endsWith('.gs'));
   let doGetCount = 0;
   for (const name of gsFiles) {
@@ -21,16 +21,21 @@ test('Code.gs owns the single web entry point and injects the enhancement withou
     doGetCount += (content.match(/function\s+doGet\s*\(/g) || []).length;
   }
   assert.equal(doGetCount, 1);
-  assert.match(code, /createTemplateFromFile\(view\)/);
-  assert.match(code, /CalendarWellbeingEnhancements/);
-  assert.match(code, /rendered\.replace/);
-  assert.match(code, /Heute im Kalender/);
+  const doGet = code.match(/function doGet\(e\) \{([\s\S]*?)\n\}/)?.[0] || '';
+  assert.match(doGet, /createTemplateFromFile\(view\)/);
+  assert.match(doGet, /template\.evaluate\(\)/);
+  assert.doesNotMatch(doGet, /getContent|rendered\.replace|safeIncludeHtml_|Heute im Kalender/);
   assert.doesNotMatch(calendarServer, /function\s+doGet\s*\(/);
   assert.doesNotMatch(wellbeingServer, /function\s+doGet\s*\(/);
+  for (const source of [desktop, mobile]) {
+    assert.equal((source.match(/includeHtml_\('CalendarWellbeingEnhancements'\)/g) || []).length, 1);
+    assert.equal((source.match(/includeHtml_\('FoodTrackingEnhancements'\)/g) || []).length, 1);
+  }
   assert.match(desktop, /Claude Design source SHA-256/);
   assert.match(desktop, /data-kz-calendar-detail-host/);
   assert.match(desktop, /showLedger:dk!=='calendar'/);
   assert.match(mobile, /Claude Mobile Design source SHA-256/);
+  assert.match(mobile, /Kalenderwoche/);
 });
 
 test('calendar endpoint supports day week month and hides Möglichkeiten by default', () => {

@@ -8,7 +8,7 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const index = await readFile(join(root, 'src', 'Index.html'), 'utf8');
 const adapterFile = await readFile(join(root, 'src', 'LiveAdapter.html'), 'utf8');
 const adapterScript = adapterFile.replace(/^\s*<script>\s*/i, '').replace(/\s*<\/script>\s*$/i, '');
-const logic = index.match(/<script type="text\/x-dc"[\s\S]*?>([\s\S]*?)<\/script>\s*<\/body>/i)?.[1];
+const logic = index.match(/<script(?:\s[^>]*)?data-dc-script[^>]*>([\s\S]*?)<\/script>/i)?.[1];
 assert.ok(logic, 'x-dc logic missing');
 
 function harness() {
