@@ -100,8 +100,18 @@ jobs:
                   if p.is_file() and p.suffix.lower() in {'.gs', '.html'}
               }
 
-          repo = runtime_files('src')
-          live = runtime_files('.apps-script-current')
+          def normalize_runtime_names(names, root):
+              prefix = Path(root).as_posix().rstrip('/') + '/'
+              return {
+                  name[len(prefix):] if name.startswith(prefix) else name
+                  for name in names
+              }
+
+          repo = normalize_runtime_names(runtime_files('src'), 'src')
+          live = normalize_runtime_names(runtime_files('.apps-script-current'), '.apps-script-current')
+          print('Sync comparison revision: explicit-runtime-path-normalization-v3')
+          print('Normalized repo files:', sorted(repo))
+          print('Normalized Apps Script files:', sorted(live))
           live_only = sorted(live - repo)
           repo_only = sorted(repo - live)
 
