@@ -10,6 +10,8 @@ const backend = await readFile(join(root, 'src', 'FoodTracking.gs'), 'utf8');
 const entry = await readFile(join(root, 'src', 'FoodTrackingEnhancements.html'), 'utf8');
 const desktop = await readFile(join(root, 'src', 'FoodIndex.html'), 'utf8');
 const mobile = await readFile(join(root, 'src', 'FoodMobileIndex.html'), 'utf8');
+const cockpitDesktop = await readFile(join(root, 'src', 'Index.html'), 'utf8');
+const cockpitMobile = await readFile(join(root, 'src', 'MobileIndex.html'), 'utf8');
 
 test('Food-Tracking definiert den OPS-Datenvertrag', () => {
   assert.match(backend, /const FOOD_SHEETS_V1/);
@@ -27,21 +29,20 @@ test('Food-Tracking definiert den OPS-Datenvertrag', () => {
   assert.match(backend, /protein_estimate/);
 });
 
-test('Ernährung ist als getrennte Desktop-/Mobile-Route eingebunden', () => {
-  assert.match(code, /FoodIndex/);
-  assert.match(code, /FoodMobileIndex/);
-  assert.match(code, /isFoodView/);
-  assert.match(code, /let enhancement = ''/);
-  assert.match(code, /safeIncludeHtml_\(/);
-  assert.match(code, /Logger\.log/);
+test('Ernährung ist in die kanonische Desktop-/Mobile-Route integriert', () => {
+  const doGet = code.match(/function doGet\(e\) \{([\s\S]*?)\n\}/)?.[0] || '';
+  assert.doesNotMatch(doGet, /FoodIndex|FoodMobileIndex|isFoodView/);
+  assert.match(doGet, /requestedView === 'mobile' \|\| requestedView === 'food-mobile'/);
+  assert.match(doGet, /'MobileIndex' : 'Index'/);
+  for (const source of [cockpitDesktop, cockpitMobile]) {
+    assert.match(source, /includeHtml_\('FoodTrackingEnhancements'\)/);
+    assert.match(source, /includeHtml_\('CalendarWellbeingEnhancements'\)/);
+  }
+  // Legacy visual artifacts remain traceable during migration, but are not productive routes.
   assert.match(desktop, /data-screen-label="Ernährung — Desktop"/);
   assert.match(mobile, /data-screen-label="Ernährung — Mobil"/);
-  assert.match(desktop, /includeHtml_\('ClaudeRuntime'\)/);
-  assert.match(mobile, /includeHtml_\('ClaudeRuntime'\)/);
   assert.doesNotMatch(desktop, /support\.js/);
   assert.doesNotMatch(mobile, /support\.js/);
-  assert.match(desktop, /preview/);
-  assert.match(mobile, /preview/);
 });
 
 test('Hauptseite enthält nur einen kompakten Einstieg ohne erfundene Live-Werte', () => {
@@ -51,8 +52,8 @@ test('Hauptseite enthält nur einen kompakten Einstieg ohne erfundene Live-Werte
   assert.match(entry, /food-mobile/);
   assert.doesNotMatch(entry, /FIXTURE|mock|fake|demo/i);
   assert.doesNotMatch(entry, /data-kz-food-entry-nav|ensureNav/);
-  assert.match(entry, /document\.addEventListener\('click'/);
-  assert.match(entry, /aria-label', 'Ernährungsbereich öffnen'/);
+  assert.match(entry, /card\.addEventListener\('click',openFood\)/);
+  assert.match(entry, /aria-label'\s*,\s*'Ernährungsbereich öffnen'/);
 });
 
 test('Backend, Routen und eingebettete Scripts sind syntaktisch parsebar', () => {

@@ -38,7 +38,7 @@ test('Frontend bietet Verlauf, freiwillige Felder und Speichern an', () => {
 
 test('Backend und eingebettetes Frontend sind syntaktisch parsebar', () => {
   assert.doesNotThrow(() => new Function(code));
-  const logic = html.match(/<script type="text\/x-dc"[\s\S]*?>([\s\S]*?)<\/script>\s*<\/body>/i);
+  const logic = html.match(/<script(?:\s[^>]*)?data-dc-script[^>]*>([\s\S]*?)<\/script>/i);
   assert.ok(logic, 'Index.html enthält keinen x-dc-Logikblock');
   const unwrap = source => source.replace(/^\s*<script>\s*/i, '').replace(/\s*<\/script>\s*$/i, '');
   assert.doesNotThrow(() => new Function(logic[1]));

@@ -25,15 +25,21 @@ test('Claude Design source and runtime remain traceable and design-locked', () =
   assert.equal(createHash('sha256').update(match[1]).digest('hex'), '8fe7df74405f3c55f49b7249c74ea1397e65d07dea2b1bd3b4a489bec2e28cbe');
 });
 
-test('Apps Script evaluates the design template and includes both repository-owned fragments', () => {
+test('Apps Script evaluates one canonical desktop/mobile template and templates own shared runtime fragments', () => {
   assert.match(code, /const requestedView = e && e\.parameter \? String\(e\.parameter\.view \|\| ''\) : ''/);
-  assert.match(code, /requestedView === 'mobile' \? 'MobileIndex'/);
-  assert.match(code, /: 'Index';/);
+  assert.match(code, /requestedView === 'mobile' \|\| requestedView === 'food-mobile'/);
+  assert.match(code, /'MobileIndex' : 'Index'/);
   assert.match(code, /createTemplateFromFile\(view\)/);
   assert.match(code, /template\.evaluate\(\)/);
   assert.match(code, /function includeHtml_\(fileName\)/);
-  assert.match(index, /includeHtml_\('ClaudeRuntime'\)/);
-  assert.match(index, /includeHtml_\('LiveAdapter'\)/);
+  const doGet = code.match(/function doGet\(e\) \{([\s\S]*?)\n\}/)?.[0] || '';
+  assert.doesNotMatch(doGet, /getContent|rendered\.replace|FoodIndex|FoodMobileIndex/);
+  for (const source of [index, mobile]) {
+    assert.match(source, /includeHtml_\('ClaudeRuntime'\)/);
+    assert.match(source, /includeHtml_\('LiveAdapter'\)/);
+    assert.match(source, /includeHtml_\('CalendarWellbeingEnhancements'\)/);
+    assert.match(source, /includeHtml_\('FoodTrackingEnhancements'\)/);
+  }
 });
 
 test('live adapter covers every visible source and every authorized cockpit write', () => {

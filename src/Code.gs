@@ -47,41 +47,13 @@ const WELLBEING_INFLUENCES = [
 
 function doGet(e) {
   const requestedView = e && e.parameter ? String(e.parameter.view || '') : '';
-  const view = requestedView === 'food' ? 'FoodIndex'
-    : requestedView === 'food-mobile' ? 'FoodMobileIndex'
-    : requestedView === 'mobile' ? 'MobileIndex'
-    : 'Index';
-  const isFoodView = view === 'FoodIndex' || view === 'FoodMobileIndex';
+  // Legacy food URLs stay compatible, but Food is rendered inside the canonical cockpit.
+  const view = requestedView === 'mobile' || requestedView === 'food-mobile' ? 'MobileIndex' : 'Index';
   const template = HtmlService.createTemplateFromFile(view);
   template.webAppUrl = ScriptApp.getService().getUrl() || '';
-  const evaluated = template.evaluate();
-  let enhancement = '';
-  if (!isFoodView) {
-    enhancement = [
-      safeIncludeHtml_('CalendarWellbeingEnhancements'),
-      safeIncludeHtml_('FoodTrackingEnhancements')
-    ].filter(Boolean).join('\n');
-  }
-  // Mobile currently labels the card "Heute im Kalender"; normalize it so the
-  // shared enhancement layer can address the same calendar surface on both views.
-  const rendered = evaluated.getContent().replace('Heute im Kalender', 'Kalenderwoche');
-  const content = rendered.replace(/<\/body>\s*<\/html>\s*$/i, enhancement + '\n</body>\n</html>');
-  return HtmlService.createHtmlOutput(content)
-    .setTitle(isFoodView ? 'Ernährung · Lukes Kommandozentrale' : 'Lukes Kommandozentrale')
+  return template.evaluate()
+    .setTitle('Lukes Kommandozentrale')
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
-}
-
-/**
- * Reads an optional UI fragment without allowing one missing file to break doGet().
- * The core cockpit must remain available even during partial Apps-Script syncs.
- */
-function safeIncludeHtml_(fileName) {
-  try {
-    return HtmlService.createHtmlOutputFromFile(fileName).getContent();
-  } catch (error) {
-    Logger.log('Optional enhancement unavailable [' + fileName + ']: ' + String(error && error.message ? error.message : error));
-    return '';
-  }
 }
 
 /** Includes repository-owned HTML fragments into the evaluated Apps-Script template. */

@@ -11,7 +11,7 @@ const index = await readFile(join(root, 'src', 'Index.html'), 'utf8');
 const code = await readFile(join(root, 'src', 'Code.gs'), 'utf8');
 const adapterFile = await readFile(join(root, 'src', 'LiveAdapter.html'), 'utf8');
 const adapterScript = adapterFile.replace(/^\s*<script>\s*/i, '').replace(/\s*<\/script>\s*$/i, '');
-const logic = mobile.match(/<script type="text\/x-dc"[\s\S]*?>([\s\S]*?)<\/script>\s*<\/body>/i)?.[1];
+const logic = mobile.match(/<script(?:\s[^>]*)?data-dc-script[^>]*>([\s\S]*?)<\/script>/i)?.[1];
 assert.ok(logic, 'mobile x-dc logic missing');
 
 test('mobile Claude source is retained and routed without external support.js', () => {
@@ -29,8 +29,8 @@ test('mobile Claude source is retained and routed without external support.js', 
   const style = mobile.match(/<style>([\s\S]*?)<\/style>/)?.[1];
   assert.ok(style, 'mobile Claude stylesheet missing');
   assert.equal(createHash('sha256').update(style).digest('hex'), '5adc33a567a3c3f99c247ecdbd7619a085d84a26cd23af492e03a8777fbd4f3a');
-  assert.match(code, /requestedView === 'mobile' \? 'MobileIndex'/);
-  assert.match(code, /: 'Index';/);
+  assert.match(code, /requestedView === 'mobile' \|\| requestedView === 'food-mobile'/);
+  assert.match(code, /'MobileIndex' : 'Index'/);
   assert.match(code, /template\.webAppUrl = ScriptApp\.getService\(\)\.getUrl\(\)/);
   assert.match(index, /searchParams\.set\('view', 'mobile'\)/);
   assert.match(index, /publishedUrl = '[^']*webAppUrl[^']*'/);
