@@ -42,9 +42,9 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 20.20.2
 
-      - name: Validate required secrets
+      - name: Validate and normalize clasp authentication
         env:
           APPS_SCRIPT_ID: ${{ secrets.APPS_SCRIPT_ID }}
           CLASPRC_JSON: ${{ secrets.CLASPRC_JSON }}
@@ -54,8 +54,88 @@ jobs:
           test -n "$APPS_SCRIPT_ID" || { echo "Secret APPS_SCRIPT_ID fehlt." >&2; exit 1; }
           test -n "$CLASPRC_JSON" || { echo "Secret CLASPRC_JSON fehlt." >&2; exit 1; }
           mkdir -p "$HOME"
-          printf '%s' "$CLASPRC_JSON" > "$HOME/.clasprc.json"
-          chmod 600 "$HOME/.clasprc.json"
+          python - <<'PY'
+          import base64
+          import json
+          import os
+          from pathlib import Path
+
+          raw = os.environ.get('CLASPRC_JSON', '').strip()
+          if not raw:
+              raise SystemExit('Secret CLASPRC_JSON ist leer.')
+
+          candidates = []
+
+          def add(value):
+              if value and value not in candidates:
+                  candidates.append(value)
+
+          add(raw)
+
+          # Common copy/paste wrappers.
+          if raw.startswith('```') and raw.endswith('```'):
+              inner = raw.strip('`').strip()
+              if inner.lower().startswith('json'):
+                  inner = inner[4:].lstrip()
+              add(inner)
+          if len(raw) >= 2 and raw[0] == raw[-1] == "'":
+              add(raw[1:-1].strip())
+
+          # Also accept a base64 encoded JSON secret for future rotations.
+          try:
+              decoded = base64.b64decode(raw, validate=True).decode('utf-8').strip()
+              add(decoded)
+          except Exception:
+              pass
+
+          parsed = None
+          last_error = None
+          for candidate in candidates:
+              value = candidate
+              for _ in range(3):
+                  try:
+                      value = json.loads(value)
+                  except json.JSONDecodeError as exc:
+                      last_error = exc
+                      break
+                  if isinstance(value, str):
+                      value = value.strip()
+                      continue
+                  if isinstance(value, dict):
+                      parsed = value
+                  break
+              if parsed is not None:
+                  break
+
+          if parsed is None:
+              detail = ''
+              if last_error is not None:
+                  detail = f' (JSON-Fehler bei Zeichen {last_error.pos}: {last_error.msg})'
+              raise SystemExit(
+                  'CLASPRC_JSON ist kein gültiges JSON' + detail + '. '
+                  'Bitte den vollständigen Inhalt einer echten .clasprc.json als GitHub Secret speichern.'
+              )
+
+          # clasp 3.x: {"tokens":{"default":{...}}}
+          v3 = isinstance(parsed.get('tokens'), dict) and bool(parsed.get('tokens'))
+          # clasp legacy local: {"token":{...},"oauth2ClientSettings":{...}}
+          legacy_local = isinstance(parsed.get('token'), dict) and isinstance(parsed.get('oauth2ClientSettings'), dict)
+          # clasp legacy global: top-level refresh_token/access_token
+          legacy_global = bool(parsed.get('refresh_token') or parsed.get('access_token'))
+
+          if not (v3 or legacy_local or legacy_global):
+              safe_keys = ', '.join(sorted(str(k) for k in parsed.keys())) or '(keine)'
+              raise SystemExit(
+                  'CLASPRC_JSON ist gültiges JSON, aber kein erkennbares clasp-Auth-Format. '
+                  f'Gefundene Top-Level-Felder: {safe_keys}. '
+                  'Benötigt wird der Inhalt der von clasp erzeugten .clasprc.json, nicht nur eine OAuth client_secret.json.'
+              )
+
+          target = Path.home() / '.clasprc.json'
+          target.write_text(json.dumps(parsed, indent=2), encoding='utf-8')
+          target.chmod(0o600)
+          print('clasp-Authentifizierung syntaktisch und strukturell validiert.')
+          PY
 
       - name: Pull current Apps Script HEAD safely
         env:
