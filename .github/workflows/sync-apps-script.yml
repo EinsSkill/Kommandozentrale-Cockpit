@@ -1,0 +1,194 @@
+name: Sync Apps Script (manual)
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "check = nur vergleichen, push = GitHub src nach Apps Script HEAD synchronisieren"
+        required: true
+        default: check
+        type: choice
+        options:
+          - check
+          - push
+      allow_live_only_deletions:
+        description: "Nur aktivieren, wenn live-only Dateien bewusst entfernt werden dürfen"
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  group: apps-script-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Require main branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ "${GITHUB_REF}" != "refs/heads/main" ]]; then
+            echo "Apps-Script-Sync darf nur von main gestartet werden. Aktuell: ${GITHUB_REF}" >&2
+            exit 1
+          fi
+
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Validate required secrets
+        env:
+          APPS_SCRIPT_ID: ${{ secrets.APPS_SCRIPT_ID }}
+          CLASPRC_JSON: ${{ secrets.CLASPRC_JSON }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$APPS_SCRIPT_ID" || { echo "Secret APPS_SCRIPT_ID fehlt." >&2; exit 1; }
+          test -n "$CLASPRC_JSON" || { echo "Secret CLASPRC_JSON fehlt." >&2; exit 1; }
+          mkdir -p "$HOME"
+          printf '%s' "$CLASPRC_JSON" > "$HOME/.clasprc.json"
+          chmod 600 "$HOME/.clasprc.json"
+
+      - name: Pull current Apps Script HEAD safely
+        env:
+          APPS_SCRIPT_ID: ${{ secrets.APPS_SCRIPT_ID }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf .apps-script-current .apps-script-verify
+          mkdir -p .apps-script-current .apps-script-verify
+          cat > .clasp.json <<JSON
+          {
+            "scriptId": "$APPS_SCRIPT_ID",
+            "rootDir": ".apps-script-current",
+            "fileExtension": "gs"
+          }
+          JSON
+          npx --yes @google/clasp@3.1.3 pull
+          test -f .apps-script-current/appsscript.json || {
+            echo "Aktuelles Apps-Script-Manifest konnte nicht gelesen werden." >&2
+            exit 1
+          }
+
+      - name: Check for live-only runtime files
+        id: live_only
+        env:
+          ALLOW_DELETE: ${{ inputs.allow_live_only_deletions }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          import os
+
+          def runtime_files(root):
+              root = Path(root)
+              return {
+                  str(p.relative_to(root)).replace('\\', '/')
+                  for p in root.rglob('*')
+                  if p.is_file() and p.suffix.lower() in {'.gs', '.html'}
+              }
+
+          repo = runtime_files('src')
+          live = runtime_files('.apps-script-current')
+          live_only = sorted(live - repo)
+          repo_only = sorted(repo - live)
+
+          print(f'Repo runtime files: {len(repo)}')
+          print(f'Apps Script runtime files: {len(live)}')
+          if repo_only:
+              print('Werden beim Push hinzugefügt/aktualisiert:')
+              for name in repo_only:
+                  print(f'  + {name}')
+          if live_only:
+              print('Nur live vorhanden:')
+              for name in live_only:
+                  print(f'  - {name}')
+              if os.environ.get('ALLOW_DELETE', '').lower() != 'true':
+                  raise SystemExit('Abbruch: live-only Dateien würden beim vollständigen Push gelöscht. Erst prüfen oder allow_live_only_deletions aktivieren.')
+          PY
+
+      - name: Check only
+        if: ${{ inputs.mode == 'check' }}
+        shell: bash
+        run: |
+          echo "CHECK erfolgreich. Es wurde nichts in Apps Script verändert."
+
+      - name: Prepare exact repository payload
+        if: ${{ inputs.mode == 'push' }}
+        env:
+          APPS_SCRIPT_ID: ${{ secrets.APPS_SCRIPT_ID }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp .apps-script-current/appsscript.json src/appsscript.json
+          cat > .clasp.json <<JSON
+          {
+            "scriptId": "$APPS_SCRIPT_ID",
+            "rootDir": "src",
+            "fileExtension": "gs"
+          }
+          JSON
+          npx --yes @google/clasp@3.1.3 status
+
+      - name: Push GitHub src to Apps Script HEAD
+        if: ${{ inputs.mode == 'push' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx --yes @google/clasp@3.1.3 push --force
+
+      - name: Verify Apps Script HEAD after push
+        if: ${{ inputs.mode == 'push' }}
+        env:
+          APPS_SCRIPT_ID: ${{ secrets.APPS_SCRIPT_ID }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > .clasp.json <<JSON
+          {
+            "scriptId": "$APPS_SCRIPT_ID",
+            "rootDir": ".apps-script-verify",
+            "fileExtension": "gs"
+          }
+          JSON
+          npx --yes @google/clasp@3.1.3 pull
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib
+
+          def runtime_map(root):
+              root = Path(root)
+              result = {}
+              for p in root.rglob('*'):
+                  if p.is_file() and p.suffix.lower() in {'.gs', '.html'}:
+                      rel = str(p.relative_to(root)).replace('\\', '/')
+                      result[rel] = hashlib.sha256(p.read_bytes()).hexdigest()
+              return result
+
+          expected = runtime_map('src')
+          actual = runtime_map('.apps-script-verify')
+          if expected != actual:
+              missing = sorted(set(expected) - set(actual))
+              extra = sorted(set(actual) - set(expected))
+              changed = sorted(k for k in set(expected) & set(actual) if expected[k] != actual[k])
+              print('Missing:', missing)
+              print('Extra:', extra)
+              print('Changed:', changed)
+              raise SystemExit('Apps-Script-Verifikation fehlgeschlagen: HEAD entspricht nicht exakt GitHub src.')
+          print(f'Verifiziert: {len(expected)} Runtime-Dateien entsprechen exakt GitHub src.')
+          PY
+
+      - name: Deployment remains manual
+        if: ${{ inputs.mode == 'push' }}
+        shell: bash
+        run: |
+          echo "Apps Script HEAD wurde synchronisiert. Keine Web-App-Version wurde erstellt oder deployed."
