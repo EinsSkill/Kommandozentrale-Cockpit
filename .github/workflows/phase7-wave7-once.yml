@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   apply-once:
-    if: github.actor != 'github-actions[bot]' && contains(github.event.head_commit.message, 'chore: arm Phase 7 Wave 7 one-shot')
+    if: "${{ github.actor != 'github-actions[bot]' }}"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
