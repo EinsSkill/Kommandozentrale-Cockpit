@@ -13,7 +13,7 @@ const OPS_SPREADSHEET_ID = PropertiesService.getScriptProperties().getProperty('
 const TZ = 'Europe/Berlin';
 const CACHE_CORE = 'KZ_V3_CORE';
 const CACHE_MAIL = 'KZ_V34_EMAIL_REFS';
-const CACHE_BASE_V31 = 'KZ_V31_BASE';
+const CACHE_BASE_V31 = 'KZ_V31_BASE_LIVE_HOTFIX_1';
 const CACHE_FIN_V31 = 'KZ_V31_FIN';
 const CACHE_FIN_V33 = 'KZ_V33_FIN';
 const CACHE_HEALTH_V31 = 'KZ_V31_HEALTH';
@@ -87,9 +87,27 @@ function getDashboardBaseV31(force) {
     safeAssign_(out, 'alerts', function(){ return getAlerts_(rd); }, []);
     safeAssign_(out, 'syncState', function(){ return rd.rows('SYNC_STATE'); }, []);
     safeAssign_(out, 'goals', function(){ return getGoals_(rd); }, []);
+    out.runtimeVersion = 'PHASE7_LIVE_HOTFIX_1';
+    out.integrity = dashboardBaseIntegrityV1_(rd);
     out.timingMs = new Date().getTime() - started;
     return out;
   });
+}
+
+function dashboardBaseIntegrityV1_(rd) {
+  const tasks = rd.rows('TASKS');
+  const projects = rd.rows('PROJECTS');
+  const briefings = rd.rows('BRIEFINGS');
+  const weather = rd.rows('WEATHER_CURRENT');
+  const normalized = value => String(value == null ? '' : value).trim().toUpperCase();
+  const archived = row => truthy_(row && row.archived);
+  return {
+    rawTaskRows: tasks.filter(row => row.task_id).length,
+    openTaskCandidates: tasks.filter(row => row.task_id && !archived(row) && !['DONE','CANCELLED'].includes(normalized(row.status))).length,
+    activeProjectCandidates: projects.filter(row => row.project_id && !archived(row) && normalized(row.status) === 'ACTIVE').length,
+    successfulBriefings: briefings.filter(row => row.briefing_id && normalized(row.generation_status) === 'SUCCESS').length,
+    weatherSnapshots: weather.filter(row => row.weather_id).length
+  };
 }
 
 function getFinanceV31(force) {
