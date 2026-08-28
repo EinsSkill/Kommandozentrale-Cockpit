@@ -46,7 +46,7 @@ test('real endpoint-shaped payloads flow through the adapter into Claude Design 
   Object.keys(adapter.loads).forEach(key => { adapter.loads[key] = { state: 'ok', ms: 12, error: '' }; });
 
   adapter.applyBase({
-    runtimeVersion: 'PHASE7_LIVE_HOTFIX_1',
+    runtimeVersion: 'PHASE7_LIVE_HOTFIX_2',
     integrity: { openTaskCandidates: 1, activeProjectCandidates: 1, successfulBriefings: 1, weatherSnapshots: 1 },
     tasks: [{ id: 'TASK_1', title: 'Live-Aufgabe', status: 'OPEN', aiPriority: 88, deadline: '2026-08-22', dueLabel: 'Heute', nextAction: 'Live-Schritt', estimatedMinutes: 45 }],
     projects: [{ id: 'PROJECT_1', title: 'Live-Projekt', progress: 42, health: 'YELLOW', blocker: 'Live-Blocker' }],
@@ -116,12 +116,12 @@ test('real endpoint-shaped payloads flow through the adapter into Claude Design 
 test('base integrity rejects a green-but-empty canonical payload', () => {
   const { adapter } = harness();
   assert.match(adapter.baseIntegrityProblem({
-    runtimeVersion: 'PHASE7_LIVE_HOTFIX_1',
+    runtimeVersion: 'PHASE7_LIVE_HOTFIX_2',
     integrity: { openTaskCandidates: 12, activeProjectCandidates: 6, successfulBriefings: 4, weatherSnapshots: 1 },
     tasks: [], projects: [], briefing: null, weather: { current: null }
   }), /offene Tasks fehlen.*aktive Projekte fehlen.*Briefing fehlt.*Wetter-Snapshot fehlt/);
   assert.equal(adapter.baseIntegrityProblem({
-    runtimeVersion: 'PHASE7_LIVE_HOTFIX_1',
+    runtimeVersion: 'PHASE7_LIVE_HOTFIX_2',
     integrity: { openTaskCandidates: 0, activeProjectCandidates: 0, successfulBriefings: 0, weatherSnapshots: 0 },
     tasks: [], projects: [], briefing: null, weather: { current: null }
   }), '');
@@ -130,7 +130,7 @@ test('base integrity rejects a green-but-empty canonical payload', () => {
 test('cached live data is replayed into a replacement component after a runtime remount', () => {
   const first = harness();
   first.adapter.applyBase({
-    runtimeVersion: 'PHASE7_LIVE_HOTFIX_1',
+    runtimeVersion: 'PHASE7_LIVE_HOTFIX_2',
     integrity: { openTaskCandidates: 1, activeProjectCandidates: 1, successfulBriefings: 1, weatherSnapshots: 1 },
     tasks: [{ id: 'TASK_REPLAY', title: 'Replay-Aufgabe', status: 'OPEN', aiPriority: 90 }],
     projects: [{ id: 'PROJ_REPLAY', title: 'Replay-Projekt', status: 'ACTIVE' }],
