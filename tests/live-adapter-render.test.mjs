@@ -26,6 +26,14 @@ function harness() {
   return { window, component, adapter: window.KZLive };
 }
 
+test('empty OPS response is distinguished from a backend version mismatch', () => {
+  const { adapter } = harness();
+  assert.match(adapter.baseIntegrityProblem(null), /OPS-Antwort ist leer/);
+  assert.match(adapter.baseIntegrityProblem(undefined), /OPS-Antwort ist leer/);
+  assert.match(adapter.baseIntegrityProblem({ runtimeVersion: 'OLD' }), /OPS-Backend-Stand OLD/);
+  assert.equal(adapter.baseIntegrityProblem({ runtimeVersion: 'PHASE7_LIVE_HOTFIX_2' }), '');
+});
+
 test('empty live state renders without fabricated fallback records', () => {
   const { component } = harness();
   component.state.p = 1;
