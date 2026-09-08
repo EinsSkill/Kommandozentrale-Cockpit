@@ -21,8 +21,9 @@ test('Apps Script sync keeps deployment separate', () => {
 });
 
 test('Apps Script sync preserves manifest and verifies exact runtime content', () => {
-  assert.match(workflow, /\.apps-script-current\/appsscript\.json/);
-  assert.match(workflow, /cp \.apps-script-current\/appsscript\.json src\/appsscript\.json/);
+  assert.match(workflow, /find \.apps-script-current -type f -iname 'appsscript\.json' -print -quit/);
+  assert.match(workflow, /test -n "\$MANIFEST_PATH"/);
+  assert.match(workflow, /cp "\$MANIFEST_PATH" src\/appsscript\.json/);
   assert.match(workflow, /live-only Dateien würden beim vollständigen Push gelöscht/);
   assert.match(workflow, /Apps-Script-Verifikation fehlgeschlagen/);
   assert.match(workflow, /"scriptExtensions": \["\.gs"\]/);
