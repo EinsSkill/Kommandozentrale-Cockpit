@@ -145,6 +145,7 @@
     },
 
     baseIntegrityProblem(value) {
+      if (value == null) return 'OPS-Antwort ist leer. Datenübertragung oder bereitgestellte Backend-Version prüfen.';
       if (!value || value.runtimeVersion !== 'PHASE7_LIVE_HOTFIX_2') return 'OPS-Backend-Stand ' + text(value && value.runtimeVersion || 'UNBEKANNT') + ' passt nicht zu PHASE7_LIVE_HOTFIX_2.';
       const integrity = value.integrity || {};
       const problems = [];

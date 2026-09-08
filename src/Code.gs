@@ -946,7 +946,17 @@ function table_(sh){
 function setByHeader_(sh,table,rowIndex,header,value){if(table.index[header]==null)return;sh.getRange(rowIndex,table.index[header]+1).setValue(value);}
 function appendAudit_(ss,data){const sh=ss.getSheetByName('AUDIT_LOG');if(!sh)return;const input=Object.assign({},data||{});input.permission_class=assertAuditPermissionClassV1_(input.permission_class);const t=table_(sh),headers=t.headers,stamp=isoLocal_(new Date()),id='AUDIT_'+Utilities.formatDate(new Date(),TZ,'yyyyMMdd_HHmmss_SSS'),record=Object.assign({audit_id:id,timestamp:stamp,actor:'USER',error_message:'',rollback_reference:''},input);sh.appendRow(headers.map(h=>record[h]!=null?record[h]:''));}
 
-function cachedJson_(key,seconds,force,producer){const c=CacheService.getScriptCache();if(!force){const raw=c.get(key);if(raw){try{return JSON.parse(raw);}catch(e){}}}const value=producer();try{const raw=JSON.stringify(value);if(raw.length<95000)c.put(key,raw,seconds);}catch(e){}return value;}
+function cachedJson_(key,seconds,force,producer){
+  const c=CacheService.getScriptCache();
+  if(!force){const raw=c.get(key);if(raw){try{return JSON.parse(raw);}catch(e){}}}
+  // google.script.run rejects Date objects, including nested Sheet values.
+  // Normalize fresh/forced responses exactly like cache hits, even if caching fails
+  // or the payload exceeds the cache limit. Do not return the raw producer object.
+  const raw=JSON.stringify(producer());
+  const value=JSON.parse(raw);
+  try{if(raw.length<95000)c.put(key,raw,seconds);}catch(e){}
+  return value;
+}
 function invalidateWellbeing_(){
   CacheService.getScriptCache().remove(CACHE_WELLBEING_V1);
 }
